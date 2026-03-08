@@ -1,0 +1,169 @@
+@import "primeicons/primeicons.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap');
+
+/* ─── Base ───────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #F7F7F5;
+  color: #0A0A0A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+.luxury-font {
+  font-family: 'Playfair Display', serif;
+}
+
+/* ─── Scrollbar ──────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0F0EE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 2px;
+}
+
+/* ─── Color Tokens ───────────────────────── */
+:root {
+  --color-primary: #D4AF37;
+  --color-black: #0A0A0A;
+  --color-white: #FFFFFF;
+  --color-bg: #F7F7F5;
+  --color-surface: #FFFFFF;
+  --color-border: #E8E8E4;
+  --color-muted: #6B6B6B;
+}
+
+/* ─── Tailwind Custom Color ──────────────── */
+.text-primary {
+  color: #D4AF37;
+}
+
+.bg-primary {
+  background-color: #D4AF37;
+}
+
+.border-primary {
+  border-color: #D4AF37;
+}
+
+/* ─── Reusable Buttons ───────────────────── */
+.btn-luxury {
+  @apply inline-flex items-center justify-center gap-2 bg-black text-white text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 transition-all duration-300 hover:bg-[#D4AF37] hover:text-black;
+}
+
+.btn-luxury-outline {
+  @apply inline-flex items-center justify-center gap-2 bg-transparent text-black text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 border border-black transition-all duration-300 hover:bg-black hover:text-white;
+}
+
+.btn-gold {
+  @apply inline-flex items-center justify-center gap-2 bg-[#D4AF37] text-black text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 transition-all duration-300 hover:bg-black hover:text-white;
+}
+
+/* ─── Cards ──────────────────────────────── */
+.premium-card {
+  @apply bg-white border border-[#E8E8E4] shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+/* ─── Inputs ─────────────────────────────── */
+.luxury-input {
+  @apply w-full bg-gray-50 border border-gray-200 focus:border-black text-black px-4 py-3 text-sm outline-none transition-colors duration-200 placeholder-gray-300 rounded-none;
+}
+
+/* ─── Animations ─────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease both;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #F0F0EE 25%, #E4E4E0 50%, #F0F0EE 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── PrimeNG Overrides ──────────────────── */
+.p-paginator {
+  background: transparent !important;
+}
+
+.p-datatable .p-datatable-thead>tr>th {
+  background: #F7F7F5 !important;
+  color: #6B6B6B !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em !important;
+  font-weight: 700 !important;
+  border-bottom: 1px solid #E8E8E4 !important;
+}
+
+.p-datatable .p-datatable-tbody>tr>td {
+  border-bottom: 1px solid #F0F0EE !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.p-datatable .p-datatable-tbody>tr:hover {
+  background: #FAFAF8 !important;
+}
