@@ -14,6 +14,14 @@ export class OutfitService {
         return this.http.get<any[]>(`${environment.apiUrl}/outfits/`);
     }
 
+    getTrendingOutfits(limit: number = 100): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/outfits/trending?limit=${limit}`);
+    }
+
+    searchExternalProducts(keyword: string, platform: string = 'amazon', limit: number = 10): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/outfits/search/products?keyword=${keyword}&platform=${platform}&limit=${limit}`);
+    }
+
     importProduct(data: { url: string, category: string, color: string, brand: string }): Observable<any> {
         return this.http.post<any>(`${environment.apiUrl}/admin/import`, data);
     }
