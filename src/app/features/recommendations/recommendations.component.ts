@@ -12,8 +12,8 @@ import { OutfitService } from '../../core/services/outfit.service';
   template: `
     <div class="min-h-screen bg-[#FDFDFB] pb-24">
 
-      <!-- Premium Sticky Header -->
-      <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#E8E8E4] pt-24 pb-6 transition-all duration-500">
+      <!-- Premium Sticky Header - Adjusted for Global Header (80px) -->
+      <div class="sticky top-[80px] z-[40] bg-white/80 backdrop-blur-xl border-b border-[#E8E8E4] pt-8 pb-6 transition-all duration-500">
         <div class="max-w-7xl mx-auto px-6 sm:px-10">
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div class="space-y-3">
@@ -61,9 +61,10 @@ import { OutfitService } from '../../core/services/outfit.service';
       </div>
 
       <div class="max-w-7xl mx-auto px-6 sm:px-10 py-12">
+        <div id="top-of-grid" class="scroll-mt-[350px]"></div>
 
         <!-- Search Results Grid -->
-        <div *ngIf="searchResults.length > 0" class="mb-24 animate-fade-in">
+        <div *ngIf="searchResults.length > 0" id="search-results" class="mb-24 animate-fade-in scroll-mt-[350px]">
           <div class="flex items-end justify-between mb-12 border-b border-[#E8E8E4] pb-6">
             <div>
               <p class="text-[9px] uppercase tracking-[0.4em] text-[#D4AF37] font-bold mb-3">Instant Discovery</p>
@@ -74,7 +75,7 @@ import { OutfitService } from '../../core/services/outfit.service';
               Clear Discovery
             </button>
           </div>
-
+          <!-- ... grid continues -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
             <div *ngFor="let outfit of searchResults; let i = index"
               class="group animate-fade-in-up"
@@ -116,7 +117,7 @@ import { OutfitService } from '../../core/services/outfit.service';
         </div>
 
         <!-- Main Product Feed -->
-        <div *ngIf="filteredTrending.length > 0" class="space-y-16">
+        <div *ngIf="filteredTrending.length > 0" id="product-feed" class="space-y-16 scroll-mt-[350px]">
           <div class="text-center space-y-4 animate-fade-in">
             <p class="text-[10px] uppercase tracking-[0.5em] text-[#D4AF37] font-bold">The Edit</p>
             <h2 class="text-4xl luxury-font text-black">{{ activeCategory }} <span class="italic text-[#D4AF37]">Essentials</span></h2>
@@ -195,6 +196,11 @@ import { OutfitService } from '../../core/services/outfit.service';
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    
+    /* Ensure smooth transitions for category changes */
+    .scroll-mt-[280px] {
+      scroll-margin-top: 280px;
+    }
   `]
 })
 export class RecommendationsComponent implements OnInit {
@@ -231,7 +237,10 @@ export class RecommendationsComponent implements OnInit {
 
   setActiveCategory(category: string) {
     this.activeCategory = category;
-    window.scrollTo({ top: 400, behavior: 'smooth' });
+    setTimeout(() => {
+      const el = document.getElementById('top-of-grid');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   searchExternal() {
@@ -247,7 +256,7 @@ export class RecommendationsComponent implements OnInit {
         this.isSearching = false;
         this.searchQuery = '';
         setTimeout(() => {
-          const el = document.querySelector('.animate-fade-in');
+          const el = document.getElementById('search-results');
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
       },
