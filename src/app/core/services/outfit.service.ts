@@ -44,30 +44,4 @@ export class OutfitService {
         return this.http.delete(`${environment.apiUrl}/outfits/${id}`);
     }
 
-    /**
-     * Fetch a blob from Azure via the backend proxy and return as base64 data URL.
-     * Usage: getProfileImage(blobName, bucket) -> base64 string for <img [src]="...">
-     *
-     * @param blobName  Full blob path e.g. "outfits/uuid_shirt.jpg"
-     * @param bucket    Bucket label e.g. "azure~careai-emr-transcription"
-     */
-    getBlobAsBase64(blobName: string, bucket: string): Observable<string> {
-        const params = new URLSearchParams({ blob_name: blobName, bucket });
-        return this.http
-            .get(`${environment.apiUrl}/storage/blob?${params.toString()}`, {
-                responseType: 'blob'
-            })
-            .pipe(
-                switchMap((blob: Blob) => from(this.convertBlobToBase64(blob)))
-            );
-    }
-
-    private convertBlobToBase64(blob: Blob): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
 }

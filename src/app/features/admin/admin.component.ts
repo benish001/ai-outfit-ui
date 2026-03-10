@@ -11,11 +11,11 @@ import { MessageService } from 'primeng/api';
 import { LucideAngularModule, Plus, Trash2, ExternalLink, X, ShieldCheck, Package, Sparkles } from 'lucide-angular';
 
 @Component({
-   selector: 'app-admin',
-   standalone: true,
-   imports: [CommonModule, ReactiveFormsModule, InputText, InputNumber, Select, TableModule, Toast, LucideAngularModule],
-   providers: [MessageService],
-   template: `
+  selector: 'app-admin',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, InputText, InputNumber, Select, TableModule, Toast, LucideAngularModule],
+  providers: [MessageService],
+  template: `
     <div class="min-h-screen bg-[#F7F7F5] pt-20 pb-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
@@ -230,156 +230,149 @@ import { LucideAngularModule, Plus, Trash2, ExternalLink, X, ShieldCheck, Packag
   `
 })
 export class AdminComponent implements OnInit {
-   private fb = inject(FormBuilder);
-   private outfitService = inject(OutfitService);
-   private messageService = inject(MessageService);
+  private fb = inject(FormBuilder);
+  private outfitService = inject(OutfitService);
+  private messageService = inject(MessageService);
 
-   readonly PlusIcon = Plus;
-   readonly TrashIcon = Trash2;
-   readonly LinkIcon = ExternalLink;
-   readonly CloseIcon = X;
-   readonly ShieldIcon = ShieldCheck;
-   readonly PackageIcon = Package;
-   readonly SparklesIcon = Sparkles;
+  readonly PlusIcon = Plus;
+  readonly TrashIcon = Trash2;
+  readonly LinkIcon = ExternalLink;
+  readonly CloseIcon = X;
+  readonly ShieldIcon = ShieldCheck;
+  readonly PackageIcon = Package;
+  readonly SparklesIcon = Sparkles;
 
-   showForm = false;
-   showImport = false;
-   isLoading = false;
-   outfits: any[] = [];
-   selectedFile: File | null = null;
-   imagePreview: string | null = null;
+  showForm = false;
+  showImport = false;
+  isLoading = false;
+  outfits: any[] = [];
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
 
-   categories = ['Shirts', 'T-Shirts', 'Trousers', 'Dresses', 'Suits', 'Jackets', 'Skirts', 'Accessories'];
-   colors = ['White', 'Black', 'Blue', 'Navy', 'Gray', 'Beige', 'Brown', 'Red', 'Pink', 'Green', 'Olive', 'Maroon', 'Yellow', 'Light Blue'];
+  categories = ['Shirts', 'T-Shirts', 'Trousers', 'Dresses', 'Suits', 'Jackets', 'Skirts', 'Accessories'];
+  colors = ['White', 'Black', 'Blue', 'Navy', 'Gray', 'Beige', 'Brown', 'Red', 'Pink', 'Green', 'Olive', 'Maroon', 'Yellow', 'Light Blue'];
 
-   outfitForm: FormGroup = this.fb.group({
-      name: ['', Validators.required],
-      category: ['Shirts', Validators.required],
-      color: ['White', Validators.required],
-      brand: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(1)]],
-      affiliate_link: ['', Validators.required]
-   });
+  outfitForm: FormGroup = this.fb.group({
+    name: ['', Validators.required],
+    category: ['Shirts', Validators.required],
+    color: ['White', Validators.required],
+    brand: ['', Validators.required],
+    price: [0, [Validators.required, Validators.min(1)]],
+    affiliate_link: ['', Validators.required]
+  });
 
-   importForm: FormGroup = this.fb.group({
-      url: ['', [Validators.required, Validators.pattern('https?://.*')]],
-      category: ['Shirts', Validators.required],
-      color: ['White', Validators.required],
-      brand: ['']
-   });
+  importForm: FormGroup = this.fb.group({
+    url: ['', [Validators.required, Validators.pattern('https?://.*')]],
+    category: ['Shirts', Validators.required],
+    color: ['White', Validators.required],
+    brand: ['']
+  });
 
-   ngOnInit() { this.loadOutfits(); }
+  ngOnInit() { this.loadOutfits(); }
 
-   toggleImportMode() {
-      this.showImport = !this.showImport;
-      if (this.showImport) this.showForm = false;
-   }
+  toggleImportMode() {
+    this.showImport = !this.showImport;
+    if (this.showImport) this.showForm = false;
+  }
 
-   toggleAddMode() {
-      this.showForm = !this.showForm;
-      if (this.showForm) this.showImport = false;
-   }
+  toggleAddMode() {
+    this.showForm = !this.showForm;
+    if (this.showForm) this.showImport = false;
+  }
 
-   loadOutfits() {
-      this.outfitService.getOutfits().subscribe({
-         next: (data: any[]) => {
-            this.outfits = data;
-            this.outfits.forEach(outfit => {
-               if (outfit.blob_name && outfit.bucket_name) {
-                  this.outfitService.getBlobAsBase64(outfit.blob_name, outfit.bucket_name).subscribe({
-                     next: (b64) => outfit.base64Image = b64,
-                     error: () => outfit.base64Image = outfit.image_url
-                  });
-               } else {
-                  outfit.base64Image = outfit.image_url;
-               }
-            });
-         },
-         error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load outfits' })
-      });
-   }
+  loadOutfits() {
+    this.outfitService.getOutfits().subscribe({
+      next: (data: any[]) => {
+        this.outfits = data.map(outfit => ({
+          ...outfit,
+          base64Image: outfit.image_url
+        }));
+      },
+      error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load outfits' })
+    });
+  }
 
-   onFileSelected(event: any) {
-      const file = event.target.files[0];
-      if (file) {
-         this.selectedFile = file;
-         const reader = new FileReader();
-         reader.onload = () => this.imagePreview = reader.result as string;
-         reader.readAsDataURL(file);
-      }
-   }
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => this.imagePreview = reader.result as string;
+      reader.readAsDataURL(file);
+    }
+  }
 
-   onSubmit() {
-      if (this.outfitForm.valid && this.selectedFile) {
-         this.isLoading = true;
-         const formData = new FormData();
-         Object.keys(this.outfitForm.value).forEach(k => formData.append(k, this.outfitForm.value[k]));
-         formData.append('image', this.selectedFile);
-         this.outfitService.uploadOutfit(formData).subscribe({
-            next: () => {
-               this.isLoading = false;
-               this.showForm = false;
-               this.outfitForm.reset({ category: 'Shirts', color: 'White', price: 0 });
-               this.imagePreview = null;
-               this.selectedFile = null;
-               this.messageService.add({ severity: 'success', summary: 'Done', detail: 'Outfit added to catalog' });
-               this.loadOutfits();
-            },
-            error: () => { this.isLoading = false; this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save outfit' }); }
-         });
-      } else if (!this.selectedFile) {
-         this.messageService.add({ severity: 'warn', summary: 'Missing Image', detail: 'Please select an image file' });
-      }
-   }
-
-   onImportSubmit() {
-      if (this.importForm.valid) {
-         this.isLoading = true;
-         this.outfitService.importProduct(this.importForm.value).subscribe({
-            next: () => {
-               this.isLoading = false;
-               this.showImport = false;
-               this.importForm.reset({ category: 'Shirts', color: 'White' });
-               this.messageService.add({ severity: 'success', summary: 'Imported', detail: 'Product fetched and added to catalog' });
-               this.loadOutfits();
-            },
-            error: (err) => {
-               this.isLoading = false;
-               this.messageService.add({ severity: 'error', summary: 'Import Failed', detail: err.error?.detail || 'Could not import product' });
-            }
-         });
-      }
-   }
-
-   triggerSync() {
+  onSubmit() {
+    if (this.outfitForm.valid && this.selectedFile) {
       this.isLoading = true;
-      this.outfitService.syncProducts().subscribe({
-         next: (res) => {
-            this.isLoading = false;
-            this.messageService.add({
-               severity: 'success',
-               summary: 'Sync Started',
-               detail: 'Auto-import job is running in the background'
-            });
-            // Reload outfits after a short delay
-            setTimeout(() => this.loadOutfits(), 5000);
-         },
-         error: (err) => {
-            this.isLoading = false;
-            this.messageService.add({
-               severity: 'error',
-               summary: 'Sync Failed',
-               detail: err.error?.detail || 'Could not start sync'
-            });
-         }
+      const formData = new FormData();
+      Object.keys(this.outfitForm.value).forEach(k => formData.append(k, this.outfitForm.value[k]));
+      formData.append('image', this.selectedFile);
+      this.outfitService.uploadOutfit(formData).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.showForm = false;
+          this.outfitForm.reset({ category: 'Shirts', color: 'White', price: 0 });
+          this.imagePreview = null;
+          this.selectedFile = null;
+          this.messageService.add({ severity: 'success', summary: 'Done', detail: 'Outfit added to catalog' });
+          this.loadOutfits();
+        },
+        error: () => { this.isLoading = false; this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save outfit' }); }
       });
-   }
+    } else if (!this.selectedFile) {
+      this.messageService.add({ severity: 'warn', summary: 'Missing Image', detail: 'Please select an image file' });
+    }
+  }
 
-   onDelete(id: number) {
-      if (confirm('Remove this outfit from the catalog?')) {
-         this.outfitService.deleteOutfit(id).subscribe({
-            next: () => { this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Outfit removed' }); this.loadOutfits(); }
-         });
+  onImportSubmit() {
+    if (this.importForm.valid) {
+      this.isLoading = true;
+      this.outfitService.importProduct(this.importForm.value).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.showImport = false;
+          this.importForm.reset({ category: 'Shirts', color: 'White' });
+          this.messageService.add({ severity: 'success', summary: 'Imported', detail: 'Product fetched and added to catalog' });
+          this.loadOutfits();
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.messageService.add({ severity: 'error', summary: 'Import Failed', detail: err.error?.detail || 'Could not import product' });
+        }
+      });
+    }
+  }
+
+  triggerSync() {
+    this.isLoading = true;
+    this.outfitService.syncProducts().subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sync Started',
+          detail: 'Auto-import job is running in the background'
+        });
+        // Reload outfits after a short delay
+        setTimeout(() => this.loadOutfits(), 5000);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Sync Failed',
+          detail: err.error?.detail || 'Could not start sync'
+        });
       }
-   }
+    });
+  }
+
+  onDelete(id: number) {
+    if (confirm('Remove this outfit from the catalog?')) {
+      this.outfitService.deleteOutfit(id).subscribe({
+        next: () => { this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Outfit removed' }); this.loadOutfits(); }
+      });
+    }
+  }
 }
