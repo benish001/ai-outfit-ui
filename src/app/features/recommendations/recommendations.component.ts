@@ -52,20 +52,20 @@ import { OutfitService } from '../../core/services/outfit.service';
           <div class="flex items-center justify-between py-4">
             <h1 class="text-2xl luxury-font text-black">Style <span class="italic text-[#D4AF37]">Explorer</span></h1>
             <div class="flex items-center gap-2">
-              <button (click)="loadTrendingOutfits()" class="w-9 h-9 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl flex items-center justify-center hover:border-black transition-colors">
+              <button (click)="forceRefresh()" [disabled]="isLoading" class="w-9 h-9 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl flex items-center justify-center hover:border-black transition-colors disabled:opacity-40">
                 <lucide-angular [img]="RefreshIcon" class="w-4 h-4 text-gray-400 hover:text-black" [class.animate-spin]="isLoading"></lucide-angular>
               </button>
             </div>
           </div>
 
           <!-- Search bar -->
-          <div class="relative pb-3">
+          <div class="relative mb-3">
             <lucide-angular [img]="SearchIcon" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9A9A96]"></lucide-angular>
             <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchExternal()"
               placeholder="Search: Denim, Saree, Sneakers..."
-              class="w-full bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl pl-11 pr-28 py-3 text-sm text-black placeholder-[#9A9A96] focus:outline-none focus:border-black transition-all">
+              class="w-full bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl pl-12 pr-28 py-3.5 text-sm text-black placeholder-[#9A9A96] focus:outline-none focus:border-black transition-all">
             <button (click)="searchExternal()" [disabled]="isSearching || !searchQuery"
-              class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
               <span *ngIf="!isSearching">Search</span>
               <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin"></lucide-angular>
             </button>
@@ -138,7 +138,7 @@ import { OutfitService } from '../../core/services/outfit.service';
         <!-- Main Product Feed -->
         <div *ngIf="!isLoading && groupedProducts.length > 0" class="space-y-12">
           <div *ngFor="let group of groupedProducts; let groupIdx = index"
-            class="animate-fade-in" [style.animation-delay]="groupIdx * 80 + 'ms'">
+            class=""> <!-- Removed animation from group -->
 
             <!-- Section Header -->
             <div class="flex items-center gap-4 mb-6">
@@ -154,13 +154,13 @@ import { OutfitService } from '../../core/services/outfit.service';
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 items-start">
               <div *ngFor="let outfit of group.items; let i = index"
-                class="group animate-fade-in-up"
-                [style.animation-delay]="(i % 10) * 50 + 'ms'">
+                class="group flex flex-col"> <!-- Removed animate-fade-in-up -->
 
-                <div class="relative rounded-2xl overflow-hidden bg-white border border-[#EDEDE9] mb-3 transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1"
-                  style="aspect-ratio:3/4;">
+                <!-- Image container: fixed aspect-ratio, never collapses -->
+                <div class="relative rounded-2xl overflow-hidden bg-[#F0EEE9] border border-[#EDEDE9] transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 flex-shrink-0"
+                  style="aspect-ratio:3/4; width:100%;">
                   <img [src]="outfit.image_url" [alt]="outfit.name"
                     loading="lazy"
                     (error)="handleImageError($event)"
@@ -184,19 +184,19 @@ import { OutfitService } from '../../core/services/outfit.service';
                     </button>
                   </div>
 
-                  <!-- Category badge (bottom) - only show for non-accessory items -->
+                  <!-- Category badge (bottom) -->
                   <div *ngIf="getCleanCategory(outfit.category)"
                     class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white border border-white/10">
                     {{ getCleanCategory(outfit.category) }}
                   </div>
                 </div>
 
-                <!-- Card text -->
-                <div class="px-1">
-                  <h3 class="text-[11px] font-bold uppercase tracking-wider text-black truncate" [title]="outfit.name">{{ outfit.name }}</h3>
-                  <div class="flex items-center justify-between mt-1">
+                <!-- Card text: always below image, fixed height area -->
+                <div class="px-1 pt-2">
+                  <h3 class="text-[11px] font-bold uppercase tracking-wider text-black line-clamp-2 leading-tight" [title]="outfit.name">{{ outfit.name }}</h3>
+                  <div class="flex items-center justify-between mt-1.5">
                     <span class="text-sm font-black text-black">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
-                    <span class="text-[9px] uppercase tracking-widest text-[#9A9A96] font-semibold">{{ outfit.color }}</span>
+                    <span class="text-[9px] uppercase tracking-widest text-[#9A9A96] font-semibold truncate ml-2">{{ outfit.color }}</span>
                   </div>
                 </div>
               </div>
@@ -248,6 +248,7 @@ export class RecommendationsComponent implements OnInit {
   lastSearchQuery: string = '';
   isSearching: boolean = false;
   isLoading: boolean = false;
+  dataLoaded: boolean = false;
   analysisResult: any = null;
 
   categories: string[] = ['All', 'Dress'];
@@ -268,6 +269,7 @@ export class RecommendationsComponent implements OnInit {
           ...o,
           image_url: o.image_url || o.image || null
         }));
+        this.dataLoaded = true; // AI results loaded - skip background trending fetch
         this.updateDynamicCategories();
       }
     }
@@ -417,13 +419,15 @@ export class RecommendationsComponent implements OnInit {
   }
 
   loadTrendingOutfits() {
-    // Only show loading skeleton if we have no data yet
-    if (!this.trendingOutfits.length) {
-      this.isLoading = true;
-    }
+    // Guard: don't re-fetch if already loading or data already loaded
+    if (this.isLoading || this.dataLoaded) return;
+    this.isLoading = true;
+    console.log('Fetching fresh trending outfits...');
     this.outfitService.getTrendingOutfits(100).subscribe({
       next: (data) => {
+        console.log('Successfully loaded', data.length, 'outfits');
         this.isLoading = false;
+        this.dataLoaded = true;
         // Use AI-personalized results if available, otherwise fall back to trending
         if (!this.analysisResult?.recommended_outfits?.length) {
           this.trendingOutfits = data;
@@ -432,6 +436,16 @@ export class RecommendationsComponent implements OnInit {
       },
       error: () => { this.isLoading = false; }
     });
+  }
+
+  forceRefresh() {
+    // Explicit user action - clear cache and reload fresh trending data
+    if (this.isLoading) return;
+    this.dataLoaded = false;
+    this.analysisResult = null;
+    this.trendingOutfits = [];
+    localStorage.removeItem('latest_recommendations');
+    this.loadTrendingOutfits();
   }
 
   getCleanCategory(category: string): string {
