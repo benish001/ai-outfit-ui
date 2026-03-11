@@ -147,9 +147,12 @@ import { OutfitService } from '../../core/services/outfit.service';
           <div *ngFor="let group of groupedProducts; let groupIdx = index" class="space-y-12 animate-fade-in" [style.animation-delay]="groupIdx * 100 + 'ms'">
             <!-- Category Header -->
             <div class="flex items-center gap-6">
-              <h2 class="text-2xl luxury-font text-black whitespace-nowrap">{{ group.name }} <span class="italic text-[#D4AF37]">Selection</span></h2>
-              <div class="flex-1 h-[1px] bg-gray-100"></div>
-              <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-bold whitespace-nowrap">{{ group.items.length }} Pieces</p>
+              <div class="space-y-1">
+                <p *ngIf="group.name === 'Dresses & Outfits'" class="text-[8px] uppercase tracking-[0.4em] text-[#D4AF37] font-black">Matched to Complexion</p>
+                <h2 class="text-2xl luxury-font text-black whitespace-nowrap">{{ group.name }} <span class="italic text-[#D4AF37]">Selection</span></h2>
+              </div>
+              <div class="flex-1 h-[1px] bg-gray-100 mt-4"></div>
+              <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-bold whitespace-nowrap mt-4">{{ group.items.length }} Pieces</p>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-8 gap-y-14">
@@ -157,38 +160,37 @@ import { OutfitService } from '../../core/services/outfit.service';
                 class="group animate-fade-in-up"
                 [style.animation-delay]="(i % 10) * 60 + 'ms'">
 
-                <div class="relative aspect-[3/4] overflow-hidden bg-[#F7F7F5] mb-5 shadow-sm hover:shadow-xl transition-all duration-700">
+                <div class="relative aspect-[3/4] overflow-hidden bg-[#F7F7F5] mb-5 shadow-sm hover:shadow-xl transition-all duration-700 rounded-sm">
                   <img [src]="outfit.image_url" [alt]="outfit.name"
                     class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105">
 
-                  <!-- Sale Badge or New Arrival -->
-                  <div class="absolute top-0 right-0 bg-black text-white text-[8px] uppercase tracking-widest px-4 py-2 font-bold transform translate-x-1 translate-y-1">
-                    {{ outfit.price > 5000 ? 'Luxury Edit' : 'New Arrival' }}
+                  <!-- Premium Badge -->
+                  <div *ngIf="isMainOutfit(outfit.category)" class="absolute top-0 right-0 bg-[#D4AF37] text-black text-[7px] uppercase tracking-widest px-3 py-1.5 font-black shadow-lg">
+                    Style Match
                   </div>
 
                   <!-- Hover Actions -->
                   <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-6 text-center space-y-4">
                      <div class="space-y-1 transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                         <p class="text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">{{ outfit.brand || 'Luxury' }}</p>
-                        <h4 class="text-white text-[11px] uppercase tracking-wider font-light line-clamp-2 px-4">{{ outfit.name }}</h4>
+                        <h4 class="text-white text-[10px] uppercase tracking-wider font-light line-clamp-2 px-4 leading-relaxed">{{ outfit.name }}</h4>
                      </div>
                      <button (click)="buyNow(outfit.affiliate_link)"
-                      class="w-full border border-white/30 hover:border-[#D4AF37] bg-white/10 backdrop-blur-md text-white py-3.5 text-[9px] uppercase tracking-[0.3em] transition-all hover:bg-[#D4AF37]">
-                      Shop the Look
+                      class="w-full bg-white text-black py-3.5 text-[9px] uppercase tracking-[0.3em] font-black transition-all hover:bg-[#D4AF37]">
+                      Shop Piece
                     </button>
                   </div>
 
-                  <div class="absolute top-4 left-4 bg-white/95 px-3 py-1.5 text-[8px] uppercase tracking-[0.2em] text-black font-bold shadow-sm">
-                    {{ outfit.brand || 'Premium' }}
+                  <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-2 py-1 text-[7px] uppercase tracking-widest text-black font-bold border border-gray-100">
+                    {{ outfit.category || 'Premium' }}
                   </div>
                 </div>
 
-                <div class="space-y-2 text-center group-hover:-translate-y-1 transition-transform duration-300">
-                  <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-black truncate">{{ outfit.name }}</h3>
-                  <div class="flex items-center justify-center gap-3">
-                    <span class="text-[9px] uppercase tracking-[0.4em] text-gray-400 font-medium">{{ outfit.color }}</span>
-                    <span class="w-[3px] h-[3px] rounded-full bg-[#D4AF37]"></span>
-                    <span class="text-[11px] font-black text-black">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
+                <div class="space-y-2 px-1 transition-transform duration-300">
+                  <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-black truncate leading-tight">{{ outfit.name }}</h3>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-black tracking-tighter">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
+                    <span class="text-[8px] uppercase tracking-widest text-gray-400 font-medium">{{ outfit.color }}</span>
                   </div>
                 </div>
               </div>
@@ -249,7 +251,7 @@ export class RecommendationsComponent implements OnInit {
   isSearching: boolean = false;
   analysisResult: any = null;
 
-  categories: string[] = ['All', 'Dresses', 'Ethnic', 'Tops', 'Casual', 'Luxury'];
+  categories: string[] = ['All', 'Dress'];
   activeCategory: string = 'All';
 
   ngOnInit() {
@@ -263,8 +265,52 @@ export class RecommendationsComponent implements OnInit {
       this.analysisResult = JSON.parse(stored);
       if (this.analysisResult.recommended_outfits) {
         this.trendingOutfits = this.analysisResult.recommended_outfits;
+        this.updateDynamicCategories();
       }
     }
+  }
+
+  get primaryOutfits() {
+    let outfits = this.trendingOutfits;
+
+    // Strict Gender Filter
+    if (this.analysisResult?.gender) {
+      const g = this.analysisResult.gender.toLowerCase();
+      if (g === 'male') {
+        outfits = outfits.filter(o =>
+          (o.category.toLowerCase().includes('men') || o.name.toLowerCase().includes('men')) &&
+          !o.category.toLowerCase().includes('women') &&
+          !o.name.toLowerCase().includes('women')
+        );
+      } else if (g === 'female') {
+        outfits = outfits.filter(o =>
+          o.category.toLowerCase().includes('women') ||
+          o.name.toLowerCase().includes('women') ||
+          this.isDress(o.category)
+        );
+      }
+    }
+
+    // Prioritize "Dresses/Outfits" for the main view
+    return outfits.filter(o => this.isMainOutfit(o.category));
+  }
+
+  get secondaryItems() {
+    // Accessories
+    return this.trendingOutfits.filter(o => !this.isMainOutfit(o.category));
+  }
+
+  isMainOutfit(category: string): boolean {
+    if (!category) return true;
+    const cat = category.toLowerCase();
+    const accessoryKeywords = ['bag', 'shoe', 'chappal', 'sandal', 'heel', 'accessory', 'jewelry', 'belt', 'watch'];
+    return !accessoryKeywords.some(key => cat.includes(key));
+  }
+
+  isDress(category: string): boolean {
+    if (!category) return false;
+    const cat = category.toLowerCase();
+    return cat.includes('dress') || cat.includes('saree') || cat.includes('kurta');
   }
 
   get filteredTrending() {
@@ -277,26 +323,25 @@ export class RecommendationsComponent implements OnInit {
         outfits = outfits.filter(o =>
           (o.category.toLowerCase().includes('men') || o.name.toLowerCase().includes('men')) &&
           !o.category.toLowerCase().includes('women') &&
-          !o.name.toLowerCase().includes('women') &&
-          !o.category.toLowerCase().includes('saree') &&
-          !o.category.toLowerCase().includes('dress')
+          !o.name.toLowerCase().includes('women')
         );
       } else if (g === 'female') {
         outfits = outfits.filter(o =>
           o.category.toLowerCase().includes('women') ||
           o.name.toLowerCase().includes('women') ||
-          o.category.toLowerCase().includes('saree') ||
-          o.category.toLowerCase().includes('dress')
+          this.isDress(o.category)
         );
       }
     }
 
     if (this.activeCategory === 'All') return outfits;
 
+    // If user selected "Dress", show only main outfits
+    if (this.activeCategory === 'Dress') return outfits.filter(o => this.isMainOutfit(o.category));
+
+    // Otherwise show specific accessory category
     return outfits.filter(o =>
-      o.category.toLowerCase().includes(this.activeCategory.toLowerCase()) ||
-      (this.activeCategory === 'Ethnic' && (o.category.toLowerCase().includes('saree') || o.category.toLowerCase().includes('kurta'))) ||
-      (this.activeCategory === 'Luxury' && o.price > 5000)
+      o.category.toLowerCase().includes(this.activeCategory.toLowerCase())
     );
   }
 
@@ -329,15 +374,28 @@ export class RecommendationsComponent implements OnInit {
     const groups: { [key: string]: any[] } = {};
 
     products.forEach(p => {
-      const cat = p.category || 'General';
+      let cat = p.category || 'General';
+      if (this.isMainOutfit(cat)) cat = 'Dresses & Outfits';
+
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(p);
     });
 
-    return Object.keys(groups).map(key => ({
+    // Sort to put Dresses first
+    return Object.keys(groups).sort((a, b) => a.includes('Dresses') ? -1 : 1).map(key => ({
       name: key,
       items: groups[key]
     }));
+  }
+
+  updateDynamicCategories() {
+    const cats = new Set<string>(['All', 'Dress']);
+    this.trendingOutfits.forEach(o => {
+      if (!this.isMainOutfit(o.category)) {
+        cats.add(o.category || 'Accessories');
+      }
+    });
+    this.categories = Array.from(cats);
   }
 
   setActiveCategory(category: string) {
@@ -385,6 +443,7 @@ export class RecommendationsComponent implements OnInit {
     this.outfitService.getTrendingOutfits(100).subscribe({
       next: (data) => {
         this.trendingOutfits = data;
+        this.updateDynamicCategories();
       }
     });
   }

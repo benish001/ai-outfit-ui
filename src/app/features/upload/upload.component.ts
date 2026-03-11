@@ -9,61 +9,77 @@ import { LucideAngularModule, Upload, CheckCircle, X, Camera, Sparkles } from 'l
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
-    <div class="min-h-screen bg-[#F7F7F5] pt-20 pb-16">
-      <div class="max-w-2xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+    <div class="min-h-screen bg-[#FDFDFB] pt-28 pb-16">
+      <div class="max-w-xl mx-auto px-6">
+
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-between mb-16 max-w-xs mx-auto">
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-[10px] font-bold">1</div>
+            <span class="text-[8px] uppercase tracking-widest font-black text-black">Upload</span>
+          </div>
+          <div class="flex-1 h-[1px] bg-gray-100 mx-4"></div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-300">2</div>
+            <span class="text-[8px] uppercase tracking-widest font-bold text-gray-300">Discover</span>
+          </div>
+        </div>
 
         <!-- Header -->
-        <div class="text-center space-y-3 mb-12 animate-fade-in">
-          <p class="text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] font-bold">Step 1 of 1</p>
-          <h1 class="text-3xl sm:text-4xl luxury-font text-black">Analyze Your <span class="italic text-[#D4AF37]">Style</span></h1>
-          <p class="text-sm text-gray-400 font-light">Upload a clear photo of yourself for the most accurate skin tone analysis.</p>
+        <div class="text-center space-y-4 mb-12 animate-fade-in">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl luxury-font text-black leading-tight">Your Personal <br> <span class="italic text-[#D4AF37]">Style Profile</span></h1>
+          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-light max-w-sm mx-auto">A quick scan of your complexion lets our AI suggest a perfectly curated palette.</p>
         </div>
 
         <!-- Upload Zone -->
-        <div class="bg-white border-2 border-dashed border-[#E8E8E4] hover:border-[#D4AF37] transition-colors duration-300 p-10 sm:p-14 text-center cursor-pointer relative animate-slide-up"
+        <div class="bg-[#F7F7F5]/50 border-2 border-dashed border-gray-100 hover:border-[#D4AF37] transition-all duration-700 p-8 sm:p-12 text-center cursor-pointer relative animate-slide-up rounded-2xl group"
           [class.border-[#D4AF37]]="preview"
+          [class.bg-white]="preview"
           (click)="fileInput.click()"
           (dragover)="$event.preventDefault()"
           (drop)="onDrop($event)">
           <input #fileInput type="file" accept="image/*" (change)="onFile($event)" class="hidden">
 
           <!-- Preview -->
-          <div *ngIf="preview" class="space-y-5">
-            <img [src]="preview" class="w-40 h-52 sm:w-52 sm:h-72 object-cover mx-auto shadow-xl">
-            <div class="flex items-center justify-center gap-2 text-[#D4AF37]">
-              <lucide-angular [img]="CheckIcon" class="w-4 h-4"></lucide-angular>
-              <span class="text-[10px] uppercase tracking-widest font-bold">Photo Ready</span>
+          <div *ngIf="preview" class="space-y-6">
+            <div class="relative inline-block group/preview">
+              <img [src]="preview" class="w-48 h-64 sm:w-60 sm:h-80 object-cover mx-auto shadow-2xl rounded-sm transition-transform duration-700 group-hover/preview:scale-[1.02]">
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/preview:opacity-100 transition-opacity"></div>
             </div>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ fileName }}</p>
-            <button (click)="$event.stopPropagation(); preview = null; selectedFile = null" class="text-[9px] uppercase tracking-widest text-red-400 hover:text-red-600 transition-colors">
-              Remove
-            </button>
+            
+            <div class="flex flex-col items-center gap-3">
+              <div class="flex items-center gap-3 px-4 py-2 bg-black text-white rounded-full">
+                <lucide-angular [img]="CheckIcon" class="w-3 h-3 text-[#D4AF37]"></lucide-angular>
+                <span class="text-[9px] uppercase tracking-[0.3em] font-bold">Image Locked</span>
+              </div>
+              <button (click)="$event.stopPropagation(); preview = null; selectedFile = null" 
+                class="text-[9px] uppercase tracking-[0.4em] text-gray-400 hover:text-red-500 transition-all font-bold">
+                Change Selection
+              </button>
+            </div>
           </div>
 
           <!-- Placeholder -->
-          <div *ngIf="!preview" class="space-y-4">
-            <div class="w-16 h-16 bg-[#F7F7F5] border border-[#E8E8E4] rounded-full flex items-center justify-center mx-auto">
-              <lucide-angular [img]="CameraIcon" class="w-7 h-7 text-[#D4AF37]"></lucide-angular>
+          <div *ngIf="!preview" class="space-y-6">
+            <div class="w-20 h-20 bg-white border border-gray-100 rounded-full flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform duration-500">
+              <lucide-angular [img]="CameraIcon" class="w-8 h-8 text-black"></lucide-angular>
             </div>
-            <div>
-              <p class="text-base font-bold text-black mb-1">Drop your photo here</p>
-              <p class="text-sm text-gray-400 font-light">or click to browse</p>
+            <div class="space-y-2">
+              <p class="text-lg font-bold text-black">Upload a Portrait</p>
+              <p class="text-[10px] uppercase tracking-widest text-gray-400">Drag & Drop or Click to Browse</p>
             </div>
-            <p class="text-[9px] uppercase tracking-widest text-gray-300">JPG, PNG, WEBP — Max 10MB</p>
           </div>
         </div>
 
-        <!-- Tips -->
-        <div class="grid grid-cols-3 gap-3 mt-6">
-          <div *ngFor="let tip of tips" class="bg-white border border-[#E8E8E4] p-4 text-center">
-            <p class="text-[9px] uppercase tracking-widest text-gray-400 leading-relaxed">{{ tip }}</p>
+        <!-- Gender Selection -->
+        <div class="mt-12 space-y-6">
+          <div class="flex items-center gap-4">
+            <div class="h-[1px] flex-1 bg-gray-50"></div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-black">Preferences</p>
+            <div class="h-[1px] flex-1 bg-gray-50"></div>
           </div>
-        </div>
-
-        <!-- Gender Selection (New) -->
-        <div class="mt-8 space-y-4">
-          <p class="text-[10px] uppercase tracking-widest text-center text-gray-400 font-bold">Refine Your results</p>
-          <div class="flex gap-3">
+          
+          <div class="flex gap-4">
              <button *ngFor="let g of ['Male', 'Female']" 
                (click)="selectedGender = g"
                [class.bg-black]="selectedGender === g"
@@ -71,36 +87,48 @@ import { LucideAngularModule, Upload, CheckCircle, X, Camera, Sparkles } from 'l
                [class.border-black]="selectedGender === g"
                [class.bg-white]="selectedGender !== g"
                [class.text-gray-400]="selectedGender !== g"
-               [class.border-[#E8E8E4]]="selectedGender !== g"
-               class="flex-1 py-4 border text-[10px] uppercase tracking-[0.3em] font-bold transition-all duration-300">
+               [class.border-gray-100]="selectedGender !== g"
+               [class.shadow-md]="selectedGender === g"
+               class="flex-1 py-5 border rounded-xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500">
                {{ g }}
              </button>
           </div>
-          <p class="text-[9px] text-center text-gray-300 italic">Selecting gender ensures more accurate fashion matches</p>
         </div>
 
-        <!-- Error -->
-        <div *ngIf="error" class="mt-4 bg-red-50 border border-red-100 px-4 py-3">
-          <p class="text-xs text-red-600">{{ error }}</p>
-        </div>
-
-        <!-- Analyze Button -->
-        <button (click)="analyze()" [disabled]="!selectedFile || isLoading"
-          class="btn-luxury w-full mt-8 disabled:opacity-40 disabled:cursor-not-allowed text-sm">
-          <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
-          <lucide-angular *ngIf="!isLoading" [img]="SparklesIcon" class="w-4 h-4"></lucide-angular>
-          <span>{{ isLoading ? 'Analyzing Your Look...' : 'Analyze My Style' }}</span>
-        </button>
-
-        <!-- Loading overlay -->
-        <div *ngIf="isLoading" class="mt-6 bg-white border border-[#E8E8E4] px-6 py-5">
-          <div class="flex items-center gap-4">
-            <div class="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping flex-shrink-0"></div>
-            <div>
-              <p class="text-xs font-bold uppercase tracking-widest text-black">AI is working...</p>
-              <p class="text-[10px] text-gray-400 mt-0.5">Detecting skin tone and matching outfits</p>
+        <!-- Action -->
+        <div class="mt-12">
+          <button (click)="analyze()" [disabled]="!selectedFile || isLoading"
+            class="w-full relative overflow-hidden bg-black disabled:bg-gray-100 text-white disabled:text-gray-300 py-6 rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 hover:bg-[#D4AF37] hover:text-black group">
+            <div class="relative z-10 flex items-center justify-center gap-3">
+               <lucide-angular *ngIf="!isLoading" [img]="SparklesIcon" class="w-4 h-4"></lucide-angular>
+               <i *ngIf="isLoading" class="pi pi-spin pi-spinner mr-2"></i>
+               <span>{{ isLoading ? 'Processing...' : 'Generate My Look' }}</span>
             </div>
+          </button>
+          
+          <!-- Tip Banner -->
+          <div *ngIf="!isLoading" class="mt-6 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-fade-in text-center">
+             <p class="text-[9px] uppercase tracking-[0.2em] text-gray-400 leading-relaxed italic">
+               <lucide-angular [img]="CheckIcon" class="w-3 h-3 inline mr-2 text-[#D4AF37]"></lucide-angular>
+               Pro Tip: Use natural daylight for the most accurate results
+             </p>
           </div>
+        </div>
+
+        <!-- Full Page Analysis Overlay -->
+        <div *ngIf="isLoading" class="fixed inset-0 z-[200] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
+           <div class="w-24 h-[1px] bg-gray-100 mb-12"></div>
+           <div class="relative w-40 h-40 mb-12">
+              <div class="absolute inset-0 border border-gray-100 rounded-full"></div>
+              <div class="absolute inset-0 border-t-2 border-[#D4AF37] rounded-full animate-spin"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                 <lucide-angular [img]="SparklesIcon" class="w-8 h-8 text-[#D4AF37] animate-pulse"></lucide-angular>
+              </div>
+           </div>
+           <div class="text-center space-y-4">
+              <h3 class="text-2xl luxury-font text-black italic">Crafting Your Profile</h3>
+              <p class="text-[10px] uppercase tracking-[0.5em] text-gray-400 font-bold animate-pulse">Scanning Skin Tone...</p>
+           </div>
         </div>
       </div>
     </div>

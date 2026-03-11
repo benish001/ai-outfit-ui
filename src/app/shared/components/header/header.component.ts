@@ -84,24 +84,73 @@ import { LucideAngularModule, Menu, X, ChevronDown, Sparkles, ShieldCheck } from
         </div>
       </div>
 
-      <!-- Mobile Menu -->
-      <div *ngIf="menuOpen()" class="md:hidden bg-white border-t border-[#E8E8E4] shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-4 space-y-1">
-          <a routerLink="/" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-gray-600 hover:text-black border-b border-[#F0F0EE]">Home</a>
-          <ng-container *ngIf="authService.user$ | async as user">
-            <a routerLink="/dashboard" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-gray-600 hover:text-black border-b border-[#F0F0EE]">Dashboard</a>
-            <a routerLink="/upload" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-gray-600 hover:text-black border-b border-[#F0F0EE]">Analyze</a>
-            <a routerLink="/recommendations" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-gray-600 hover:text-black border-b border-[#F0F0EE]">Recommendations</a>
-            <a *ngIf="user.is_admin" routerLink="/admin" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-[#D4AF37] font-bold border-b border-[#F0F0EE]">Admin Portal</a>
-            <div class="pt-2">
-              <p class="text-[9px] text-gray-400 uppercase tracking-widest mb-2">{{ user.name || user.email }}</p>
-              <button (click)="authService.logout()" class="text-[10px] uppercase tracking-widest text-red-500 font-medium">Sign Out</button>
+      <!-- Mobile Menu Overlay -->
+      <div 
+        *ngIf="menuOpen()" 
+        class="fixed inset-0 z-[100] md:hidden bg-black/60 backdrop-blur-md transition-all duration-500 animate-fade-in"
+        (click)="toggleMenu()">
+        
+        <div 
+          class="absolute top-0 right-0 w-[280px] h-full bg-white shadow-2xl flex flex-col transform transition-transform duration-500 animate-slide-left p-8"
+          (click)="$event.stopPropagation()">
+          
+          <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center gap-1">
+              <span class="text-xl font-black tracking-widest text-black">AI</span>
+              <span class="text-xl luxury-font italic text-[#D4AF37]">Outfit</span>
             </div>
-          </ng-container>
-          <ng-container *ngIf="!(authService.user$ | async)">
-            <a routerLink="/login" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-gray-600 hover:text-black border-b border-[#F0F0EE]">Sign In</a>
-            <a routerLink="/register" (click)="toggleMenu()" class="block py-3 text-[10px] uppercase tracking-[0.2em] text-black font-bold">Join Free</a>
-          </ng-container>
+            <button (click)="toggleMenu()" class="p-2 text-gray-400 hover:text-black transition-colors rounded-full border border-gray-100">
+              <lucide-angular [img]="CloseIcon" class="w-4 h-4"></lucide-angular>
+            </button>
+          </div>
+
+          <div class="space-y-6">
+            <a routerLink="/" (click)="toggleMenu()" class="block text-[11px] uppercase tracking-[0.3em] font-bold text-gray-400 hover:text-[#D4AF37] transition-all">Home</a>
+            
+            <div class="h-[1px] bg-gray-50 w-full"></div>
+
+            <ng-container *ngIf="authService.user$ | async as user; else guestMobile">
+              <div class="pb-4">
+                <p class="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold mb-4">Membership</p>
+                <div class="space-y-6">
+                  <a routerLink="/dashboard" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span> Dashboard
+                  </a>
+                  <a routerLink="/upload" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span> New Analysis
+                  </a>
+                  <a routerLink="/recommendations" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-200"></span> Recommendations
+                  </a>
+                  <a *ngIf="user.is_admin" routerLink="/admin" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-[#D4AF37] flex items-center gap-3">
+                    <lucide-angular [img]="ShieldIcon" class="w-4 h-4"></lucide-angular> Admin Portal
+                  </a>
+                </div>
+              </div>
+
+              <div class="mt-auto pt-12 border-t border-gray-50">
+                <div class="flex items-center gap-4 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center font-bold text-[#D4AF37]">
+                    {{ (user.name || user.email).charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-[10px] uppercase tracking-widest font-black text-black truncate">{{ user.name || 'Member' }}</p>
+                    <p class="text-[9px] text-gray-400 truncate">{{ user.email }}</p>
+                  </div>
+                </div>
+                <button (click)="authService.logout()" class="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-50 text-red-500 text-[10px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-red-100">
+                  Sign Out
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-template #guestMobile>
+              <div class="space-y-4 pt-4">
+                <a routerLink="/login" (click)="toggleMenu()" class="block w-full py-4 text-center border border-black text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black hover:text-white transition-all">Sign In</a>
+                <a routerLink="/register" (click)="toggleMenu()" class="block w-full py-4 text-center bg-black text-white text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#D4AF37] transition-all">Join Club</a>
+              </div>
+            </ng-template>
+          </div>
         </div>
       </div>
     </header>
