@@ -120,7 +120,7 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
           <h2 class="text-base font-bold uppercase tracking-widest text-black">Explore Categories</h2>
         </div>
         <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-          <a *ngFor="let cat of categories" [routerLink]="['/recommendations']"
+          <a *ngFor="let cat of categories" [routerLink]="['/recommendations']" [queryParams]="{ category: cat.id }"
             class="flex-shrink-0 flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-[#EDEDE9] hover:border-black transition-all duration-300 min-w-[80px]">
             <span class="text-2xl">{{ cat.emoji }}</span>
             <span class="text-[10px] font-semibold uppercase tracking-wider text-center">{{ cat.name }}</span>
@@ -152,11 +152,11 @@ export class DashboardComponent {
   ];
 
   categories = [
-    { emoji: '👗', name: 'Dresses' },
-    { emoji: '👟', name: 'Shoes' },
-    { emoji: '👜', name: 'Bags' },
-    { emoji: '🧥', name: 'Jackets' },
-    { emoji: '💄', name: 'Beauty' },
-    { emoji: '🏋️', name: 'Gym' },
+    { emoji: '👗', name: 'Dresses', id: 'Dress' },
+    { emoji: '👟', name: 'Shoes', id: 'Footwear' },
+    { emoji: '👜', name: 'Bags', id: 'Bag' },
+    { emoji: '🧥', name: 'Jackets', id: 'Outerwear' },
+    { emoji: '💄', name: 'Beauty', id: 'Beauty' },
+    { emoji: '🏋️', name: 'Gym', id: 'Activewear' },
   ];
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, ExternalLink, RefreshCw, ShoppingBag, Sparkles, Search, Loader2, SlidersHorizontal, Camera } from 'lucide-angular';
+import { ActivatedRoute } from '@angular/router';
 import { OutfitService } from '../../core/services/outfit.service';
 
 @Component({
@@ -64,11 +65,18 @@ import { OutfitService } from '../../core/services/outfit.service';
             <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchExternal()"
               placeholder="Search: Denim, Saree, Sneakers..."
               class="w-full bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl pl-12 pr-28 py-3.5 text-sm text-black placeholder-[#9A9A96] focus:outline-none focus:border-black transition-all">
-            <button (click)="searchExternal()" [disabled]="isSearching || !searchQuery"
-              class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
-              <span *ngIf="!isSearching">Search</span>
-              <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin"></lucide-angular>
-            </button>
+            
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <button *ngIf="searchQuery || searchResults.length > 0" (click)="clearSearch()" 
+                class="p-2 text-gray-400 hover:text-black transition-colors">
+                <lucide-angular [img]="RefreshIcon" class="w-4 h-4 rotate-45"></lucide-angular>
+              </button>
+              <button (click)="searchExternal()" [disabled]="isSearching || !searchQuery"
+                class="bg-black text-white text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
+                <span *ngIf="!isSearching">Search</span>
+                <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin"></lucide-angular>
+              </button>
+            </div>
           </div>
 
           <!-- Category Pill Filters -->
@@ -101,7 +109,7 @@ import { OutfitService } from '../../core/services/outfit.service';
               <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-1">Live Search</p>
               <h2 class="text-xl font-bold text-black">Results for "{{ lastSearchQuery }}"</h2>
             </div>
-            <button (click)="searchResults = []" class="text-[10px] uppercase tracking-widest text-[#9A9A96] hover:text-black transition-colors flex items-center gap-2 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl px-3 py-2">
+            <button (click)="clearSearch()" class="text-[10px] uppercase tracking-widest text-[#9A9A96] hover:text-black transition-colors flex items-center gap-2 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl px-3 py-2">
               ✕ Clear
             </button>
           </div>
@@ -167,7 +175,7 @@ import { OutfitService } from '../../core/services/outfit.service';
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
 
                   <!-- Style match badge -->
-                  <div *ngIf="isMainOutfit(outfit.category)"
+                  <div *ngIf="isMainOutfit(outfit.category, outfit.name)"
                     class="absolute top-0 right-0 bg-[#D4AF37] text-black text-[8px] uppercase tracking-widest px-2.5 py-1.5 font-black rounded-bl-xl">
                     ✦ Match
                   </div>
@@ -209,21 +217,28 @@ import { OutfitService } from '../../core/services/outfit.service';
           </div>
         </div>
 
-        <!-- Empty State (no data and not loading) -->
-        <div *ngIf="!isLoading && trendingOutfits.length === 0 && searchResults.length === 0" class="flex flex-col items-center justify-center py-24 space-y-6 animate-fade-in">
+        <!-- Empty State (No products in active category) -->
+        <div *ngIf="!isLoading && groupedProducts.length === 0 && (activeCategory !== 'All' || (trendingOutfits.length === 0 && searchResults.length === 0))" 
+          class="flex flex-col items-center justify-center py-24 space-y-6 animate-fade-in">
           <div class="w-24 h-24 bg-white border border-[#EDEDE9] rounded-3xl flex items-center justify-center shadow-sm">
             <lucide-angular [img]="BagIcon" class="w-10 h-10 text-[#EDEDE9]"></lucide-angular>
           </div>
           <div class="text-center space-y-2 max-w-xs">
-            <h3 class="text-xl luxury-font text-[#9A9A96]">Discovering New Trends</h3>
-            <p class="text-[11px] uppercase tracking-widest text-[#9A9A96]/60 leading-relaxed">Our AI is syncing the latest fashion from premium catalogs.</p>
+            <h3 class="text-xl luxury-font text-[#9A9A96]">
+              {{ activeCategory === 'All' ? 'Discovering New Trends' : 'No ' + activeCategory + ' Found' }}
+            </h3>
+            <p class="text-[11px] uppercase tracking-widest text-[#9A9A96]/60 leading-relaxed">
+              {{ activeCategory === 'All' 
+                  ? 'Our AI is syncing the latest fashion from premium catalogs.' 
+                  : 'We couldn\'t find any items in this category. Try refreshing or searching for something else.' }}
+            </p>
           </div>
           <div class="flex gap-3">
-            <a routerLink="/upload" class="btn-primary text-[10px] px-6 py-3">
+            <a *ngIf="activeCategory === 'All'" routerLink="/upload" class="btn-primary text-[10px] px-6 py-3">
               <lucide-angular [img]="CameraIcon" class="w-4 h-4"></lucide-angular>
               Analyze Your Style
             </a>
-            <button (click)="loadTrendingOutfits()" class="btn-outline text-[10px] px-6 py-3">Refresh</button>
+            <button (click)="forceRefresh()" class="btn-outline text-[10px] px-6 py-3">Refresh Catalog</button>
           </div>
         </div>
       </div>
@@ -233,6 +248,7 @@ import { OutfitService } from '../../core/services/outfit.service';
 })
 export class RecommendationsComponent implements OnInit {
   private outfitService = inject(OutfitService);
+  private route = inject(ActivatedRoute);
 
   readonly RefreshIcon = RefreshCw;
   readonly LinkIcon = ExternalLink;
@@ -257,6 +273,17 @@ export class RecommendationsComponent implements OnInit {
   ngOnInit() {
     this.loadAnalysisResult();
     this.loadTrendingOutfits();
+    
+    // Switch to category passed via query params (e.g., from Dashboard)
+    this.route.queryParams.subscribe(params => {
+      if (params['category']) {
+        const cat = params['category'];
+        // Map common dashboard IDs to internal category names if needed
+        this.activeCategory = cat;
+        // Trigger scroll after data is likely rendered
+        setTimeout(() => this.setActiveCategory(cat), 500);
+      }
+    });
   }
 
   loadAnalysisResult() {
@@ -302,11 +329,15 @@ export class RecommendationsComponent implements OnInit {
     return this.trendingOutfits.filter(o => !this.isMainOutfit(o.category));
   }
 
-  isMainOutfit(category: string): boolean {
-    if (!category) return true;
-    const cat = category.toLowerCase();
-    const accessoryKeywords = ['bag', 'shoe', 'chappal', 'sandal', 'heel', 'accessory', 'jewelry', 'belt', 'watch'];
-    return !accessoryKeywords.some(key => cat.includes(key));
+  isMainOutfit(category: string, name: string = ''): boolean {
+    if (!category && !name) return true;
+    const clean = this.getCleanCategory(category, name);
+    // Clothing items are main outfits. Accessories, beauty, etc. are not.
+    const clothingCategories = ['Dress', 'Top', 'Bottom', 'Outerwear', 'Activewear'];
+    if (clean) return clothingCategories.includes(clean);
+    
+    // Fallback: if we can't categorize it, but it doesn't match known accessories, assume it's an outfit
+    return true; 
   }
 
   isDress(category: string): boolean {
@@ -337,11 +368,7 @@ export class RecommendationsComponent implements OnInit {
       }
     }
     if (this.activeCategory === 'All') return outfits;
-    if (this.activeCategory === 'Dress') return outfits.filter(o => this.isMainOutfit(o.category));
-    return outfits.filter(o => {
-      const cat = (o.category || '').toLowerCase();
-      return cat.includes(this.activeCategory.toLowerCase());
-    });
+    return outfits.filter(o => this.getCleanCategory(o.category, o.name) === this.activeCategory);
   }
 
   get filteredSearchResults() {
@@ -367,21 +394,34 @@ export class RecommendationsComponent implements OnInit {
     const outfits = this.filteredTrending;
     const groups: { [key: string]: any[] } = {};
     outfits.forEach(p => {
-      const cat = this.isMainOutfit(p.category) ? 'Dresses & Outfits' : (p.category || 'Accessories');
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(p);
+      let groupName = 'Dresses & Outfits';
+      if (!this.isMainOutfit(p.category, p.name)) {
+        groupName = this.getCleanCategory(p.category, p.name) || 'Accessories';
+      }
+      
+      if (!groups[groupName]) groups[groupName] = [];
+      groups[groupName].push(p);
     });
-    return Object.keys(groups).sort((a, b) => a.includes('Dresses') ? -1 : 1).map(key => ({
-      name: key,
-      items: groups[key]
-    }));
+    
+    // Sort so Dresses & Outfits is always first, then others alphabetically
+    return Object.keys(groups)
+      .sort((a, b) => {
+        if (a === 'Dresses & Outfits') return -1;
+        if (b === 'Dresses & Outfits') return 1;
+        return a.localeCompare(b);
+      })
+      .map(key => ({
+        name: key,
+        items: groups[key]
+      }));
   }
 
   updateDynamicCategories() {
     const cats = new Set<string>(['All', 'Dress']);
     this.trendingOutfits.forEach(o => {
-      if (!this.isMainOutfit(o.category)) {
-        cats.add(o.category || 'Accessories');
+      const clean = this.getCleanCategory(o.category, o.name);
+      if (clean && clean !== 'Dress') {
+        cats.add(clean);
       }
     });
     this.categories = Array.from(cats);
@@ -390,8 +430,7 @@ export class RecommendationsComponent implements OnInit {
   setActiveCategory(category: string) {
     this.activeCategory = category;
     setTimeout(() => {
-      const el = document.getElementById('top-of-grid');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 50);
   }
 
@@ -416,6 +455,13 @@ export class RecommendationsComponent implements OnInit {
       },
       error: () => { this.isSearching = false; }
     });
+  }
+  
+  clearSearch() {
+    this.searchResults = [];
+    this.searchQuery = '';
+    this.isSearching = false;
+    this.lastSearchQuery = '';
   }
 
   loadTrendingOutfits() {
@@ -448,21 +494,35 @@ export class RecommendationsComponent implements OnInit {
     this.loadTrendingOutfits();
   }
 
-  getCleanCategory(category: string): string {
-    if (!category) return '';
-    const cat = category.toLowerCase();
-    if (cat.includes('dress') || cat.includes('kurta') || cat.includes('saree') || cat.includes('suit')) return 'Dress';
-    if (cat.includes('jean') || cat.includes('denim') || cat.includes('trouser') || cat.includes('pant')) return 'Bottom';
-    if (cat.includes('top') || cat.includes('shirt') || cat.includes('blouse') || cat.includes('tee') || cat.includes('t-shirt')) return 'Top';
-    if (cat.includes('jacket') || cat.includes('coat') || cat.includes('blazer')) return 'Outerwear';
-    if (cat.includes('shoe') || cat.includes('chappal') || cat.includes('sandal') || cat.includes('heel') || cat.includes('sneaker') || cat.includes('boot')) return 'Footwear';
-    if (cat.includes('bag') || cat.includes('purse') || cat.includes('clutch')) return 'Bag';
-    if (cat.includes('jewelry') || cat.includes('necklace') || cat.includes('ring') || cat.includes('earring') || cat.includes('bracelet')) return 'Jewelry';
-    if (cat.includes('belt')) return 'Belt';
-    if (cat.includes('watch')) return 'Watch';
-    if (cat.includes('hair')) return 'Hair';
-    // If it's a generic tag like Men's Fashion / Women's Fashion, don't show it
-    if (cat.includes('fashion') || cat.includes('cloth') || cat.includes('apparel') || cat.includes('wear')) return '';
+  getCleanCategory(category: string, name: string = ''): string {
+    const cat = (category || '').toLowerCase();
+    const nm = (name || '').toLowerCase();
+    const combined = `${cat} ${nm}`;
+    
+    const has = (keywords: string[], wholeWord = false) => {
+      return keywords.some(k => {
+        if (wholeWord) {
+          return new RegExp(`\\b${k}\\b`, 'i').test(combined);
+        }
+        return combined.includes(k.toLowerCase());
+      });
+    };
+
+    // Priority 1: Accessories & Beauty (Short/Dangerous keywords must use wholeWord=true)
+    if (has(['shoe', 'chappal', 'sandal', 'heel', 'sneaker', 'boot', 'jutti', 'mojari', 'flat', 'slipper', 'loafer', 'slide', 'flip flap'], true)) return 'Footwear';
+    if (has(['jewelry', 'necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'pin', 'bindi', 'tikka', 'mangalsutra'], true)) return 'Jewelry';
+    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'comb', 'scrunchy'], false) || has(['band', 'bow'], true)) return 'Hair Accessories';
+    if (has(['lipstick', 'serum', 'mask', 'cream', 'lotion', 'palette', 'perfume', 'skincare', 'makeup', 'cosmetic', 'beauty', 'eyeliner', 'kajal', 'face wash'], false)) return 'Beauty';
+    if (has(['watch', 'belt', 'wallet', 'purse', 'clutch'], true)) return 'Accessories';
+    if (has(['bag', 'backpack', 'handbag', 'tote'], true)) return 'Bag';
+
+    // Priority 2: Clothing categories (Substring matching is generally fine here)
+    if (has(['dress', 'saree', 'kurta', 'suit', 'gown', 'lehenga', 'anarkali'], false)) return 'Dress';
+    if (has(['jean', 'denim', 'trouser', 'pant', 'legging', 'jegging', 'short', 'skirt', 'palazzo', 'dhoti'], false)) return 'Bottom';
+    if (has(['top', 'shirt', 'blouse', 'tee', 't-shirt', 'kurti', 'tunic', 'crop top'], false)) return 'Top';
+    if (has(['jacket', 'coat', 'blazer', 'shrug', 'sweater', 'hoodie', 'cardigan', 'overcoat', 'windbreaker'], false)) return 'Outerwear';
+    if (has(['gym', 'sport', 'workout', 'active', 'track', 'yoga', 'sweatpant', 'hoodie'], false)) return 'Activewear';
+    
     return '';
   }
 
