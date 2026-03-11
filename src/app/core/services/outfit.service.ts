@@ -34,10 +34,13 @@ export class OutfitService {
         return this.http.post(`${environment.apiUrl}/outfits/`, formData);
     }
 
-    analyzeStyle(imageFile: File): Observable<any> {
+    analyzeStyle(imageFile: File, gender?: string): Observable<any> {
         const formData = new FormData();
         formData.append('image', imageFile);
-        return this.http.post(`${environment.apiUrl}/outfit/analyze`, formData);
+        if (gender) {
+            formData.append('gender', gender);
+        }
+        return this.http.post(`${environment.apiUrl}/recommendations/analyze`, formData);
     }
 
     deleteOutfit(id: number): Observable<any> {

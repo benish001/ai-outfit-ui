@@ -60,6 +60,25 @@ import { LucideAngularModule, Upload, CheckCircle, X, Camera, Sparkles } from 'l
           </div>
         </div>
 
+        <!-- Gender Selection (New) -->
+        <div class="mt-8 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-center text-gray-400 font-bold">Refine Your results</p>
+          <div class="flex gap-3">
+             <button *ngFor="let g of ['Male', 'Female']" 
+               (click)="selectedGender = g"
+               [class.bg-black]="selectedGender === g"
+               [class.text-white]="selectedGender === g"
+               [class.border-black]="selectedGender === g"
+               [class.bg-white]="selectedGender !== g"
+               [class.text-gray-400]="selectedGender !== g"
+               [class.border-[#E8E8E4]]="selectedGender !== g"
+               class="flex-1 py-4 border text-[10px] uppercase tracking-[0.3em] font-bold transition-all duration-300">
+               {{ g }}
+             </button>
+          </div>
+          <p class="text-[9px] text-center text-gray-300 italic">Selecting gender ensures more accurate fashion matches</p>
+        </div>
+
         <!-- Error -->
         <div *ngIf="error" class="mt-4 bg-red-50 border border-red-100 px-4 py-3">
           <p class="text-xs text-red-600">{{ error }}</p>
@@ -99,6 +118,7 @@ export class UploadComponent {
   preview: string | null = null;
   selectedFile: File | null = null;
   fileName = '';
+  selectedGender: string | null = null;
   isLoading = false;
   error = '';
 
@@ -127,7 +147,7 @@ export class UploadComponent {
     if (!this.selectedFile) return;
     this.isLoading = true;
     this.error = '';
-    this.outfitService.analyzeStyle(this.selectedFile).subscribe({
+    this.outfitService.analyzeStyle(this.selectedFile, this.selectedGender || undefined).subscribe({
       next: (result) => {
         localStorage.setItem('latest_recommendations', JSON.stringify(result));
         this.router.navigate(['/recommendations']);
