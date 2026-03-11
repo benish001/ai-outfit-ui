@@ -4,7 +4,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+/* ─── Design Tokens ───────────────────────── */
+:root {
+  --brand-gold: #D4AF37;
+  --brand-gold-light: #F9F3E3;
+  --brand-dark: #0A0A0A;
+  --surface: #F8F8F6;
+  --card: #FFFFFF;
+  --border: #EDEDE9;
+  --muted: #9A9A96;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --tab-height: 68px;
+}
 
 /* ─── Base ───────────────────────────────── */
 *,
@@ -16,92 +31,171 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
-  /* Accounts for the 80px fixed header globally */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #F7F7F5;
-  color: #0A0A0A;
+  background-color: var(--surface);
+  color: var(--brand-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-.luxury-font {
-  font-family: 'Playfair Display', serif;
+/* ─── Typography ──────────────────────────── */
+.luxury-font,
+h1.display,
+h2.display {
+  font-family: 'Cormorant Garamond', serif;
 }
 
 /* ─── Scrollbar ──────────────────────────── */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
+  height: 3px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F0F0EE;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D4AF37;
+  background: var(--brand-gold);
   border-radius: 2px;
 }
 
-/* ─── Color Tokens ───────────────────────── */
-:root {
-  --color-primary: #D4AF37;
-  --color-black: #0A0A0A;
-  --color-white: #FFFFFF;
-  --color-bg: #F7F7F5;
-  --color-surface: #FFFFFF;
-  --color-border: #E8E8E4;
-  --color-muted: #6B6B6B;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-/* ─── Tailwind Custom Color ──────────────── */
-.text-primary {
-  color: #D4AF37;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.bg-primary {
-  background-color: #D4AF37;
-}
+/* ─── Buttons ─────────────────────────────── */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 bg-black text-white font-bold uppercase tracking-[0.15em] text-[11px] px-8 py-4 rounded-xl transition-all duration-300 active:scale-95;
 
-.border-primary {
-  border-color: #D4AF37;
-}
+  &:hover {
+    background-color: var(--brand-gold);
+    color: var(--brand-dark);
+  }
 
-/* ─── Reusable Buttons ───────────────────── */
-.btn-luxury {
-  @apply inline-flex items-center justify-center gap-2 bg-black text-white text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 transition-all duration-300 hover:bg-[#D4AF37] hover:text-black;
-}
-
-.btn-luxury-outline {
-  @apply inline-flex items-center justify-center gap-2 bg-transparent text-black text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 border border-black transition-all duration-300 hover:bg-black hover:text-white;
+  &:disabled {
+    @apply opacity-40 cursor-not-allowed pointer-events-none;
+  }
 }
 
 .btn-gold {
-  @apply inline-flex items-center justify-center gap-2 bg-[#D4AF37] text-black text-[10px] font-bold uppercase tracking-[0.2em] px-8 py-4 transition-all duration-300 hover:bg-black hover:text-white;
+  @apply inline-flex items-center justify-center gap-2 font-bold uppercase tracking-[0.15em] text-[11px] px-8 py-4 rounded-xl transition-all duration-300 active:scale-95;
+  background-color: var(--brand-gold);
+  color: var(--brand-dark);
+
+  &:hover {
+    background-color: var(--brand-dark);
+    color: white;
+  }
 }
 
-/* ─── Cards ──────────────────────────────── */
-.premium-card {
-  @apply bg-white border border-[#E8E8E4] shadow-sm hover:shadow-md transition-shadow duration-300;
+.btn-outline {
+  @apply inline-flex items-center justify-center gap-2 bg-transparent font-bold uppercase tracking-[0.15em] text-[11px] px-8 py-4 rounded-xl border transition-all duration-300 active:scale-95;
+  border-color: var(--border);
+  color: var(--brand-dark);
+
+  &:hover {
+    border-color: var(--brand-dark);
+  }
+}
+
+/* Keep old names as aliases for backwards compat */
+.btn-luxury {
+  @extend .btn-primary;
+}
+
+.btn-luxury-outline {
+  @extend .btn-outline;
 }
 
 /* ─── Inputs ─────────────────────────────── */
+.app-input,
 .luxury-input {
-  @apply w-full bg-gray-50 border border-gray-200 focus:border-black text-black px-4 py-3 text-sm outline-none transition-colors duration-200 placeholder-gray-300 rounded-none;
+  @apply w-full bg-white border text-sm outline-none transition-all duration-200 placeholder-gray-300 px-4 py-3.5;
+  border-color: var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+
+  &:focus {
+    border-color: var(--brand-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+  }
+}
+
+/* ─── Cards ──────────────────────────────── */
+.app-card {
+  @apply bg-white transition-all duration-300;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+    transform: translateY(-2px);
+  }
+}
+
+.premium-card {
+  @extend .app-card;
+}
+
+/* ─── Pill Filters ───────────────────────── */
+.pill-filter {
+  @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-widest cursor-pointer transition-all duration-200 whitespace-nowrap border select-none;
+  border-color: var(--border);
+  color: var(--muted);
+  background: var(--card);
+
+  &.active,
+  &:hover {
+    background: var(--brand-dark);
+    color: white;
+    border-color: var(--brand-dark);
+  }
+
+  &.active-gold {
+    background: var(--brand-gold);
+    color: var(--brand-dark);
+    border-color: var(--brand-gold);
+  }
+}
+
+/* ─── Skeleton Loaders ───────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #EEEDE9 25%, #E5E3DE 50%, #EEEDE9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-sm);
 }
 
 /* ─── Animations ─────────────────────────── */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
   }
 
   to {
@@ -113,7 +207,7 @@ h4,
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(40px);
   }
 
   to {
@@ -142,18 +236,163 @@ h4,
   }
 }
 
+@keyframes scanLine {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px rgba(212, 175, 55, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.5s ease both;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.55s ease both;
 }
 
 .animate-slide-up {
   animation: slideUp 0.6s ease both;
 }
 
-.skeleton {
-  background: linear-gradient(90deg, #F0F0EE 25%, #E4E4E0 50%, #F0F0EE 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.animate-slide-left {
+  animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-scan {
+  animation: scanLine 2s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* ─── Product Card ────────────────────────── */
+.product-card {
+  @apply bg-white cursor-pointer overflow-hidden transition-all duration-300;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  &:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .product-image {
+    @apply w-full object-cover;
+    aspect-ratio: 3/4;
+    transition: transform 0.8s ease;
+  }
+
+  &:hover .product-image {
+    transform: scale(1.05);
+  }
+}
+
+/* ─── Bottom Tab Nav (Mobile) ────────────── */
+.bottom-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: var(--tab-height);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab-item {
+  @apply flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200;
+  flex: 1;
+  min-height: 52px;
+
+  .tab-icon {
+    @apply transition-all duration-200;
+    color: var(--muted);
+  }
+
+  .tab-label {
+    @apply text-[9px] font-semibold uppercase tracking-wider transition-all duration-200;
+    color: var(--muted);
+  }
+
+  &.active {
+    .tab-icon {
+      color: var(--brand-dark);
+    }
+
+    .tab-label {
+      color: var(--brand-dark);
+    }
+  }
+}
+
+/* ─── Mobile-First Page Padding ──────────── */
+.page-content {
+  padding-bottom: calc(var(--tab-height) + env(safe-area-inset-bottom) + 16px);
 }
 
 /* ─── PrimeNG Overrides ──────────────────── */
@@ -162,17 +401,17 @@ h4,
 }
 
 .p-datatable .p-datatable-thead>tr>th {
-  background: #F7F7F5 !important;
-  color: #6B6B6B !important;
+  background: #F8F8F6 !important;
+  color: #9A9A96 !important;
   font-size: 10px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.15em !important;
   font-weight: 700 !important;
-  border-bottom: 1px solid #E8E8E4 !important;
+  border-bottom: 1px solid #EDEDE9 !important;
 }
 
 .p-datatable .p-datatable-tbody>tr>td {
-  border-bottom: 1px solid #F0F0EE !important;
+  border-bottom: 1px solid #F3F3F0 !important;
   padding: 1rem 1.5rem !important;
 }
 

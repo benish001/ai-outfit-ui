@@ -1,171 +1,180 @@
 import { Component, inject, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { LucideAngularModule, Menu, X, ChevronDown, Sparkles, ShieldCheck } from 'lucide-angular';
+import { LucideAngularModule, Home, Upload, Sparkles, User, ShieldCheck, X, Settings, LogOut } from 'lucide-angular';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
+    <!-- TOP NAV (desktop only, or non-logged-in mobile) -->
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       [class.bg-white]="isScrolled"
       [class.shadow-sm]="isScrolled"
       [class.border-b]="isScrolled"
-      [class.border-[#E8E8E4]]="isScrolled"
+      [class.border-[#EDEDE9]]="isScrolled"
       [class.bg-transparent]="!isScrolled">
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 sm:h-20">
+        <div class="flex items-center justify-between h-16 sm:h-18">
 
           <!-- Logo -->
-          <a routerLink="/" class="flex items-center gap-1 group">
-            <span class="text-lg sm:text-xl font-black tracking-[0.2em] uppercase text-black">AI</span>
-            <span class="text-lg sm:text-xl luxury-font italic text-[#D4AF37] tracking-widest">Outfit</span>
+          <a routerLink="/" class="flex items-center gap-1.5 group flex-shrink-0">
+            <div class="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
+              <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
+            </div>
+            <span class="text-base font-black tracking-[0.15em] uppercase text-black">AI</span>
+            <span class="text-base luxury-font italic text-[#D4AF37]">Outfit</span>
           </a>
 
-          <!-- Desktop Nav -->
-          <nav class="hidden md:flex items-center gap-8">
-            <a routerLink="/" class="text-[10px] uppercase tracking-[0.2em] text-gray-500 hover:text-black transition-colors font-medium">Home</a>
-            <ng-container *ngIf="authService.user$ | async as user">
-              <a routerLink="/dashboard" class="text-[10px] uppercase tracking-[0.2em] text-gray-500 hover:text-black transition-colors font-medium">Dashboard</a>
-              <a routerLink="/upload" class="text-[10px] uppercase tracking-[0.2em] text-gray-500 hover:text-black transition-colors font-medium">Analyze</a>
-              <a *ngIf="user.is_admin" routerLink="/admin" class="text-[10px] uppercase tracking-[0.2em] text-[#D4AF37] hover:text-black transition-colors font-bold flex items-center gap-1">
-                <lucide-angular [img]="ShieldIcon" class="w-3 h-3"></lucide-angular>Admin
-              </a>
-            </ng-container>
+          <!-- Desktop Nav (only when logged in) -->
+          <nav class="hidden md:flex items-center gap-6" *ngIf="authService.user$ | async as user">
+            <a routerLink="/dashboard" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">Home</a>
+            <a routerLink="/upload" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">Analyze</a>
+            <a routerLink="/recommendations" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">My Looks</a>
+            <a *ngIf="user.is_admin" routerLink="/admin" class="text-[11px] uppercase tracking-[0.2em] text-[#D4AF37] hover:text-black transition-colors flex items-center gap-1.5 font-bold">
+              <lucide-angular [img]="ShieldIcon" class="w-3 h-3"></lucide-angular>Admin
+            </a>
           </nav>
 
-          <!-- Right Actions -->
-          <div class="flex items-center gap-3 sm:gap-4">
-            <ng-container *ngIf="authService.user$ | async as user; else guestNav">
-              <div class="relative group hidden sm:block">
-                <button class="flex items-center gap-2 py-1">
-                  <div class="w-8 h-8 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#B8860B] text-xs font-bold uppercase">
-                    {{ (user.name || user.email).charAt(0) }}
-                  </div>
-                  <span class="text-[10px] uppercase tracking-widest text-gray-700 hidden lg:block max-w-[100px] truncate">{{ user.name || (user.email || '').split('@')[0] }}</span>
-                  <lucide-angular [img]="ChevronIcon" class="w-3 h-3 text-gray-400"></lucide-angular>
-                </button>
-                <!-- Dropdown -->
-                <div class="absolute right-0 top-full mt-3 hidden group-hover:block bg-white border border-[#E8E8E4] shadow-xl min-w-[200px] py-2 z-50">
-                  <div class="px-4 py-2 border-b border-[#E8E8E4]">
-                    <p class="text-[9px] uppercase tracking-widest text-gray-400">Signed in as</p>
-                    <p class="text-xs text-black font-medium truncate mt-0.5">{{ user.email }}</p>
-                  </div>
-                  <a routerLink="/dashboard" class="block px-4 py-2.5 text-[10px] uppercase tracking-widest text-gray-600 hover:bg-[#F7F7F5] hover:text-black transition-colors">Dashboard</a>
-                  <a routerLink="/upload" class="block px-4 py-2.5 text-[10px] uppercase tracking-widest text-gray-600 hover:bg-[#F7F7F5] hover:text-black transition-colors">New Analysis</a>
-                  <a routerLink="/recommendations" class="block px-4 py-2.5 text-[10px] uppercase tracking-widest text-gray-600 hover:bg-[#F7F7F5] hover:text-black transition-colors">Recommendations</a>
-                  <div *ngIf="user.is_admin" class="border-t border-[#E8E8E4] mt-1 pt-1">
-                    <a routerLink="/admin" class="block px-4 py-2.5 text-[10px] uppercase tracking-widest text-[#D4AF37] hover:bg-[#F7F7F5] transition-colors font-bold">Admin Portal</a>
-                  </div>
-                  <div class="border-t border-[#E8E8E4] mt-1 pt-1">
-                    <button (click)="authService.logout()" class="w-full text-left px-4 py-2.5 text-[10px] uppercase tracking-widest text-red-500 hover:bg-red-50 transition-colors">Sign Out</button>
-                  </div>
+          <!-- Guest desktop nav -->
+          <nav class="hidden md:flex items-center gap-4" *ngIf="!(authService.user$ | async)">
+            <a routerLink="/login" class="text-[11px] uppercase tracking-[0.2em] text-gray-500 hover:text-black transition-colors font-medium">Sign In</a>
+            <a routerLink="/register" class="btn-primary text-[10px] px-5 py-2.5">Join Free</a>
+          </nav>
+
+          <!-- Right side: User avatar (desktop) -->
+          <ng-container *ngIf="authService.user$ | async as user">
+            <!-- Desktop profile dropdown -->
+            <div class="relative group hidden md:block">
+              <button class="flex items-center gap-2.5 py-1.5 px-3 rounded-xl hover:bg-gray-50 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border-2 border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black uppercase">
+                  {{ (user.name || user.email).charAt(0) }}
+                </div>
+                <span class="text-[11px] uppercase tracking-wider text-gray-700 hidden lg:block max-w-[100px] truncate font-semibold">{{ user.name || (user.email || '').split('@')[0] }}</span>
+              </button>
+              <!-- Dropdown -->
+              <div class="absolute right-0 top-full mt-2 hidden group-hover:block bg-white border border-[#EDEDE9] shadow-2xl rounded-2xl min-w-[220px] py-2 z-50 overflow-hidden">
+                <div class="px-4 py-3 border-b border-[#EDEDE9]">
+                  <p class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold">Signed in as</p>
+                  <p class="text-sm text-black font-semibold truncate mt-0.5">{{ user.email }}</p>
+                </div>
+                <a routerLink="/dashboard" class="flex items-center gap-3 px-4 py-3 text-[11px] uppercase tracking-wider text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
+                  <lucide-angular [img]="HomeIcon" class="w-4 h-4"></lucide-angular>Dashboard
+                </a>
+                <a routerLink="/upload" class="flex items-center gap-3 px-4 py-3 text-[11px] uppercase tracking-wider text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
+                  <lucide-angular [img]="UploadIcon" class="w-4 h-4"></lucide-angular>New Analysis
+                </a>
+                <a routerLink="/recommendations" class="flex items-center gap-3 px-4 py-3 text-[11px] uppercase tracking-wider text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
+                  <lucide-angular [img]="SparklesIcon" class="w-4 h-4"></lucide-angular>My Looks
+                </a>
+                <div class="border-t border-[#EDEDE9] mt-1 pt-1">
+                  <button (click)="authService.logout()" class="w-full flex items-center gap-3 px-4 py-3 text-[11px] uppercase tracking-wider text-red-500 hover:bg-red-50 transition-colors">
+                    <lucide-angular [img]="LogOutIcon" class="w-4 h-4"></lucide-angular>Sign Out
+                  </button>
                 </div>
               </div>
-              <!-- Mobile avatar -->
-              <button (click)="toggleMenu()" class="sm:hidden w-8 h-8 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#B8860B] text-xs font-bold uppercase">
-                {{ (user.name || user.email)?.charAt(0) }}
-              </button>
-            </ng-container>
+            </div>
+          </ng-container>
 
-            <ng-template #guestNav>
-              <a routerLink="/login" class="hidden sm:block text-[10px] uppercase tracking-[0.2em] text-gray-500 hover:text-black transition-colors font-medium">Sign In</a>
-              <a routerLink="/register" class="btn-luxury text-[9px] px-5 py-2.5">Join Free</a>
-            </ng-template>
-
-            <!-- Hamburger (mobile) -->
-            <button (click)="toggleMenu()" class="md:hidden p-1 text-black">
-              <lucide-angular [img]="menuOpen() ? CloseIcon : MenuIcon" class="w-5 h-5"></lucide-angular>
+          <!-- Mobile hamburger for guest -->
+          <ng-container *ngIf="!(authService.user$ | async)">
+            <button (click)="toggleMenu()" class="md:hidden p-2 text-black rounded-lg hover:bg-gray-100 transition-colors">
+              <div class="w-5 h-4 flex flex-col justify-between">
+                <span class="block h-0.5 bg-black rounded-full transition-all"></span>
+                <span class="block h-0.5 bg-black rounded-full transition-all w-3/4"></span>
+                <span class="block h-0.5 bg-black rounded-full transition-all"></span>
+              </div>
             </button>
-          </div>
+          </ng-container>
         </div>
       </div>
 
-      <!-- Mobile Menu Overlay -->
-      <div 
-        *ngIf="menuOpen()" 
-        class="fixed inset-0 z-[100] md:hidden bg-black/60 backdrop-blur-md transition-all duration-500 animate-fade-in"
+      <!-- Mobile Guest Menu -->
+      <div *ngIf="menuOpen() && !(authService.user$ | async)"
+        class="fixed inset-0 z-[100] md:hidden bg-black/50 backdrop-blur-sm animate-fade-in"
         (click)="toggleMenu()">
-        
-        <div 
-          class="absolute top-0 right-0 w-[280px] h-full bg-white shadow-2xl flex flex-col transform transition-transform duration-500 animate-slide-left p-8"
+        <div class="absolute top-0 right-0 w-72 h-full bg-white shadow-2xl animate-slide-left flex flex-col p-8"
           (click)="$event.stopPropagation()">
-          
-          <div class="flex items-center justify-between mb-12">
-            <div class="flex items-center gap-1">
-              <span class="text-xl font-black tracking-widest text-black">AI</span>
-              <span class="text-xl luxury-font italic text-[#D4AF37]">Outfit</span>
+          <div class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-1.5">
+              <div class="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
+                <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
+              </div>
+              <span class="font-black tracking-widest text-black">AI</span>
+              <span class="luxury-font italic text-[#D4AF37]">Outfit</span>
             </div>
-            <button (click)="toggleMenu()" class="p-2 text-gray-400 hover:text-black transition-colors rounded-full border border-gray-100">
+            <button (click)="toggleMenu()" class="p-2 text-gray-400 hover:text-black rounded-xl border border-[#EDEDE9] transition-colors">
               <lucide-angular [img]="CloseIcon" class="w-4 h-4"></lucide-angular>
             </button>
           </div>
-
-          <div class="space-y-6">
-            <a routerLink="/" (click)="toggleMenu()" class="block text-[11px] uppercase tracking-[0.3em] font-bold text-gray-400 hover:text-[#D4AF37] transition-all">Home</a>
-            
-            <div class="h-[1px] bg-gray-50 w-full"></div>
-
-            <ng-container *ngIf="authService.user$ | async as user; else guestMobile">
-              <div class="pb-4">
-                <p class="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold mb-4">Membership</p>
-                <div class="space-y-6">
-                  <a routerLink="/dashboard" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span> Dashboard
-                  </a>
-                  <a routerLink="/upload" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span> New Analysis
-                  </a>
-                  <a routerLink="/recommendations" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-black flex items-center gap-3">
-                    <span class="w-1.5 h-1.5 rounded-full bg-gray-200"></span> Recommendations
-                  </a>
-                  <a *ngIf="user.is_admin" routerLink="/admin" (click)="toggleMenu()" class="block text-[12px] uppercase tracking-[0.2em] font-bold text-[#D4AF37] flex items-center gap-3">
-                    <lucide-angular [img]="ShieldIcon" class="w-4 h-4"></lucide-angular> Admin Portal
-                  </a>
-                </div>
-              </div>
-
-              <div class="mt-auto pt-12 border-t border-gray-50">
-                <div class="flex items-center gap-4 mb-6">
-                  <div class="w-10 h-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center font-bold text-[#D4AF37]">
-                    {{ (user.name || user.email).charAt(0).toUpperCase() }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-[10px] uppercase tracking-widest font-black text-black truncate">{{ user.name || 'Member' }}</p>
-                    <p class="text-[9px] text-gray-400 truncate">{{ user.email }}</p>
-                  </div>
-                </div>
-                <button (click)="authService.logout()" class="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-red-50 text-red-500 text-[10px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-red-100">
-                  Sign Out
-                </button>
-              </div>
-            </ng-container>
-
-            <ng-template #guestMobile>
-              <div class="space-y-4 pt-4">
-                <a routerLink="/login" (click)="toggleMenu()" class="block w-full py-4 text-center border border-black text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black hover:text-white transition-all">Sign In</a>
-                <a routerLink="/register" (click)="toggleMenu()" class="block w-full py-4 text-center bg-black text-white text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#D4AF37] transition-all">Join Club</a>
-              </div>
-            </ng-template>
+          <div class="space-y-4 flex-1">
+            <a routerLink="/login" (click)="toggleMenu()" class="block w-full py-4 text-center rounded-xl border border-[#EDEDE9] text-[11px] uppercase tracking-widest font-bold hover:border-black transition-all">Sign In</a>
+            <a routerLink="/register" (click)="toggleMenu()" class="block w-full py-4 text-center rounded-xl bg-black text-white text-[11px] uppercase tracking-widest font-bold hover:bg-[#D4AF37] hover:text-black transition-all">Join Free</a>
           </div>
+          <p class="text-[9px] text-gray-300 uppercase tracking-widest text-center">© 2024 AI Outfit Advisor</p>
         </div>
       </div>
     </header>
+
+    <!-- BOTTOM TAB BAR (mobile, logged-in users only) -->
+    <ng-container *ngIf="authService.user$ | async as user">
+      <nav class="bottom-tab-bar md:hidden">
+        <a routerLink="/dashboard" class="tab-item" [class.active]="currentRoute === '/dashboard'">
+          <lucide-angular [img]="HomeIcon" class="tab-icon w-5 h-5"></lucide-angular>
+          <span class="tab-label">Home</span>
+        </a>
+        <a routerLink="/upload" class="tab-item" [class.active]="currentRoute === '/upload'">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200"
+            [class.bg-black]="currentRoute === '/upload'"
+            [class.bg-gray-100]="currentRoute !== '/upload'">
+            <lucide-angular [img]="UploadIcon" class="w-5 h-5 transition-all"
+              [class.text-white]="currentRoute === '/upload'"
+              [class.text-black]="currentRoute !== '/upload'"></lucide-angular>
+          </div>
+          <span class="tab-label">Analyze</span>
+        </a>
+        <a routerLink="/recommendations" class="tab-item" [class.active]="currentRoute === '/recommendations'">
+          <lucide-angular [img]="SparklesIcon" class="tab-icon w-5 h-5"></lucide-angular>
+          <span class="tab-label">Looks</span>
+        </a>
+        <a routerLink="/dashboard" class="tab-item" [class.active]="false">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black">
+            {{ (user.name || user.email)?.charAt(0)?.toUpperCase() }}
+          </div>
+          <span class="tab-label">Profile</span>
+        </a>
+      </nav>
+    </ng-container>
   `
 })
 export class HeaderComponent {
   authService = inject(AuthService);
+  private router = inject(Router);
   menuOpen = signal(false);
   isScrolled = false;
+  currentRoute = '/dashboard';
 
-  readonly MenuIcon = Menu;
-  readonly CloseIcon = X;
-  readonly ChevronIcon = ChevronDown;
+  readonly HomeIcon = Home;
+  readonly UploadIcon = Upload;
   readonly SparklesIcon = Sparkles;
+  readonly UserIcon = User;
   readonly ShieldIcon = ShieldCheck;
+  readonly CloseIcon = X;
+  readonly SettingsIcon = Settings;
+  readonly LogOutIcon = LogOut;
+
+  constructor() {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      this.currentRoute = e.urlAfterRedirects || e.url;
+      this.menuOpen.set(false);
+    });
+  }
 
   toggleMenu() { this.menuOpen.update(v => !v); }
 

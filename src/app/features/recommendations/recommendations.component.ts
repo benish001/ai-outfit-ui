@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, ExternalLink, RefreshCw, ShoppingBag, Sparkles, Search, Loader2 } from 'lucide-angular';
+import { LucideAngularModule, ExternalLink, RefreshCw, ShoppingBag, Sparkles, Search, Loader2, SlidersHorizontal, Camera } from 'lucide-angular';
 import { OutfitService } from '../../core/services/outfit.service';
 
 @Component({
@@ -10,229 +10,226 @@ import { OutfitService } from '../../core/services/outfit.service';
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-[#FDFDFB] pb-24">
+    <div class="min-h-screen bg-[#F8F8F6] pt-16 page-content">
 
-      <!-- Premium Sticky Header - Adjusted for Global Header (80px) -->
-      <div class="sticky top-[80px] z-[40] bg-white/80 backdrop-blur-xl border-b border-[#E8E8E4] pt-8 pb-6 transition-all duration-500">
-        <div class="max-w-7xl mx-auto px-6 sm:px-10">
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div class="space-y-3">
-              <div class="flex items-center gap-3">
-                <span class="w-8 h-[1px] bg-[#D4AF37]"></span>
-                <p class="text-[10px] uppercase tracking-[0.5em] text-[#D4AF37] font-bold">Curated Luxury</p>
+      <!-- Skin Tone Profile Banner -->
+      <div *ngIf="analysisResult" class="bg-black text-white animate-fade-in">
+        <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40 flex-shrink-0">
+              <img *ngIf="analysisResult.photo?.url" [src]="analysisResult.photo?.url" class="w-full h-full object-cover">
+              <div *ngIf="!analysisResult.photo?.url" class="w-full h-full bg-[#D4AF37]/20 flex items-center justify-center">
+                <lucide-angular [img]="CameraIcon" class="w-6 h-6 text-[#D4AF37]"></lucide-angular>
               </div>
-              <h1 class="text-4xl sm:text-5xl luxury-font text-black transition-all">Style <span class="italic text-[#D4AF37]">Explorer</span></h1>
             </div>
-
-            <!-- Search & Actions -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1 max-w-2xl justify-end">
-              <div class="relative group flex-1">
-                <input 
-                  type="text" 
-                  [(ngModel)]="searchQuery" 
-                  (keyup.enter)="searchExternal()"
-                  placeholder="Search live fashion (Denim, Saree, Evening)..." 
-                  class="w-full bg-[#F7F7F5] border-0 border-b-2 border-transparent px-12 py-4 text-xs tracking-wider text-black focus:border-[#D4AF37] focus:bg-white transition-all outline-none rounded-t-lg shadow-sm group-hover:shadow-md">
-                <lucide-angular [img]="SearchIcon" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#D4AF37] transition-colors"></lucide-angular>
-                <button 
-                  (click)="searchExternal()"
-                  [disabled]="isSearching || !searchQuery"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 bg-black text-white text-[9px] uppercase tracking-widest px-6 py-2.5 hover:bg-[#D4AF37] transition-all disabled:opacity-50 overflow-hidden group/btn">
-                  <span *ngIf="!isSearching" class="relative z-10">Find Now</span>
-                  <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin mx-2"></lucide-angular>
-                </button>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-white">Style Profile</span>
+                <span class="w-1 h-1 rounded-full bg-[#D4AF37]"></span>
+                <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-[#D4AF37]">{{ analysisResult.gender }}</span>
+              </div>
+              <p class="text-sm font-bold text-white mt-0.5 truncate">
+                {{ analysisResult.skin_tone }}
+                <span class="text-white/40 font-normal text-xs ml-2">· {{ trendingOutfits.length }} matches found</span>
+              </p>
+            </div>
+            <!-- Color dots -->
+            <div class="flex gap-1.5 flex-shrink-0">
+              <div *ngFor="let color of (analysisResult.recommended_colors || []).slice(0, 5)"
+                class="w-5 h-5 rounded-full border-2 border-white/20"
+                [style.background]="color.toLowerCase().replace(' ', '')"
+                [title]="color">
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Style Profile Banner (Dynamic) -->
-          <div *ngIf="analysisResult" class="mt-8 flex items-center gap-4 bg-[#D4AF37]/5 border border-[#D4AF37]/10 p-4 rounded-sm animate-fade-in shadow-inner">
-            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
-               <img [src]="analysisResult.photo?.url" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-3">
-                 <p class="text-[9px] uppercase tracking-[0.3em] font-black text-black">Style Profile Detected</p>
-                 <span class="w-1 h-1 rounded-full bg-[#D4AF37]"></span>
-                 <p class="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">{{ analysisResult.gender }}</p>
-              </div>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-gray-500 font-light">Tone: <span class="font-bold text-black">{{ analysisResult.skin_tone }}</span></span>
-                <span class="text-gray-200">|</span>
-                <span class="text-[10px] text-gray-500 font-light italic">Optimized for your unique complexion</span>
-              </div>
-            </div>
-            <div class="hidden sm:flex gap-1">
-               <div *ngFor="let color of analysisResult.recommended_colors" 
-                    [style.background-color]="color.toLowerCase().replace(' ', '')"
-                    class="w-3 h-3 rounded-full border border-white shadow-sm"
-                    [title]="color"></div>
+      <!-- Page Header + Search -->
+      <div class="sticky top-16 z-40 bg-white/95 backdrop-blur-xl border-b border-[#EDEDE9]">
+        <div class="max-w-7xl mx-auto px-5 sm:px-8">
+          <!-- Title row -->
+          <div class="flex items-center justify-between py-4">
+            <h1 class="text-2xl luxury-font text-black">Style <span class="italic text-[#D4AF37]">Explorer</span></h1>
+            <div class="flex items-center gap-2">
+              <button (click)="loadTrendingOutfits()" class="w-9 h-9 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl flex items-center justify-center hover:border-black transition-colors">
+                <lucide-angular [img]="RefreshIcon" class="w-4 h-4 text-gray-400 hover:text-black" [class.animate-spin]="isLoading"></lucide-angular>
+              </button>
             </div>
           </div>
 
-          <!-- Category Navigation -->
-          <div class="flex items-center gap-8 mt-10 overflow-x-auto no-scrollbar pb-2">
+          <!-- Search bar -->
+          <div class="relative pb-3">
+            <lucide-angular [img]="SearchIcon" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9A9A96]"></lucide-angular>
+            <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchExternal()"
+              placeholder="Search: Denim, Saree, Sneakers..."
+              class="w-full bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl pl-11 pr-28 py-3 text-sm text-black placeholder-[#9A9A96] focus:outline-none focus:border-black transition-all">
+            <button (click)="searchExternal()" [disabled]="isSearching || !searchQuery"
+              class="absolute right-2 top-1/2 -translate-y-1/2 bg-black text-white text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
+              <span *ngIf="!isSearching">Search</span>
+              <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin"></lucide-angular>
+            </button>
+          </div>
+
+          <!-- Category Pill Filters -->
+          <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3">
             <button *ngFor="let cat of categories"
               (click)="setActiveCategory(cat)"
-              [class.text-black]="activeCategory === cat"
-              [class.text-gray-400]="activeCategory !== cat"
-              class="relative text-[10px] uppercase tracking-[0.3em] font-bold py-2 whitespace-nowrap transition-colors hover:text-[#D4AF37] group">
+              class="pill-filter flex-shrink-0"
+              [class.active]="activeCategory === cat">
               {{ cat }}
-              <span class="absolute bottom-0 left-0 w-full h-[2px] bg-[#D4AF37] scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-                [class.scale-x-100]="activeCategory === cat"></span>
             </button>
           </div>
         </div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-6 sm:px-10 py-12">
-        <div id="top-of-grid" class="scroll-mt-grid"></div>
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-6" id="top-of-grid">
 
-        <!-- Search Results Grid -->
-        <div *ngIf="searchResults.length > 0" id="search-results" class="mb-24 animate-fade-in scroll-mt-grid">
-          <div class="flex items-end justify-between mb-12 border-b border-[#E8E8E4] pb-6">
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="animate-fade-in">
+            <div class="skeleton rounded-2xl mb-3" style="aspect-ratio:3/4;"></div>
+            <div class="skeleton h-4 rounded-xl w-3/4 mb-2"></div>
+            <div class="skeleton h-3 rounded-xl w-1/2"></div>
+          </div>
+        </div>
+
+        <!-- Search Results -->
+        <div *ngIf="searchResults.length > 0 && !isLoading" id="search-results" class="mb-10 animate-fade-in">
+          <div class="flex items-center justify-between mb-5">
             <div>
-              <p class="text-[9px] uppercase tracking-[0.4em] text-[#D4AF37] font-bold mb-3">Instant Discovery</p>
-              <h2 class="text-3xl luxury-font text-black">Results for <span class="italic text-[#D4AF37]">"{{ lastSearchQuery }}"</span></h2>
+              <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-1">Live Search</p>
+              <h2 class="text-xl font-bold text-black">Results for "{{ lastSearchQuery }}"</h2>
             </div>
-            <button (click)="searchResults = []" class="text-[9px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors flex items-center gap-2 group">
-              <span class="w-4 h-4 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-black transition-colors">×</span>
-              Clear Discovery
+            <button (click)="searchResults = []" class="text-[10px] uppercase tracking-widest text-[#9A9A96] hover:text-black transition-colors flex items-center gap-2 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl px-3 py-2">
+              ✕ Clear
             </button>
           </div>
-          <!-- ... grid continues -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div *ngFor="let outfit of filteredSearchResults; let i = index"
               class="group animate-fade-in-up"
-              [style.animation-delay]="i * 50 + 'ms'">
-
-              <div class="relative aspect-[3/4] overflow-hidden bg-[#F7F7F5] mb-4 shadow-sm group-hover:shadow-2xl transition-all duration-500 rounded-sm">
+              [style.animation-delay]="i * 40 + 'ms'">
+              <div class="relative rounded-2xl overflow-hidden bg-white border border-[#EDEDE9] mb-3"
+                style="aspect-ratio:3/4;">
                 <img [src]="outfit.image_url" [alt]="outfit.name"
-                  class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
-
-                <!-- Hover Overlay -->
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-5 translate-y-4 group-hover:translate-y-0">
+                  loading="lazy"
+                  (error)="handleImageError($event)"
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <!-- Action overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-3">
                   <button (click)="buyNow(outfit.affiliate_link)"
-                    class="w-full bg-white text-black py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#D4AF37] hover:text-white transition-all transform translate-y-2 group-hover:translate-y-0">
-                    Acquire Piece
+                    class="w-full bg-white text-black py-2.5 text-[10px] uppercase tracking-widest font-bold rounded-xl hover:bg-[#D4AF37] transition-all">
+                    Buy Now
                   </button>
                 </div>
-
-                <!-- Brand Float -->
-                <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 text-[8px] uppercase tracking-[0.2em] text-black font-black border border-[#E8E8E4] shadow-sm transform -rotate-1 group-hover:rotate-0 transition-transform">
-                  {{ outfit.brand || 'Luxury' }}
-                </div>
-                
-                <!-- Platforms -->
-                <div class="absolute top-4 right-4 flex gap-1">
-                  <div class="w-2 h-2 rounded-full" [class.bg-orange-500]="outfit.image_url.includes('amazon')" [class.bg-blue-500]="outfit.image_url.includes('flipkart')"></div>
+                <!-- Brand tag -->
+                <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[9px] font-bold uppercase tracking-wider border border-white/20 shadow-sm">
+                  {{ outfit.brand || 'Premium' }}
                 </div>
               </div>
-
-              <div class="space-y-2 px-1">
-                <p class="text-[8px] uppercase tracking-widest text-[#D4AF37] font-bold">Direct Discovery</p>
-                <h3 class="text-[11px] font-medium uppercase tracking-wider text-black truncate group-hover:text-[#D4AF37] transition-colors leading-relaxed">{{ outfit.name }}</h3>
-                <div class="flex items-baseline gap-2">
-                  <span class="text-sm font-light text-black tracking-tighter">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
-                  <span class="text-[8px] text-gray-400 line-through font-light" *ngIf="outfit.price > 0">{{ (outfit.price * 1.5) | currency:'INR':'symbol':'1.0-0' }}</span>
-                </div>
+              <div class="px-1">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-black truncate" [title]="outfit.name">{{ outfit.name }}</h3>
+                <p class="text-sm font-black text-black mt-0.5">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Main Product Feed - Category Wise -->
-        <div *ngIf="groupedProducts.length > 0" id="product-feed" class="space-y-24 scroll-mt-grid">
-          
-          <div *ngFor="let group of groupedProducts; let groupIdx = index" class="space-y-12 animate-fade-in" [style.animation-delay]="groupIdx * 100 + 'ms'">
-            <!-- Category Header -->
-            <div class="flex items-center gap-6">
-              <div class="space-y-1">
-                <p *ngIf="group.name === 'Dresses & Outfits'" class="text-[8px] uppercase tracking-[0.4em] text-[#D4AF37] font-black">Matched to Complexion</p>
-                <h2 class="text-2xl luxury-font text-black whitespace-nowrap">{{ group.name }} <span class="italic text-[#D4AF37]">Selection</span></h2>
+        <!-- Main Product Feed -->
+        <div *ngIf="!isLoading && groupedProducts.length > 0" class="space-y-12">
+          <div *ngFor="let group of groupedProducts; let groupIdx = index"
+            class="animate-fade-in" [style.animation-delay]="groupIdx * 80 + 'ms'">
+
+            <!-- Section Header -->
+            <div class="flex items-center gap-4 mb-6">
+              <div>
+                <div *ngIf="group.name === 'Dresses & Outfits'" class="flex items-center gap-1.5 mb-1">
+                  <lucide-angular [img]="SparklesIcon" class="w-3 h-3 text-[#D4AF37]"></lucide-angular>
+                  <p class="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">Matched to Your Tone</p>
+                </div>
+                <h2 class="text-xl font-bold text-black">{{ group.name }}</h2>
               </div>
-              <div class="flex-1 h-[1px] bg-gray-100 mt-4"></div>
-              <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-bold whitespace-nowrap mt-4">{{ group.items.length }} Pieces</p>
+              <div class="flex-1 h-px bg-[#EDEDE9]"></div>
+              <span class="text-[10px] uppercase tracking-widest text-[#9A9A96] font-semibold">{{ group.items.length }}</span>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-8 gap-y-14">
+            <!-- Product Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               <div *ngFor="let outfit of group.items; let i = index"
                 class="group animate-fade-in-up"
-                [style.animation-delay]="(i % 10) * 60 + 'ms'">
+                [style.animation-delay]="(i % 10) * 50 + 'ms'">
 
-                <div class="relative aspect-[3/4] overflow-hidden bg-[#F7F7F5] mb-5 shadow-sm hover:shadow-xl transition-all duration-700 rounded-sm">
+                <div class="relative rounded-2xl overflow-hidden bg-white border border-[#EDEDE9] mb-3 transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1"
+                  style="aspect-ratio:3/4;">
                   <img [src]="outfit.image_url" [alt]="outfit.name"
-                    class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105">
+                    loading="lazy"
+                    (error)="handleImageError($event)"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
 
-                  <!-- Premium Badge -->
-                  <div *ngIf="isMainOutfit(outfit.category)" class="absolute top-0 right-0 bg-[#D4AF37] text-black text-[7px] uppercase tracking-widest px-3 py-1.5 font-black shadow-lg">
-                    Style Match
+                  <!-- Style match badge -->
+                  <div *ngIf="isMainOutfit(outfit.category)"
+                    class="absolute top-0 right-0 bg-[#D4AF37] text-black text-[8px] uppercase tracking-widest px-2.5 py-1.5 font-black rounded-bl-xl">
+                    ✦ Match
                   </div>
 
-                  <!-- Hover Actions -->
-                  <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-6 text-center space-y-4">
-                     <div class="space-y-1 transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <p class="text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">{{ outfit.brand || 'Luxury' }}</p>
-                        <h4 class="text-white text-[10px] uppercase tracking-wider font-light line-clamp-2 px-4 leading-relaxed">{{ outfit.name }}</h4>
-                     </div>
-                     <button (click)="buyNow(outfit.affiliate_link)"
-                      class="w-full bg-white text-black py-3.5 text-[9px] uppercase tracking-[0.3em] font-black transition-all hover:bg-[#D4AF37]">
-                      Shop Piece
+                  <!-- Hover overlay with CTA -->
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col justify-end p-4 gap-3">
+                    <div>
+                      <p class="text-[9px] text-[#D4AF37] uppercase tracking-widest font-bold">{{ outfit.brand || 'Premium' }}</p>
+                      <p class="text-[11px] text-white font-semibold leading-snug line-clamp-2">{{ outfit.name }}</p>
+                    </div>
+                    <button (click)="buyNow(outfit.affiliate_link)"
+                      class="w-full bg-white text-black py-2.5 text-[10px] uppercase tracking-widest font-black rounded-xl hover:bg-[#D4AF37] transition-all active:scale-95">
+                      Buy Now
                     </button>
                   </div>
 
-                  <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-2 py-1 text-[7px] uppercase tracking-widest text-black font-bold border border-gray-100">
-                    {{ outfit.category || 'Premium' }}
+                  <!-- Category badge (bottom) - only show for non-accessory items -->
+                  <div *ngIf="getCleanCategory(outfit.category)"
+                    class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 text-[8px] font-semibold uppercase tracking-wider text-white border border-white/10">
+                    {{ getCleanCategory(outfit.category) }}
                   </div>
                 </div>
 
-                <div class="space-y-2 px-1 transition-transform duration-300">
-                  <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-black truncate leading-tight">{{ outfit.name }}</h3>
-                  <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-black text-black tracking-tighter">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
-                    <span class="text-[8px] uppercase tracking-widest text-gray-400 font-medium">{{ outfit.color }}</span>
+                <!-- Card text -->
+                <div class="px-1">
+                  <h3 class="text-[11px] font-bold uppercase tracking-wider text-black truncate" [title]="outfit.name">{{ outfit.name }}</h3>
+                  <div class="flex items-center justify-between mt-1">
+                    <span class="text-sm font-black text-black">{{ outfit.price | currency:'INR':'symbol':'1.0-0' }}</span>
+                    <span class="text-[9px] uppercase tracking-widest text-[#9A9A96] font-semibold">{{ outfit.color }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- End of List -->
-          <div class="text-center pt-20 border-t border-gray-50">
-            <p class="text-[9px] uppercase tracking-[0.5em] text-gray-300 font-bold">End of Curated Selection</p>
+
+          <!-- End of list -->
+          <div class="text-center py-12 border-t border-[#EDEDE9]">
+            <p class="text-[10px] uppercase tracking-[0.4em] text-[#9A9A96] font-semibold">End of Curated Selection</p>
           </div>
         </div>
 
-        <!-- Empty State -->
-        <div *ngIf="trendingOutfits.length === 0 && searchResults.length === 0 && !isSearching" class="text-center py-40 space-y-8 animate-fade-in">
-          <div class="w-24 h-24 bg-white border border-[#E8E8E4] rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <lucide-angular [img]="BagIcon" class="w-8 h-8 text-gray-200"></lucide-angular>
+        <!-- Empty State (no data and not loading) -->
+        <div *ngIf="!isLoading && trendingOutfits.length === 0 && searchResults.length === 0" class="flex flex-col items-center justify-center py-24 space-y-6 animate-fade-in">
+          <div class="w-24 h-24 bg-white border border-[#EDEDE9] rounded-3xl flex items-center justify-center shadow-sm">
+            <lucide-angular [img]="BagIcon" class="w-10 h-10 text-[#EDEDE9]"></lucide-angular>
           </div>
-          <div class="max-w-md mx-auto space-y-3">
-            <h3 class="text-2xl luxury-font text-gray-400">Discovering New Trends</h3>
-            <p class="text-[11px] uppercase tracking-widest text-gray-300 leading-relaxed">Our AI is currently syncing the latest fashion from premium catalogs.</p>
+          <div class="text-center space-y-2 max-w-xs">
+            <h3 class="text-xl luxury-font text-[#9A9A96]">Discovering New Trends</h3>
+            <p class="text-[11px] uppercase tracking-widest text-[#9A9A96]/60 leading-relaxed">Our AI is syncing the latest fashion from premium catalogs.</p>
           </div>
-          <button (click)="loadTrendingOutfits()" class="text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] font-bold hover:text-black transition-colors">Refresh Catalog</button>
+          <div class="flex gap-3">
+            <a routerLink="/upload" class="btn-primary text-[10px] px-6 py-3">
+              <lucide-angular [img]="CameraIcon" class="w-4 h-4"></lucide-angular>
+              Analyze Your Style
+            </a>
+            <button (click)="loadTrendingOutfits()" class="btn-outline text-[10px] px-6 py-3">Refresh</button>
+          </div>
         </div>
       </div>
     </div>
   `,
-  styles: [`
-    :host { display: block; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-    
-    /* Ensure smooth transitions for category changes */
-    .scroll-mt-grid {
-      scroll-margin-top: 350px;
-    }
-  `]
+  styles: [`:host { display: block; }`]
 })
 export class RecommendationsComponent implements OnInit {
   private outfitService = inject(OutfitService);
@@ -243,12 +240,14 @@ export class RecommendationsComponent implements OnInit {
   readonly SparklesIcon = Sparkles;
   readonly SearchIcon = Search;
   readonly LoaderIcon = Loader2;
+  readonly CameraIcon = Camera;
 
   trendingOutfits: any[] = [];
   searchResults: any[] = [];
   searchQuery: string = '';
   lastSearchQuery: string = '';
   isSearching: boolean = false;
+  isLoading: boolean = false;
   analysisResult: any = null;
 
   categories: string[] = ['All', 'Dress'];
@@ -263,40 +262,41 @@ export class RecommendationsComponent implements OnInit {
     const stored = localStorage.getItem('latest_recommendations');
     if (stored) {
       this.analysisResult = JSON.parse(stored);
-      if (this.analysisResult.recommended_outfits) {
-        this.trendingOutfits = this.analysisResult.recommended_outfits;
+      if (this.analysisResult.recommended_outfits?.length) {
+        // Normalize legacy data: old API used 'image', new API uses 'image_url'
+        this.trendingOutfits = this.analysisResult.recommended_outfits.map((o: any) => ({
+          ...o,
+          image_url: o.image_url || o.image || null
+        }));
         this.updateDynamicCategories();
       }
     }
   }
 
   get primaryOutfits() {
-    let outfits = this.trendingOutfits;
-
-    // Strict Gender Filter
-    if (this.analysisResult?.gender) {
+    let outfits = [...this.trendingOutfits];
+    // Only keyword-filter if these are general trending items (not AI-personalized matches)
+    if (this.analysisResult?.gender && !this.analysisResult?.recommended_outfits?.length) {
       const g = this.analysisResult.gender.toLowerCase();
       if (g === 'male') {
-        outfits = outfits.filter(o =>
-          (o.category.toLowerCase().includes('men') || o.name.toLowerCase().includes('men')) &&
-          !o.category.toLowerCase().includes('women') &&
-          !o.name.toLowerCase().includes('women')
-        );
+        outfits = outfits.filter(o => {
+          const cat = (o.category || '').toLowerCase();
+          const name = (o.name || '').toLowerCase();
+          return (cat.includes('men') || name.includes('men')) &&
+            !cat.includes('women') && !name.includes('women');
+        });
       } else if (g === 'female') {
-        outfits = outfits.filter(o =>
-          o.category.toLowerCase().includes('women') ||
-          o.name.toLowerCase().includes('women') ||
-          this.isDress(o.category)
-        );
+        outfits = outfits.filter(o => {
+          const cat = (o.category || '').toLowerCase();
+          const name = (o.name || '').toLowerCase();
+          return cat.includes('women') || name.includes('women') || this.isDress(o.category);
+        });
       }
     }
-
-    // Prioritize "Dresses/Outfits" for the main view
     return outfits.filter(o => this.isMainOutfit(o.category));
   }
 
   get secondaryItems() {
-    // Accessories
     return this.trendingOutfits.filter(o => !this.isMainOutfit(o.category));
   }
 
@@ -314,74 +314,61 @@ export class RecommendationsComponent implements OnInit {
   }
 
   get filteredTrending() {
-    let outfits = this.trendingOutfits;
-
-    // Strict Gender Filter
-    if (this.analysisResult?.gender) {
+    let outfits = [...this.trendingOutfits];
+    // Only apply keyword-based gender filter when NOT using AI-personalized results
+    // (AI recommendations are already gender-matched server-side)
+    if (this.analysisResult?.gender && !this.analysisResult?.recommended_outfits?.length) {
       const g = this.analysisResult.gender.toLowerCase();
       if (g === 'male') {
-        outfits = outfits.filter(o =>
-          (o.category.toLowerCase().includes('men') || o.name.toLowerCase().includes('men')) &&
-          !o.category.toLowerCase().includes('women') &&
-          !o.name.toLowerCase().includes('women')
-        );
+        outfits = outfits.filter(o => {
+          const cat = (o.category || '').toLowerCase();
+          const name = (o.name || '').toLowerCase();
+          return (cat.includes('men') || name.includes('men')) &&
+            !cat.includes('women') && !name.includes('women');
+        });
       } else if (g === 'female') {
-        outfits = outfits.filter(o =>
-          o.category.toLowerCase().includes('women') ||
-          o.name.toLowerCase().includes('women') ||
-          this.isDress(o.category)
-        );
+        outfits = outfits.filter(o => {
+          const cat = (o.category || '').toLowerCase();
+          const name = (o.name || '').toLowerCase();
+          return cat.includes('women') || name.includes('women') || this.isDress(o.category);
+        });
       }
     }
-
     if (this.activeCategory === 'All') return outfits;
-
-    // If user selected "Dress", show only main outfits
     if (this.activeCategory === 'Dress') return outfits.filter(o => this.isMainOutfit(o.category));
-
-    // Otherwise show specific accessory category
-    return outfits.filter(o =>
-      o.category.toLowerCase().includes(this.activeCategory.toLowerCase())
-    );
+    return outfits.filter(o => {
+      const cat = (o.category || '').toLowerCase();
+      return cat.includes(this.activeCategory.toLowerCase());
+    });
   }
 
   get filteredSearchResults() {
-    let results = this.searchResults;
-
+    let results = [...this.searchResults];
     if (this.analysisResult?.gender) {
       const g = this.analysisResult.gender.toLowerCase();
       if (g === 'male') {
-        results = results.filter(o =>
-          (o.name.toLowerCase().includes('men')) &&
-          !o.name.toLowerCase().includes('women') &&
-          !o.name.toLowerCase().includes('saree') &&
-          !o.name.toLowerCase().includes('dress')
-        );
+        results = results.filter(o => {
+          const name = (o.name || '').toLowerCase();
+          return name.includes('men') && !name.includes('women') && !name.includes('saree') && !name.includes('dress');
+        });
       } else if (g === 'female') {
-        results = results.filter(o =>
-          o.name.toLowerCase().includes('women') ||
-          o.name.toLowerCase().includes('girl') ||
-          o.name.toLowerCase().includes('saree') ||
-          o.name.toLowerCase().includes('dress')
-        );
+        results = results.filter(o => {
+          const name = (o.name || '').toLowerCase();
+          return name.includes('women') || name.includes('girl') || name.includes('saree') || name.includes('dress');
+        });
       }
     }
     return results;
   }
 
   get groupedProducts() {
-    const products = this.filteredTrending;
+    const outfits = this.filteredTrending;
     const groups: { [key: string]: any[] } = {};
-
-    products.forEach(p => {
-      let cat = p.category || 'General';
-      if (this.isMainOutfit(cat)) cat = 'Dresses & Outfits';
-
+    outfits.forEach(p => {
+      const cat = this.isMainOutfit(p.category) ? 'Dresses & Outfits' : (p.category || 'Accessories');
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(p);
     });
-
-    // Sort to put Dresses first
     return Object.keys(groups).sort((a, b) => a.includes('Dresses') ? -1 : 1).map(key => ({
       name: key,
       items: groups[key]
@@ -408,17 +395,13 @@ export class RecommendationsComponent implements OnInit {
 
   searchExternal() {
     if (!this.searchQuery || this.isSearching) return;
-
     this.isSearching = true;
     this.lastSearchQuery = this.searchQuery;
     this.searchResults = [];
-
-    // Add gender context to search if available
     let refinedQuery = this.searchQuery;
     if (this.analysisResult?.gender && this.analysisResult.gender.toLowerCase() !== 'universal') {
       refinedQuery = `${this.analysisResult.gender} ${this.searchQuery}`;
     }
-
     this.outfitService.searchExternalProducts(refinedQuery, 'amazon', 12).subscribe({
       next: (data) => {
         this.searchResults = data;
@@ -429,23 +412,49 @@ export class RecommendationsComponent implements OnInit {
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
       },
-      error: () => {
-        this.isSearching = false;
-        alert('Search fail. Check your connection.');
-      }
+      error: () => { this.isSearching = false; }
     });
   }
 
   loadTrendingOutfits() {
-    // If we have a gender, we should search for gender-specific trending items
-    const query = this.analysisResult?.gender ? `${this.analysisResult.gender} fashion` : 'trending';
-
+    // Only show loading skeleton if we have no data yet
+    if (!this.trendingOutfits.length) {
+      this.isLoading = true;
+    }
     this.outfitService.getTrendingOutfits(100).subscribe({
       next: (data) => {
-        this.trendingOutfits = data;
+        this.isLoading = false;
+        // Use AI-personalized results if available, otherwise fall back to trending
+        if (!this.analysisResult?.recommended_outfits?.length) {
+          this.trendingOutfits = data;
+        }
         this.updateDynamicCategories();
-      }
+      },
+      error: () => { this.isLoading = false; }
     });
+  }
+
+  getCleanCategory(category: string): string {
+    if (!category) return '';
+    const cat = category.toLowerCase();
+    if (cat.includes('dress') || cat.includes('kurta') || cat.includes('saree') || cat.includes('suit')) return 'Dress';
+    if (cat.includes('jean') || cat.includes('denim') || cat.includes('trouser') || cat.includes('pant')) return 'Bottom';
+    if (cat.includes('top') || cat.includes('shirt') || cat.includes('blouse') || cat.includes('tee') || cat.includes('t-shirt')) return 'Top';
+    if (cat.includes('jacket') || cat.includes('coat') || cat.includes('blazer')) return 'Outerwear';
+    if (cat.includes('shoe') || cat.includes('chappal') || cat.includes('sandal') || cat.includes('heel') || cat.includes('sneaker') || cat.includes('boot')) return 'Footwear';
+    if (cat.includes('bag') || cat.includes('purse') || cat.includes('clutch')) return 'Bag';
+    if (cat.includes('jewelry') || cat.includes('necklace') || cat.includes('ring') || cat.includes('earring') || cat.includes('bracelet')) return 'Jewelry';
+    if (cat.includes('belt')) return 'Belt';
+    if (cat.includes('watch')) return 'Watch';
+    if (cat.includes('hair')) return 'Hair';
+    // If it's a generic tag like Men's Fashion / Women's Fashion, don't show it
+    if (cat.includes('fashion') || cat.includes('cloth') || cat.includes('apparel') || cat.includes('wear')) return '';
+    return '';
+  }
+
+  handleImageError(event: any) {
+    event.target.src = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop';
+    event.target.classList.add('opacity-60');
   }
 
   buyNow(link: string) { if (link) window.open(link, '_blank'); }

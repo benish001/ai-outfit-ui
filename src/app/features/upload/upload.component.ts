@@ -2,137 +2,178 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { OutfitService } from '../../core/services/outfit.service';
-import { LucideAngularModule, Upload, CheckCircle, X, Camera, Sparkles } from 'lucide-angular';
+import { LucideAngularModule, Upload, CheckCircle, X, Camera, Sparkles, Zap, ChevronRight } from 'lucide-angular';
 
 @Component({
   selector: 'app-upload',
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
-    <div class="min-h-screen bg-[#FDFDFB] pt-28 pb-16">
-      <div class="max-w-xl mx-auto px-6">
+    <div class="min-h-screen bg-[#F8F8F6] pt-16 page-content">
+      <div class="max-w-lg mx-auto px-5 py-10">
 
         <!-- Progress Steps -->
-        <div class="flex items-center justify-between mb-16 max-w-xs mx-auto">
-          <div class="flex flex-col items-center gap-2">
-            <div class="w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-[10px] font-bold">1</div>
-            <span class="text-[8px] uppercase tracking-widest font-black text-black">Upload</span>
+        <div class="flex items-center justify-center gap-3 mb-12">
+          <div class="flex flex-col items-center gap-1.5">
+            <div class="w-9 h-9 rounded-full bg-black border-2 border-black flex items-center justify-center text-white text-[11px] font-black">1</div>
+            <span class="text-[9px] uppercase tracking-widest font-black text-black">Upload</span>
           </div>
-          <div class="flex-1 h-[1px] bg-gray-100 mx-4"></div>
-          <div class="flex flex-col items-center gap-2">
-            <div class="w-8 h-8 rounded-full border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-300">2</div>
-            <span class="text-[8px] uppercase tracking-widest font-bold text-gray-300">Discover</span>
+          <div class="flex-1 h-px bg-[#EDEDE9] max-w-[60px]"></div>
+          <div class="flex flex-col items-center gap-1.5">
+            <div class="w-9 h-9 rounded-full border-2 border-[#EDEDE9] flex items-center justify-center text-[11px] font-black text-[#9A9A96]">2</div>
+            <span class="text-[9px] uppercase tracking-widest font-bold text-[#9A9A96]">Discover</span>
           </div>
         </div>
 
         <!-- Header -->
-        <div class="text-center space-y-4 mb-12 animate-fade-in">
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl luxury-font text-black leading-tight">Your Personal <br> <span class="italic text-[#D4AF37]">Style Profile</span></h1>
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-light max-w-sm mx-auto">A quick scan of your complexion lets our AI suggest a perfectly curated palette.</p>
+        <div class="text-center space-y-3 mb-10 animate-fade-in">
+          <h1 class="text-3xl sm:text-4xl luxury-font text-black leading-tight">
+            Your Style<br>
+            <span class="italic text-[#D4AF37]">Profile</span>
+          </h1>
+          <p class="text-[11px] uppercase tracking-[0.2em] text-[#9A9A96] font-light max-w-xs mx-auto">Our AI scans your complexion and curates the perfect palette</p>
         </div>
 
         <!-- Upload Zone -->
-        <div class="bg-[#F7F7F5]/50 border-2 border-dashed border-gray-100 hover:border-[#D4AF37] transition-all duration-700 p-8 sm:p-12 text-center cursor-pointer relative animate-slide-up rounded-2xl group"
+        <div class="bg-white border-2 border-dashed rounded-2xl transition-all duration-700 cursor-pointer relative overflow-hidden animate-slide-up mb-8"
           [class.border-[#D4AF37]]="preview"
-          [class.bg-white]="preview"
+          [class.border-[#EDEDE9]]="!preview"
+          [class.shadow-xl]="preview"
           (click)="fileInput.click()"
           (dragover)="$event.preventDefault()"
           (drop)="onDrop($event)">
           <input #fileInput type="file" accept="image/*" (change)="onFile($event)" class="hidden">
 
-          <!-- Preview -->
-          <div *ngIf="preview" class="space-y-6">
-            <div class="relative inline-block group/preview">
-              <img [src]="preview" class="w-48 h-64 sm:w-60 sm:h-80 object-cover mx-auto shadow-2xl rounded-sm transition-transform duration-700 group-hover/preview:scale-[1.02]">
-              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/preview:opacity-100 transition-opacity"></div>
-            </div>
-            
-            <div class="flex flex-col items-center gap-3">
-              <div class="flex items-center gap-3 px-4 py-2 bg-black text-white rounded-full">
-                <lucide-angular [img]="CheckIcon" class="w-3 h-3 text-[#D4AF37]"></lucide-angular>
-                <span class="text-[9px] uppercase tracking-[0.3em] font-bold">Image Locked</span>
+          <!-- Preview state -->
+          <div *ngIf="preview" class="relative">
+            <img [src]="preview" class="w-full rounded-2xl" style="aspect-ratio:4/5; object-fit:cover;">
+            <!-- Overlay controls -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-2xl flex flex-col justify-end p-5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2">
+                  <lucide-angular [img]="CheckIcon" class="w-3 h-3 text-green-500"></lucide-angular>
+                  <span class="text-[10px] uppercase tracking-widest font-black text-black">Image Ready</span>
+                </div>
+                <button (click)="$event.stopPropagation(); preview = null; selectedFile = null"
+                  class="w-9 h-9 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-600 hover:bg-red-50 hover:text-red-500 transition-all">
+                  <lucide-angular [img]="CloseIcon" class="w-4 h-4"></lucide-angular>
+                </button>
               </div>
-              <button (click)="$event.stopPropagation(); preview = null; selectedFile = null" 
-                class="text-[9px] uppercase tracking-[0.4em] text-gray-400 hover:text-red-500 transition-all font-bold">
-                Change Selection
-              </button>
             </div>
           </div>
 
-          <!-- Placeholder -->
-          <div *ngIf="!preview" class="space-y-6">
-            <div class="w-20 h-20 bg-white border border-gray-100 rounded-full flex items-center justify-center mx-auto shadow-sm group-hover:scale-110 transition-transform duration-500">
-              <lucide-angular [img]="CameraIcon" class="w-8 h-8 text-black"></lucide-angular>
+          <!-- Placeholder state -->
+          <div *ngIf="!preview" class="flex flex-col items-center justify-center py-16 px-6 space-y-6">
+            <div class="w-24 h-24 bg-[#F9F3E3] rounded-3xl flex items-center justify-center transition-transform duration-500 hover:scale-110">
+              <lucide-angular [img]="CameraIcon" class="w-10 h-10 text-[#D4AF37]"></lucide-angular>
             </div>
-            <div class="space-y-2">
+            <div class="text-center space-y-2">
               <p class="text-lg font-bold text-black">Upload a Portrait</p>
-              <p class="text-[10px] uppercase tracking-widest text-gray-400">Drag & Drop or Click to Browse</p>
+              <p class="text-[11px] uppercase tracking-widest text-[#9A9A96]">Drag & Drop or Tap to Browse</p>
+            </div>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <span *ngFor="let tip of tips" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#F8F8F6] rounded-full text-[9px] font-semibold uppercase tracking-wider text-[#9A9A96]">
+                <lucide-angular [img]="CheckIcon" class="w-3 h-3 text-[#D4AF37]"></lucide-angular>
+                {{ tip }}
+              </span>
             </div>
           </div>
         </div>
 
         <!-- Gender Selection -->
-        <div class="mt-12 space-y-6">
+        <div class="space-y-5 mb-8">
           <div class="flex items-center gap-4">
-            <div class="h-[1px] flex-1 bg-gray-50"></div>
-            <p class="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-black">Preferences</p>
-            <div class="h-[1px] flex-1 bg-gray-50"></div>
+            <div class="h-px flex-1 bg-[#EDEDE9]"></div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-[#9A9A96] font-bold">Style Preference</p>
+            <div class="h-px flex-1 bg-[#EDEDE9]"></div>
           </div>
-          
-          <div class="flex gap-4">
-             <button *ngFor="let g of ['Male', 'Female']" 
-               (click)="selectedGender = g"
-               [class.bg-black]="selectedGender === g"
-               [class.text-white]="selectedGender === g"
-               [class.border-black]="selectedGender === g"
-               [class.bg-white]="selectedGender !== g"
-               [class.text-gray-400]="selectedGender !== g"
-               [class.border-gray-100]="selectedGender !== g"
-               [class.shadow-md]="selectedGender === g"
-               class="flex-1 py-5 border rounded-xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500">
-               {{ g }}
-             </button>
-          </div>
-        </div>
 
-        <!-- Action -->
-        <div class="mt-12">
-          <button (click)="analyze()" [disabled]="!selectedFile || isLoading"
-            class="w-full relative overflow-hidden bg-black disabled:bg-gray-100 text-white disabled:text-gray-300 py-6 rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 hover:bg-[#D4AF37] hover:text-black group">
-            <div class="relative z-10 flex items-center justify-center gap-3">
-               <lucide-angular *ngIf="!isLoading" [img]="SparklesIcon" class="w-4 h-4"></lucide-angular>
-               <i *ngIf="isLoading" class="pi pi-spin pi-spinner mr-2"></i>
-               <span>{{ isLoading ? 'Processing...' : 'Generate My Look' }}</span>
-            </div>
-          </button>
-          
-          <!-- Tip Banner -->
-          <div *ngIf="!isLoading" class="mt-6 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-fade-in text-center">
-             <p class="text-[9px] uppercase tracking-[0.2em] text-gray-400 leading-relaxed italic">
-               <lucide-angular [img]="CheckIcon" class="w-3 h-3 inline mr-2 text-[#D4AF37]"></lucide-angular>
-               Pro Tip: Use natural daylight for the most accurate results
-             </p>
-          </div>
-        </div>
-
-        <!-- Full Page Analysis Overlay -->
-        <div *ngIf="isLoading" class="fixed inset-0 z-[200] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
-           <div class="w-24 h-[1px] bg-gray-100 mb-12"></div>
-           <div class="relative w-40 h-40 mb-12">
-              <div class="absolute inset-0 border border-gray-100 rounded-full"></div>
-              <div class="absolute inset-0 border-t-2 border-[#D4AF37] rounded-full animate-spin"></div>
-              <div class="absolute inset-0 flex items-center justify-center">
-                 <lucide-angular [img]="SparklesIcon" class="w-8 h-8 text-[#D4AF37] animate-pulse"></lucide-angular>
+          <div class="grid grid-cols-2 gap-3">
+            <button *ngFor="let g of genders"
+              (click)="selectedGender = g.value"
+              class="relative flex flex-col items-center gap-3 py-6 rounded-2xl border-2 transition-all duration-300"
+              [class.border-black]="selectedGender === g.value"
+              [class.bg-black]="selectedGender === g.value"
+              [class.border-[#EDEDE9]]="selectedGender !== g.value"
+              [class.bg-white]="selectedGender !== g.value"
+              [class.shadow-lg]="selectedGender === g.value">
+              <span class="text-3xl">{{ g.emoji }}</span>
+              <span class="text-[11px] uppercase tracking-[0.2em] font-black transition-colors"
+                [class.text-white]="selectedGender === g.value"
+                [class.text-[#9A9A96]]="selectedGender !== g.value">
+                {{ g.label }}
+              </span>
+              <!-- Checkmark -->
+              <div *ngIf="selectedGender === g.value" class="absolute top-3 right-3 w-5 h-5 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                <lucide-angular [img]="CheckIcon" class="w-3 h-3 text-black"></lucide-angular>
               </div>
-           </div>
-           <div class="text-center space-y-4">
-              <h3 class="text-2xl luxury-font text-black italic">Crafting Your Profile</h3>
-              <p class="text-[10px] uppercase tracking-[0.5em] text-gray-400 font-bold animate-pulse">Scanning Skin Tone...</p>
-           </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Analyze Button -->
+        <button (click)="analyze()" [disabled]="!selectedFile || isLoading"
+          class="w-full relative overflow-hidden rounded-2xl py-5 text-[11px] uppercase tracking-[0.3em] font-black transition-all duration-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          [class.bg-black]="selectedFile && !isLoading"
+          [class.text-white]="selectedFile && !isLoading"
+          [class.hover:bg-[#D4AF37]]="selectedFile && !isLoading"
+          [class.bg-[#EDEDE9]]="!selectedFile"
+          [class.text-[#9A9A96]]="!selectedFile">
+          <span class="relative z-10 flex items-center justify-center gap-3">
+            <lucide-angular *ngIf="!isLoading" [img]="SparklesIcon" class="w-5 h-5"></lucide-angular>
+            <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
+            {{ isLoading ? 'Processing...' : 'Generate My Look' }}
+          </span>
+        </button>
+
+        <!-- Error -->
+        <div *ngIf="error" class="mt-4 flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+          <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+          <p class="text-xs text-red-600">{{ error }}</p>
         </div>
       </div>
     </div>
-  `
+
+    <!-- AI Analysis Overlay (full screen) -->
+    <div *ngIf="isLoading" class="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center">
+      <!-- Background particles -->
+      <div class="absolute inset-0 opacity-[0.05]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:30px 30px"></div>
+
+      <!-- Pulsing rings -->
+      <div class="relative mb-12">
+        <div class="w-32 h-32 rounded-full border border-[#D4AF37]/20 flex items-center justify-center">
+          <div class="w-24 h-24 rounded-full border border-[#D4AF37]/30 flex items-center justify-center">
+            <div class="w-16 h-16 rounded-full border-2 border-t-[#D4AF37] border-r-[#D4AF37]/30 border-b-[#D4AF37]/10 border-l-transparent animate-spin flex items-center justify-center">
+              <lucide-angular [img]="SparklesIcon" class="w-6 h-6 text-[#D4AF37] animate-pulse"></lucide-angular>
+            </div>
+          </div>
+        </div>
+        <!-- Orbit dot -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1.5 w-3 h-3 rounded-full bg-[#D4AF37] animate-spin-slow" style="transform-origin: 0 66px;"></div>
+      </div>
+
+      <div class="text-center space-y-4 px-8">
+        <h3 class="text-3xl luxury-font text-white italic">Crafting Your<br>Profile</h3>
+        <div class="space-y-2">
+          <p class="text-[11px] uppercase tracking-[0.4em] text-[#9A9A96] animate-pulse">{{ loadingStep }}</p>
+        </div>
+        <!-- Step pills -->
+        <div class="flex items-center justify-center gap-2 pt-4">
+          <div *ngFor="let s of loadingSteps; let i = index"
+            class="w-2 h-2 rounded-full transition-all duration-500"
+            [class.bg-[#D4AF37]]="currentStepIndex >= i"
+            [class.bg-white/20]="currentStepIndex < i">
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    @keyframes orbit {
+      from { transform: rotate(0deg) translateX(66px) rotate(0deg); }
+      to   { transform: rotate(360deg) translateX(66px) rotate(-360deg); }
+    }
+  `]
 })
 export class UploadComponent {
   private outfitService = inject(OutfitService);
@@ -140,17 +181,25 @@ export class UploadComponent {
 
   readonly CameraIcon = Camera;
   readonly CheckIcon = CheckCircle;
+  readonly CloseIcon = X;
   readonly SparklesIcon = Sparkles;
-  readonly UploadIcon = Upload;
+  readonly ZapIcon = Zap;
 
   preview: string | null = null;
   selectedFile: File | null = null;
-  fileName = '';
   selectedGender: string | null = null;
   isLoading = false;
   error = '';
 
   tips = ['Good lighting', 'Face visible', 'Natural setting'];
+  genders = [
+    { label: 'Male', value: 'Male', emoji: '👨' },
+    { label: 'Female', value: 'Female', emoji: '👩' }
+  ];
+
+  loadingSteps = ['Detecting face', 'Analyzing skin tone', 'Curating outfits'];
+  currentStepIndex = 0;
+  get loadingStep() { return this.loadingSteps[this.currentStepIndex] ?? ''; }
 
   onFile(event: any) {
     const file = event.target.files[0];
@@ -165,7 +214,6 @@ export class UploadComponent {
 
   setFile(file: File) {
     this.selectedFile = file;
-    this.fileName = file.name;
     const reader = new FileReader();
     reader.onload = () => this.preview = reader.result as string;
     reader.readAsDataURL(file);
@@ -175,12 +223,21 @@ export class UploadComponent {
     if (!this.selectedFile) return;
     this.isLoading = true;
     this.error = '';
+    this.currentStepIndex = 0;
+
+    // Cycle through loading steps
+    const stepInterval = setInterval(() => {
+      this.currentStepIndex = Math.min(this.currentStepIndex + 1, this.loadingSteps.length - 1);
+    }, 2000);
+
     this.outfitService.analyzeStyle(this.selectedFile, this.selectedGender || undefined).subscribe({
       next: (result) => {
+        clearInterval(stepInterval);
         localStorage.setItem('latest_recommendations', JSON.stringify(result));
         this.router.navigate(['/recommendations']);
       },
       error: (err: any) => {
+        clearInterval(stepInterval);
         this.isLoading = false;
         this.error = err.error?.detail || 'Analysis failed. Please try again.';
       }
