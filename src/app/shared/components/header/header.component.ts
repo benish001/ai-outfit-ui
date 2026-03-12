@@ -119,34 +119,48 @@ import { filter } from 'rxjs/operators';
         </div>
       </div>
     </header>
-
     <!-- BOTTOM TAB BAR (mobile, logged-in users only) -->
     <ng-container *ngIf="authService.user$ | async as user">
       <nav class="bottom-tab-bar md:hidden">
-        <a routerLink="/dashboard" class="tab-item" [class.active]="currentRoute === '/dashboard'">
-          <lucide-angular [img]="HomeIcon" class="tab-icon w-5 h-5"></lucide-angular>
+        
+        <!-- Home -->
+        <a routerLink="/dashboard" routerLinkActive="active" class="tab-item">
+          <div class="h-12 flex items-center justify-center">
+            <lucide-angular [img]="HomeIcon" class="tab-icon w-5 h-5"></lucide-angular>
+          </div>
           <span class="tab-label">Home</span>
         </a>
-        <a routerLink="/upload" class="tab-item" [class.active]="currentRoute === '/upload'">
-          <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200"
-            [class.bg-black]="currentRoute === '/upload'"
-            [class.bg-gray-100]="currentRoute !== '/upload'">
-            <lucide-angular [img]="UploadIcon" class="w-5 h-5 transition-all"
-              [class.text-white]="currentRoute === '/upload'"
-              [class.text-black]="currentRoute !== '/upload'"></lucide-angular>
+
+        <!-- Analyze (Center Action) -->
+        <a routerLink="/upload" #rlaUpload="routerLinkActive" routerLinkActive="active" class="tab-item">
+          <div class="h-12 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm"
+             >
+              <lucide-angular [img]="UploadIcon" class="w-5 h-5 transition-colors duration-300"
+               ></lucide-angular>
+            </div>
           </div>
           <span class="tab-label">Analyze</span>
         </a>
-        <a routerLink="/recommendations" class="tab-item" [class.active]="currentRoute === '/recommendations'">
-          <lucide-angular [img]="SparklesIcon" class="tab-icon w-5 h-5"></lucide-angular>
+
+        <!-- Looks -->
+        <a routerLink="/recommendations" routerLinkActive="active" class="tab-item">
+          <div class="h-12 flex items-center justify-center">
+            <lucide-angular [img]="SparklesIcon" class="tab-icon w-5 h-5"></lucide-angular>
+          </div>
           <span class="tab-label">Looks</span>
         </a>
-        <a routerLink="/dashboard" class="tab-item" [class.active]="false">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black">
-            {{ (user.name || user.email)?.charAt(0)?.toUpperCase() }}
+
+        <!-- Profile -->
+        <a routerLink="/dashboard" class="tab-item"> <!-- Mock profile points to dashboard for now -->
+          <div class="h-12 flex items-center justify-center">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black">
+              {{ (user.name || user.email)?.charAt(0)?.toUpperCase() }}
+            </div>
           </div>
           <span class="tab-label">Profile</span>
         </a>
+
       </nav>
     </ng-container>
   `

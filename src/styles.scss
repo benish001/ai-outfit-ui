@@ -365,27 +365,29 @@ h2.display {
 }
 
 .tab-item {
-  @apply flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200;
+  @apply flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300;
   flex: 1;
   min-height: 52px;
 
   .tab-icon {
-    @apply transition-all duration-200;
-    color: var(--muted);
+    @apply transition-all duration-300;
+    color: #A0A09C; /* Slightly darker than muted for better visibility */
   }
 
   .tab-label {
-    @apply text-[9px] font-semibold uppercase tracking-wider transition-all duration-200;
-    color: var(--muted);
+    @apply text-[9px] font-bold uppercase tracking-wider transition-all duration-300;
+    color: #A0A09C;
   }
 
   &.active {
     .tab-icon {
       color: var(--brand-dark);
+      transform: scale(1.1);
     }
 
     .tab-label {
       color: var(--brand-dark);
+      font-weight: 800;
     }
   }
 }
