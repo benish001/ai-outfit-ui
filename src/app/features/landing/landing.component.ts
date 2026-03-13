@@ -80,7 +80,7 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
                     <div class="w-6 h-6 bg-[#D4AF37] rounded-lg flex items-center justify-center">
                       <lucide-angular [img]="SparklesIcon" class="w-3 h-3 text-black"></lucide-angular>
                     </div>
-                    <span class="text-white text-xs font-black tracking-widest">AI OUTFIT</span>
+                    <span class="text-white text-xs font-black tracking-widest">OUTFIT TONE AI</span>
                   </div>
                   <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
                     <lucide-angular [img]="BagIcon" class="w-3 h-3 text-white"></lucide-angular>
@@ -193,10 +193,10 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
         <div class="w-7 h-7 bg-[#D4AF37] rounded-xl flex items-center justify-center">
           <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-black"></lucide-angular>
         </div>
-        <span class="text-white font-black tracking-widest text-sm">AI</span>
-        <span class="luxury-font italic text-[#D4AF37] text-sm">Outfit</span>
+        <span class="text-white font-black tracking-widest text-sm">Outfit</span>
+        <span class="luxury-font italic text-[#D4AF37] text-sm">Tone</span>
       </div>
-      <p class="text-[9px] text-white/20 uppercase tracking-widest">© 2024 AI Outfit Advisor · All Rights Reserved</p>
+      <p class="text-[9px] text-white/20 uppercase tracking-widest">© 2024 OutfitTone AI · All Rights Reserved</p>
     </footer>
   `,
   styles: [`

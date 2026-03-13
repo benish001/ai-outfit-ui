@@ -15,10 +15,12 @@ import { LucideAngularModule } from 'lucide-angular';
           <!-- Brand -->
           <div class="lg:col-span-2 space-y-5">
             <div class="flex items-center gap-1">
-              <span class="text-xl font-black tracking-[0.2em] uppercase text-white">AI</span>
-              <span class="text-xl luxury-font italic text-[#D4AF37]">Outfit</span>
+              <span class="text-xl font-black tracking-[0.2em] uppercase text-white">Outfit</span>
+              <span class="text-xl luxury-font italic text-[#D4AF37]">Tone</span>
             </div>
-            <p class="text-sm text-white/40 font-light leading-relaxed max-w-sm">AI-powered personal styling that analyzes your skin tone to recommend outfits that truly complement you.</p>
+            <p class="text-sm text-white/40 font-light leading-relaxed max-w-sm">
+              OutfitTone is your AI-powered fashion assistant that synchronizes your clothing choices with your unique skin tone for a curated, premium look.
+            </p>
             <div class="flex gap-4">
               <div *ngFor="let s of socials" class="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors cursor-pointer text-sm font-bold">{{ s }}</div>
             </div>

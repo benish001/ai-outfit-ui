@@ -26,8 +26,8 @@ import { filter } from 'rxjs/operators';
             <div class="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
               <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
             </div>
-            <span class="text-base font-black tracking-[0.15em] uppercase text-black">AI</span>
-            <span class="text-base luxury-font italic text-[#D4AF37]">Outfit</span>
+            <span class="text-base font-black tracking-[0.15em] uppercase text-black">Outfit</span>
+            <span class="text-base luxury-font italic text-[#D4AF37]">Tone</span>
           </a>
 
           <!-- Desktop Nav (only when logged in) -->
