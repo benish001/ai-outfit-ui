@@ -10,8 +10,8 @@ import { filter } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
-    <!-- TOP NAV (desktop only, or non-logged-in mobile) -->
-    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    <!-- TOP NAV -->
+    <header *ngIf="!isAuthPage()" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       [class.bg-white]="isScrolled"
       [class.shadow-sm]="isScrolled"
       [class.border-b]="isScrolled"
@@ -22,19 +22,21 @@ import { filter } from 'rxjs/operators';
         <div class="flex items-center justify-between h-16 sm:h-18">
 
           <!-- Logo -->
-          <a routerLink="/" class="flex items-center gap-1.5 group flex-shrink-0">
-            <div class="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
-              <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
+          <a routerLink="/" class="flex items-center gap-2 group flex-shrink-0">
+            <div class="w-8 h-8 bg-[var(--brand-dark)] rounded-lg flex items-center justify-center shadow-sm">
+              <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[var(--brand-gold)]"></lucide-angular>
             </div>
-            <span class="text-base font-black tracking-[0.15em] uppercase text-black">Outfit</span>
-            <span class="text-base luxury-font italic text-[#D4AF37]">Tone</span>
+            <div class="flex flex-col -space-y-1">
+              <span class="text-xs font-black tracking-[0.2em] uppercase text-[var(--brand-dark)]">SkinTone</span>
+              <span class="text-[10px] luxury-font italic text-[var(--brand-gold)]">AI</span>
+            </div>
           </a>
 
           <!-- Desktop Nav (only when logged in) -->
-          <nav class="hidden md:flex items-center gap-6" *ngIf="authService.user$ | async as user">
-            <a routerLink="/dashboard" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">Home</a>
-            <a routerLink="/upload" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">Analyze</a>
-            <a routerLink="/recommendations" routerLinkActive="text-black font-bold" class="text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">My Looks</a>
+          <nav class="hidden md:flex items-center gap-7" *ngIf="authService.user$ | async as user">
+            <a routerLink="/dashboard" routerLinkActive="text-[var(--brand-dark)] font-bold" class="text-[10px] uppercase tracking-[0.25em] text-[var(--muted)] hover:text-[var(--brand-dark)] transition-colors">Home</a>
+            <a routerLink="/upload" routerLinkActive="text-[var(--brand-dark)] font-bold" class="text-[10px] uppercase tracking-[0.25em] text-[var(--muted)] hover:text-[var(--brand-dark)] transition-colors">Analyze</a>
+            <a routerLink="/recommendations" routerLinkActive="text-[var(--brand-dark)] font-bold" class="text-[10px] uppercase tracking-[0.25em] text-[var(--muted)] hover:text-[var(--brand-dark)] transition-colors">Looks</a>
             <a *ngIf="user.is_admin" routerLink="/admin" class="text-[11px] uppercase tracking-[0.2em] text-[#D4AF37] hover:text-black transition-colors flex items-center gap-1.5 font-bold">
               <lucide-angular [img]="ShieldIcon" class="w-3 h-3"></lucide-angular>Admin
             </a>
@@ -101,11 +103,11 @@ import { filter } from 'rxjs/operators';
           (click)="$event.stopPropagation()">
           <div class="flex items-center justify-between mb-10">
             <div class="flex items-center gap-1.5">
-              <div class="w-7 h-7 bg-black rounded-lg flex items-center justify-center">
-                <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
+              <div class="w-7 h-7 bg-[var(--brand-dark)] rounded-lg flex items-center justify-center">
+                <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[var(--brand-gold)]"></lucide-angular>
               </div>
-              <span class="font-black tracking-widest text-black">AI</span>
-              <span class="luxury-font italic text-[#D4AF37]">Outfit</span>
+              <span class="font-black tracking-widest text-[var(--brand-dark)] uppercase">SkinTone</span>
+              <span class="luxury-font italic text-[var(--brand-gold)]">AI</span>
             </div>
             <button (click)="toggleMenu()" class="p-2 text-gray-400 hover:text-black rounded-xl border border-[#EDEDE9] transition-colors">
               <lucide-angular [img]="CloseIcon" class="w-4 h-4"></lucide-angular>
@@ -115,13 +117,13 @@ import { filter } from 'rxjs/operators';
             <a routerLink="/login" (click)="toggleMenu()" class="block w-full py-4 text-center rounded-xl border border-[#EDEDE9] text-[11px] uppercase tracking-widest font-bold hover:border-black transition-all">Sign In</a>
             <a routerLink="/register" (click)="toggleMenu()" class="block w-full py-4 text-center rounded-xl bg-black text-white text-[11px] uppercase tracking-widest font-bold hover:bg-[#D4AF37] hover:text-black transition-all">Join Free</a>
           </div>
-          <p class="text-[9px] text-gray-300 uppercase tracking-widest text-center">© 2024 AI Outfit Advisor</p>
+          <p class="text-[9px] text-[var(--muted)] uppercase tracking-widest text-center mt-auto">© 2024 SkinToneAI Advisor</p>
         </div>
       </div>
     </header>
     <!-- BOTTOM TAB BAR (mobile, logged-in users only) -->
-    <ng-container *ngIf="authService.user$ | async as user">
-      <nav class="bottom-tab-bar md:hidden">
+    <ng-container *ngIf="(authService.user$ | async) as user">
+      <nav *ngIf="!isAuthPage()" class="bottom-tab-bar md:hidden">
         
         <!-- Home -->
         <a routerLink="/dashboard" routerLinkActive="active" class="tab-item">
@@ -182,6 +184,7 @@ export class HeaderComponent {
   readonly LogOutIcon = LogOut;
 
   constructor() {
+    this.currentRoute = this.router.url;
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: any) => {
@@ -194,4 +197,8 @@ export class HeaderComponent {
 
   @HostListener('window:scroll', [])
   onScroll() { this.isScrolled = window.scrollY > 30; }
+
+  isAuthPage() {
+    return ['/login', '/register'].some(path => this.currentRoute.startsWith(path));
+  }
 }

@@ -11,10 +11,10 @@ import { OutfitService } from '../../core/services/outfit.service';
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-[#F8F8F6] pt-16 page-content">
+    <div class="min-h-screen bg-[var(--surface)] pt-16 page-content">
 
       <!-- Skin Tone Profile Banner -->
-      <div *ngIf="analysisResult" class="bg-black text-white animate-fade-in">
+      <div *ngIf="analysisResult" class="bg-[var(--brand-dark)] text-white animate-fade-in shadow-xl">
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40 flex-shrink-0">
@@ -25,7 +25,7 @@ import { OutfitService } from '../../core/services/outfit.service';
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-white">Style Profile</span>
+                <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-white">SkinTone Profile</span>
                 <span class="w-1 h-1 rounded-full bg-[#D4AF37]"></span>
                 <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-[#D4AF37]">{{ analysisResult.gender }}</span>
               </div>
@@ -51,7 +51,7 @@ import { OutfitService } from '../../core/services/outfit.service';
         <div class="max-w-7xl mx-auto px-5 sm:px-8">
           <!-- Title row -->
           <div class="flex items-center justify-between py-4">
-            <h1 class="text-2xl luxury-font text-black">Style <span class="italic text-[#D4AF37]">Explorer</span></h1>
+            <h1 class="text-2xl luxury-font text-[var(--brand-dark)]">SkinTone <span class="italic text-[var(--brand-gold)]">AI</span></h1>
             <div class="flex items-center gap-2">
               <button (click)="forceRefresh()" [disabled]="isLoading" class="w-9 h-9 bg-[#F8F8F6] border border-[#EDEDE9] rounded-xl flex items-center justify-center hover:border-black transition-colors disabled:opacity-40">
                 <lucide-angular [img]="RefreshIcon" class="w-4 h-4 text-gray-400 hover:text-black" [class.animate-spin]="isLoading"></lucide-angular>
@@ -72,7 +72,7 @@ import { OutfitService } from '../../core/services/outfit.service';
                 <lucide-angular [img]="RefreshIcon" class="w-4 h-4 rotate-45"></lucide-angular>
               </button>
               <button (click)="searchExternal()" [disabled]="isSearching || !searchQuery"
-                class="bg-black text-white text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-lg hover:bg-[#D4AF37] hover:text-black transition-all disabled:opacity-40">
+                class="bg-[var(--brand-dark)] text-white text-[10px] uppercase tracking-widest px-5 py-2.5 rounded-lg hover:bg-[var(--brand-gold)] hover:text-[var(--brand-dark)] transition-all disabled:opacity-40">
                 <span *ngIf="!isSearching">Search</span>
                 <lucide-angular *ngIf="isSearching" [img]="LoaderIcon" class="w-3 h-3 animate-spin"></lucide-angular>
               </button>
@@ -151,9 +151,9 @@ import { OutfitService } from '../../core/services/outfit.service';
             <!-- Section Header -->
             <div class="flex items-center gap-4 mb-6">
               <div>
-                <div *ngIf="group.name === 'Dresses & Outfits'" class="flex items-center gap-1.5 mb-1">
-                  <lucide-angular [img]="SparklesIcon" class="w-3 h-3 text-[#D4AF37]"></lucide-angular>
-                  <p class="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">Matched to Your Tone</p>
+                <div *ngIf="analysisResult?.recommended_outfits?.length" class="flex items-center gap-1.5 mb-1">
+                  <lucide-angular [img]="SparklesIcon" class="w-3 h-3 text-[var(--brand-gold)]"></lucide-angular>
+                  <p class="text-[9px] uppercase tracking-[0.3em] text-[var(--brand-gold)] font-bold">Matched to Your Tone</p>
                 </div>
                 <h2 class="text-xl font-bold text-black">{{ group.name }}</h2>
               </div>
@@ -175,8 +175,8 @@ import { OutfitService } from '../../core/services/outfit.service';
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
 
                   <!-- Style match badge -->
-                  <div *ngIf="isMainOutfit(outfit.category, outfit.name)"
-                    class="absolute top-0 right-0 bg-[#D4AF37] text-black text-[8px] uppercase tracking-widest px-2.5 py-1.5 font-black rounded-bl-xl">
+                  <div *ngIf="analysisResult?.recommended_outfits?.length && isMainOutfit(outfit.category, outfit.name)"
+                    class="absolute top-0 right-0 bg-[var(--brand-gold)] text-[var(--brand-dark)] text-[8px] uppercase tracking-widest px-2.5 py-1.5 font-black rounded-bl-xl shadow-lg border-l border-b border-black/10">
                     ✦ Match
                   </div>
 
@@ -394,9 +394,17 @@ export class RecommendationsComponent implements OnInit {
     const outfits = this.filteredTrending;
     const groups: { [key: string]: any[] } = {};
     outfits.forEach(p => {
-      let groupName = 'Dresses & Outfits';
-      if (!this.isMainOutfit(p.category, p.name)) {
-        groupName = this.getCleanCategory(p.category, p.name) || 'Accessories';
+      let groupName = 'Clothing'; // Fallback for clothing
+      const clean = this.getCleanCategory(p.category, p.name);
+      
+      if (this.activeCategory !== 'All') {
+        groupName = this.activeCategory;
+      } else if (!this.isMainOutfit(p.category, p.name)) {
+        groupName = clean || 'Accessories';
+      } else if (clean === 'Dress') {
+        groupName = 'Dresses & Outfits';
+      } else {
+        groupName = 'Clothing';
       }
       
       if (!groups[groupName]) groups[groupName] = [];
@@ -406,8 +414,8 @@ export class RecommendationsComponent implements OnInit {
     // Sort so Dresses & Outfits is always first, then others alphabetically
     return Object.keys(groups)
       .sort((a, b) => {
-        if (a === 'Dresses & Outfits') return -1;
-        if (b === 'Dresses & Outfits') return 1;
+        if (a === 'Dresses & Outfits' || a === 'Clothing') return -1;
+        if (b === 'Dresses & Outfits' || b === 'Clothing') return 1;
         return a.localeCompare(b);
       })
       .map(key => ({
@@ -508,20 +516,20 @@ export class RecommendationsComponent implements OnInit {
       });
     };
 
-    // Priority 1: Accessories & Beauty (Short/Dangerous keywords must use wholeWord=true)
+    // Priority 1: High-precision categories
+    if (has(['gym', 'sport', 'workout', 'active', 'track', 'yoga', 'sweatpant', 'hoodie', 'resistance'], false)) return 'Activewear';
     if (has(['shoe', 'chappal', 'sandal', 'heel', 'sneaker', 'boot', 'jutti', 'mojari', 'flat', 'slipper', 'loafer', 'slide', 'flip flap'], true)) return 'Footwear';
-    if (has(['jewelry', 'necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'pin', 'bindi', 'tikka', 'mangalsutra'], true)) return 'Jewelry';
-    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'comb', 'scrunchy'], false) || has(['band', 'bow'], true)) return 'Hair Accessories';
+    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'comb', 'scrunchy', 'hairpin'], false) || (has(['band', 'bow'], true) && !has(['resistance'], false))) return 'Hair Accessories';
+    if (has(['jewelry', 'necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'pin', 'bindi', 'tikka', 'mangalsutra'], true) && !has(['hair', 'clip'], false)) return 'Jewelry';
     if (has(['lipstick', 'serum', 'mask', 'cream', 'lotion', 'palette', 'perfume', 'skincare', 'makeup', 'cosmetic', 'beauty', 'eyeliner', 'kajal', 'face wash'], false)) return 'Beauty';
     if (has(['watch', 'belt', 'wallet', 'purse', 'clutch'], true)) return 'Accessories';
     if (has(['bag', 'backpack', 'handbag', 'tote'], true)) return 'Bag';
 
-    // Priority 2: Clothing categories (Substring matching is generally fine here)
+    // Priority 2: Clothing categories
     if (has(['dress', 'saree', 'kurta', 'suit', 'gown', 'lehenga', 'anarkali'], false)) return 'Dress';
     if (has(['jean', 'denim', 'trouser', 'pant', 'legging', 'jegging', 'short', 'skirt', 'palazzo', 'dhoti'], false)) return 'Bottom';
     if (has(['top', 'shirt', 'blouse', 'tee', 't-shirt', 'kurti', 'tunic', 'crop top'], false)) return 'Top';
     if (has(['jacket', 'coat', 'blazer', 'shrug', 'sweater', 'hoodie', 'cardigan', 'overcoat', 'windbreaker'], false)) return 'Outerwear';
-    if (has(['gym', 'sport', 'workout', 'active', 'track', 'yoga', 'sweatpant', 'hoodie'], false)) return 'Activewear';
     
     return '';
   }

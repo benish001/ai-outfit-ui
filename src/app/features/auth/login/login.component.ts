@@ -13,116 +13,92 @@ import { LucideAngularModule, ArrowRight, Eye, EyeOff, Sparkles } from 'lucide-a
   imports: [CommonModule, RouterModule, ReactiveFormsModule, Toast, LucideAngularModule],
   providers: [MessageService],
   template: `
-    <div class="min-h-screen flex flex-col lg:flex-row bg-[#F8F8F6]">
+    <div class="min-h-screen flex items-center justify-center bg-[var(--surface)] p-6 relative overflow-hidden">
+      <!-- Background Decorative Elements -->
+      <div class="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style="background-image:linear-gradient(var(--brand-dark) 1px,transparent 1px),linear-gradient(90deg,var(--brand-dark) 1px,transparent 1px);background-size:40px 40px"></div>
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-[var(--brand-gold)] opacity-[0.05] rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--brand-dark)] opacity-[0.05] rounded-full blur-3xl"></div>
 
-      <!-- Left Panel (desktop branding) -->
-      <div class="hidden lg:flex flex-col w-5/12 bg-black relative overflow-hidden p-12">
-        <!-- Background pattern -->
-        <div class="absolute inset-0" style="background: radial-gradient(ellipse at top right, rgba(212,175,55,0.15) 0%, transparent 60%), radial-gradient(ellipse at bottom left, rgba(212,175,55,0.08) 0%, transparent 60%)"></div>
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:40px 40px"></div>
-
-        <!-- Logo -->
-        <a routerLink="/" class="relative z-10 flex items-center gap-2">
-          <div class="w-8 h-8 bg-[#D4AF37] rounded-xl flex items-center justify-center">
-            <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-black"></lucide-angular>
-          </div>
-          <span class="text-lg font-black tracking-[0.2em] uppercase text-white">AI</span>
-          <span class="text-lg luxury-font italic text-[#D4AF37]">Outfit</span>
-        </a>
-
-        <!-- Hero text -->
-        <div class="relative z-10 mt-auto space-y-6">
-          <div class="w-12 h-px bg-[#D4AF37]"></div>
-          <h2 class="text-4xl luxury-font text-white leading-tight">
-            Welcome<br>
-            <span class="text-[#D4AF37] italic">Back.</span>
-          </h2>
-          <p class="text-sm text-white/40 font-light leading-relaxed max-w-xs">Your personal AI stylist is waiting. Continue your fashion journey.</p>
-          <div class="space-y-3 pt-2">
-            <div *ngFor="let f of features" class="flex items-center gap-3">
-              <div class="w-5 h-5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center flex-shrink-0">
-                <div class="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></div>
-              </div>
-              <span class="text-[11px] uppercase tracking-widest text-white/40">{{ f }}</span>
+      <div class="w-full max-w-sm bg-white rounded-[var(--radius-lg)] shadow-2xl border border-[var(--border)] relative z-10 overflow-hidden animate-slide-up">
+        <div class="p-8 sm:p-10">
+          <!-- Logo -->
+          <div class="flex flex-col items-center gap-2 mb-8">
+            <div class="w-11 h-11 bg-[var(--brand-dark)] rounded-2xl flex items-center justify-center shadow-lg">
+              <lucide-angular [img]="SparklesIcon" class="w-5 h-5 text-[var(--brand-gold)]"></lucide-angular>
+            </div>
+            <div class="text-center">
+              <span class="text-lg font-black tracking-[0.25em] uppercase text-[var(--brand-dark)]">SkinTone</span>
+              <span class="text-lg luxury-font italic text-[var(--brand-gold)] ml-1">AI</span>
             </div>
           </div>
-        </div>
-
-        <p class="relative z-10 mt-12 text-[9px] text-white/20 uppercase tracking-widest">© 2024 AI Outfit Advisor</p>
-      </div>
-
-      <!-- Right Panel: Form -->
-      <div class="flex-1 flex items-center justify-center px-5 sm:px-8 py-16 bg-white">
-        <div class="w-full max-w-sm animate-fade-in space-y-8">
-
-          <!-- Mobile Logo -->
-          <a routerLink="/" class="flex lg:hidden items-center justify-center gap-2 mb-4">
-            <div class="w-8 h-8 bg-black rounded-xl flex items-center justify-center">
-              <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[#D4AF37]"></lucide-angular>
-            </div>
-            <span class="text-lg font-black tracking-[0.2em] uppercase text-black">AI</span>
-            <span class="text-lg luxury-font italic text-[#D4AF37]">Outfit</span>
-          </a>
 
           <!-- Heading -->
-          <div class="space-y-1.5">
-            <h1 class="text-3xl luxury-font text-black">Sign In</h1>
-            <p class="text-[11px] uppercase tracking-[0.3em] text-[#9A9A96]">Access your style profile</p>
-          </div>
-
-          <!-- Social Login (visual) -->
-          <div class="grid grid-cols-2 gap-3">
-            <button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-[#EDEDE9] text-[11px] uppercase tracking-wider font-semibold text-gray-600 hover:border-gray-400 transition-all">
-              <svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              Google
-            </button>
-            <button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-[#EDEDE9] text-[11px] uppercase tracking-wider font-semibold text-gray-600 hover:border-gray-400 transition-all">
-              <svg class="w-4 h-4 fill-black" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04-.03.07-.41 1.44-1.37 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              Apple
-            </button>
-          </div>
-
-          <!-- Divider -->
-          <div class="flex items-center gap-3">
-            <div class="flex-1 h-px bg-[#EDEDE9]"></div>
-            <span class="text-[10px] uppercase tracking-widest text-[#9A9A96] font-medium">or email</span>
-            <div class="flex-1 h-px bg-[#EDEDE9]"></div>
+          <div class="text-center space-y-1 mb-6">
+            <h1 class="text-2xl luxury-font text-[var(--brand-dark)]">Welcome Back</h1>
+            <p class="text-[9px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold">Access Your Style Profile</p>
           </div>
 
           <!-- Form -->
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
-            <div class="space-y-1.5">
-              <label class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#9A9A96]">Email</label>
-              <input type="email" formControlName="email" placeholder="your@email.com" class="app-input">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-3.5">
+            <div class="space-y-1">
+              <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Email Address</label>
+              <div class="relative group">
+                <input type="email" formControlName="email" placeholder="your@email.com" 
+                  class="w-full bg-[var(--surface)] border-2 border-transparent rounded-[var(--radius-md)] px-5 py-3.5 text-sm focus:border-[var(--brand-gold)] focus:bg-white transition-all outline-none">
+              </div>
             </div>
-            <div class="space-y-1.5">
-              <label class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#9A9A96]">Password</label>
-              <div class="relative">
-                <input [type]="showPw ? 'text' : 'password'" formControlName="password" placeholder="••••••••" class="app-input pr-12">
-                <button type="button" (click)="showPw = !showPw" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors">
+
+            <div class="space-y-1">
+              <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Password</label>
+              <div class="relative group">
+                <input [type]="showPw ? 'text' : 'password'" formControlName="password" placeholder="••••••••" 
+                  class="w-full bg-[var(--surface)] border-2 border-transparent rounded-[var(--radius-md)] px-5 py-3.5 text-sm focus:border-[var(--brand-gold)] focus:bg-white transition-all outline-none pr-12">
+                <button type="button" (click)="showPw = !showPw" class="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--brand-dark)]">
                   <lucide-angular [img]="showPw ? EyeOffIcon : EyeIcon" class="w-4 h-4"></lucide-angular>
                 </button>
               </div>
             </div>
 
-            <div *ngIf="error" class="flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-              <div class="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></div>
-              <p class="text-xs text-red-600">{{ error }}</p>
+            <div *ngIf="error" class="bg-red-50 border border-red-100 rounded-xl px-4 py-3 animate-fade-in">
+              <p class="text-[10px] font-bold text-red-600 uppercase tracking-widest text-center">{{ error }}</p>
             </div>
 
-            <button type="submit" [disabled]="loginForm.invalid || isLoading" class="btn-primary w-full mt-2">
+            <button type="submit" [disabled]="loginForm.invalid || isLoading" 
+              class="w-full bg-[var(--brand-dark)] text-white rounded-[var(--radius-md)] py-4 text-[11px] font-black uppercase tracking-[0.3em] shadow-xl hover:bg-[var(--brand-dark-soft)] active:scale-[0.98] transition-all disabled:opacity-30 flex items-center justify-center gap-3">
               <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
-              <span>{{ isLoading ? 'Signing in...' : 'Sign In' }}</span>
+              <span>{{ isLoading ? 'Processing...' : 'Secure Sign In' }}</span>
               <lucide-angular *ngIf="!isLoading" [img]="ArrowIcon" class="w-4 h-4"></lucide-angular>
             </button>
           </form>
 
-          <!-- Sign up link -->
-          <p class="text-center text-[11px] text-[#9A9A96]">
-            No account?
-            <a routerLink="/register" class="text-black font-bold ml-1 hover:text-[#D4AF37] transition-colors underline underline-offset-2">Create one</a>
+          <!-- Divider -->
+          <div class="flex items-center gap-4 my-6">
+            <div class="flex-1 h-px bg-[var(--border)]"></div>
+            <span class="text-[8px] uppercase tracking-[0.3em] text-[var(--muted)] font-black">Or Join Us</span>
+            <div class="flex-1 h-px bg-[var(--border)]"></div>
+          </div>
+
+          <!-- Socials (Mock) -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--border)] text-[9px] uppercase tracking-widest font-black text-[var(--brand-dark)] hover:bg-[var(--surface)] transition-all">
+              Google
+            </button>
+            <button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--border)] text-[9px] uppercase tracking-widest font-black text-[var(--brand-dark)] hover:bg-[var(--surface)] transition-all">
+              Apple
+            </button>
+          </div>
+
+          <!-- Footer Link -->
+          <p class="text-center text-[9px] text-[var(--muted)] uppercase tracking-widest mt-6">
+            New here? 
+            <a routerLink="/register" class="text-[var(--brand-dark)] font-black hover:text-[var(--brand-gold)] transition-colors underline decoration-[var(--brand-gold)] underline-offset-4 ml-1">Create Account</a>
           </p>
         </div>
+      </div>
+      
+      <!-- Bottom Branding -->
+      <div class="absolute bottom-6 left-0 w-full text-center">
+        <p class="text-[8px] uppercase tracking-[0.4em] text-[var(--muted)] opacity-50">© 2024 SkinToneAI · Luxury Fashion Curator</p>
       </div>
     </div>
     <p-toast></p-toast>

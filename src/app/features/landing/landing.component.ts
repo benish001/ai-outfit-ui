@@ -80,7 +80,7 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
                     <div class="w-6 h-6 bg-[#D4AF37] rounded-lg flex items-center justify-center">
                       <lucide-angular [img]="SparklesIcon" class="w-3 h-3 text-black"></lucide-angular>
                     </div>
-                    <span class="text-white text-xs font-black tracking-widest">OUTFIT TONE AI</span>
+                    <span class="text-white text-xs font-black tracking-widest">SKINTONE AI</span>
                   </div>
                   <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
                     <lucide-angular [img]="BagIcon" class="w-3 h-3 text-white"></lucide-angular>
@@ -174,29 +174,29 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
     </section>
 
     <!-- CTA SECTION -->
-    <section class="py-20 sm:py-32 bg-black relative overflow-hidden">
+    <section class="py-20 sm:py-32 bg-[var(--brand-dark)] relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.04]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:40px 40px"></div>
       <div class="absolute top-1/2 left-1/2 w-96 h-96 rounded-full -translate-x-1/2 -translate-y-1/2" style="background: radial-gradient(circle, rgba(212,175,55,0.15), transparent 70%)"></div>
       <div class="max-w-3xl mx-auto px-5 text-center space-y-8 relative z-10">
-        <h2 class="text-3xl sm:text-5xl luxury-font text-white">Ready to Find Your<br><span class="text-[#D4AF37] italic">Perfect Look?</span></h2>
-        <p class="text-[#9A9A96] text-sm font-light">Join thousands of fashion-forward individuals using AI to elevate their style.</p>
-        <a routerLink="/register" class="btn-gold inline-flex">
+        <h2 class="text-3xl sm:text-5xl luxury-font text-white">Ready to Find Your<br><span class="text-[var(--brand-gold)] italic">Perfect Look?</span></h2>
+        <p class="text-[var(--muted)] text-sm font-light">Join thousands of fashion-forward individuals using AI to elevate their style.</p>
+        <a routerLink="/register" class="btn-gold inline-flex group">
           Start for Free
-          <lucide-angular [img]="ArrowIcon" class="w-4 h-4"></lucide-angular>
+          <lucide-angular [img]="ArrowIcon" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></lucide-angular>
         </a>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-black border-t border-white/5 py-10 px-5 text-center">
+    <footer class="bg-[var(--brand-dark)] border-t border-white/5 py-12 px-5 text-center">
       <div class="flex items-center justify-center gap-2 mb-4">
-        <div class="w-7 h-7 bg-[#D4AF37] rounded-xl flex items-center justify-center">
-          <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-black"></lucide-angular>
+        <div class="w-8 h-8 bg-[var(--brand-gold)] rounded-xl flex items-center justify-center">
+          <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[var(--brand-dark)]"></lucide-angular>
         </div>
-        <span class="text-white font-black tracking-widest text-sm">Outfit</span>
-        <span class="luxury-font italic text-[#D4AF37] text-sm">Tone</span>
+        <span class="text-white font-black tracking-widest text-sm uppercase">SkinTone</span>
+        <span class="luxury-font italic text-[var(--brand-gold)] text-sm">AI</span>
       </div>
-      <p class="text-[9px] text-white/20 uppercase tracking-widest">© 2024 OutfitTone AI · All Rights Reserved</p>
+      <p class="text-[9px] text-white/30 uppercase tracking-[0.3em]">© 2024 SkinToneAI · Curated with Intelligence</p>
     </footer>
   `,
   styles: [`
