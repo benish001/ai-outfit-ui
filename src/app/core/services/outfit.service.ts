@@ -43,6 +43,14 @@ export class OutfitService {
         return this.http.post(`${environment.apiUrl}/recommendations/analyze`, formData);
     }
 
+    getLatestRecommendation(): Observable<any> {
+        return this.http.get<any>(`${environment.apiUrl}/recommendations/latest`);
+    }
+
+    getUserStats(): Observable<any> {
+        return this.http.get<any>(`${environment.apiUrl}/recommendations/stats`);
+    }
+
     deleteOutfit(id: number): Observable<any> {
         return this.http.delete(`${environment.apiUrl}/outfits/${id}`);
     }

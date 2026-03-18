@@ -10,6 +10,7 @@ export interface User {
     name?: string;
     id?: number;
     is_admin?: boolean;
+    profile_image?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,7 +41,13 @@ export class AuthService {
     fetchMe() {
         this.http.get<any>(`${environment.apiUrl}/auth/me`).subscribe({
             next: (res) => {
-                const user: User = { email: res.email, name: res.name, id: res.id, is_admin: res.is_admin };
+                const user: User = { 
+                    email: res.email, 
+                    name: res.name, 
+                    id: res.id, 
+                    is_admin: res.is_admin,
+                    profile_image: res.profile_image 
+                };
                 localStorage.setItem('user', JSON.stringify(user));
                 this.userSubject.next(user);
             },
@@ -65,7 +72,8 @@ export class AuthService {
             email: authResult.email || '',
             name: authResult.name || '',
             id: authResult.user_id,
-            is_admin: authResult.is_admin || false
+            is_admin: authResult.is_admin || false,
+            profile_image: authResult.profile_image
         };
         localStorage.setItem('user', JSON.stringify(user));
         this.userSubject.next(user);

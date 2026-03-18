@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { AuthService } from '../../../core/services/auth.service';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { LucideAngularModule, ArrowRight, Sparkles } from 'lucide-angular';
+import { LucideAngularModule, ArrowRight, Sparkles, Camera } from 'lucide-angular';
 
 @Component({
   selector: 'app-register',
@@ -39,7 +39,26 @@ import { LucideAngularModule, ArrowRight, Sparkles } from 'lucide-angular';
           </div>
 
           <!-- Form -->
-          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-3">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            
+            <!-- Photo Upload Area -->
+            <div class="space-y-1.5">
+              <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Profile Photo</label>
+              <div class="relative group cursor-pointer" (click)="fileInput.click()">
+                <div class="w-full h-24 bg-[var(--surface)] border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] flex items-center px-5 gap-4 group-hover:border-[var(--brand-gold)] transition-all overflow-hidden">
+                  <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center border border-[var(--border)] shadow-sm overflow-hidden flex-shrink-0">
+                    <img *ngIf="photoPreview" [src]="photoPreview" class="w-full h-full object-cover">
+                    <lucide-angular *ngIf="!photoPreview" [img]="CameraIcon" class="w-5 h-5 text-[var(--muted)]"></lucide-angular>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-black uppercase tracking-wider text-[var(--brand-dark)]">{{ photoFile ? photoFile.name : 'Upload Avatar' }}</p>
+                    <p class="text-[8px] text-[var(--muted)] uppercase tracking-widest mt-0.5">{{ photoPreview ? 'Click to change' : 'Select a professional look' }}</p>
+                  </div>
+                </div>
+                <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+              </div>
+            </div>
+
             <div class="space-y-1">
               <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Full Name</label>
               <input type="text" formControlName="name" placeholder="E.g. Alexander McQueen" 
@@ -100,16 +119,30 @@ export class RegisterComponent {
   private messageService = inject(MessageService);
   readonly ArrowIcon = ArrowRight;
   readonly SparklesIcon = Sparkles;
+  readonly CameraIcon = Camera;
 
   isLoading = false;
   error = '';
-  features = ['AI skin tone analysis', '500+ curated outfits', 'Direct buy links'];
+  photoFile: File | null = null;
+  photoPreview: string | null = null;
 
   registerForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.photoFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.photoPreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   get pwStrength(): number {
     const pw = this.registerForm.get('password')?.value || '';
@@ -125,12 +158,24 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.isLoading = true;
       this.error = '';
-      this.authService.register(this.registerForm.value).subscribe({
+
+      const formData = new FormData();
+      formData.append('name', this.registerForm.get('name')?.value);
+      formData.append('email', this.registerForm.get('email')?.value);
+      formData.append('password', this.registerForm.get('password')?.value);
+      if (this.photoFile) {
+        formData.append('photo', this.photoFile);
+      }
+
+      this.authService.register(formData).subscribe({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Account Created!', detail: 'Please sign in.' });
           setTimeout(() => this.router.navigate(['/login']), 1800);
         },
-        error: (err: any) => { this.isLoading = false; this.error = err.error?.detail || 'Registration failed.'; }
+        error: (err: any) => { 
+          this.isLoading = false; 
+          this.error = err.error?.detail || 'Registration failed.'; 
+        }
       });
     }
   }

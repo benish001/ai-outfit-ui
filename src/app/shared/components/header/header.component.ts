@@ -53,8 +53,9 @@ import { filter } from 'rxjs/operators';
             <!-- Desktop profile dropdown -->
             <div class="relative group hidden md:block">
               <button class="flex items-center gap-2.5 py-1.5 px-3 rounded-xl hover:bg-gray-50 transition-colors">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border-2 border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black uppercase">
-                  {{ (user.name || user.email).charAt(0) }}
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border-2 border-[#D4AF37]/40 flex items-center justify-center overflow-hidden">
+                  <img *ngIf="user.profile_image" [src]="user.profile_image" class="w-full h-full object-cover">
+                  <span *ngIf="!user.profile_image" class="text-[#B8860B] text-xs font-black uppercase">{{ (user.name || user.email).charAt(0) }}</span>
                 </div>
                 <span class="text-[11px] uppercase tracking-wider text-gray-700 hidden lg:block max-w-[100px] truncate font-semibold">{{ user.name || (user.email || '').split('@')[0] }}</span>
               </button>
@@ -156,8 +157,9 @@ import { filter } from 'rxjs/operators';
         <!-- Profile -->
         <a routerLink="/dashboard" class="tab-item"> <!-- Mock profile points to dashboard for now -->
           <div class="h-12 flex items-center justify-center">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center text-[#B8860B] text-xs font-black">
-              {{ (user.name || user.email)?.charAt(0)?.toUpperCase() }}
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center overflow-hidden">
+              <img *ngIf="user.profile_image" [src]="user.profile_image" class="w-full h-full object-cover">
+              <span *ngIf="!user.profile_image" class="text-[#B8860B] text-[10px] font-black uppercase">{{ (user.name || user.email)?.charAt(0) }}</span>
             </div>
           </div>
           <span class="tab-label">Profile</span>

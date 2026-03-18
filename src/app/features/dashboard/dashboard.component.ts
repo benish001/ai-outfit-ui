@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, ShoppingBag, Zap } from 'lucide-angular';
+import { OutfitService } from '../../core/services/outfit.service';
+import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, ShoppingBag, Zap, Heart, ShieldCheck, History, User } from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,127 +12,191 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
   template: `
     <div class="min-h-screen bg-[var(--surface)] pt-16 page-content">
 
-      <!-- Hero Greeting Card -->
+      <!-- Premium Hero Greeting -->
       <div class="bg-[var(--brand-dark)] text-white relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.04]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:40px 40px"></div>
-        <div class="absolute right-0 top-0 h-full w-1/2" style="background: radial-gradient(ellipse at right, rgba(212,175,55,0.12), transparent 70%)"></div>
+        <!-- Decoration background -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px"></div>
+        <div class="absolute right-0 top-0 h-full w-2/3" style="background: radial-gradient(ellipse at 70% 30%, rgba(212,175,55,0.15), transparent 70%)"></div>
         
-        <div class="relative z-10 px-5 sm:px-8 pt-10 pb-8 max-w-7xl mx-auto">
-          <div class="flex items-start justify-between">
-            <div class="space-y-3">
-              <div class="inline-flex items-center gap-2 bg-[#D4AF37]/20 border border-[#D4AF37]/30 rounded-full px-3 py-1.5">
-                <div class="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"></div>
-                <span class="text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">Your Showroom</span>
+        <div class="relative z-10 px-5 sm:px-8 pt-12 pb-10 max-w-7xl mx-auto">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div class="space-y-4">
+              <div class="inline-flex items-center gap-2 bg-[#D4AF37]/15 border border-[#D4AF37]/20 rounded-full px-4 py-2">
+                <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5 text-[#D4AF37]"></lucide-angular>
+                <span class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold">Stylist Active</span>
               </div>
-              <h1 class="text-3xl sm:text-4xl luxury-font text-white">
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl luxury-font text-white leading-tight">
                 Welcome,<br>
                 <span class="text-[#D4AF37] italic">{{ userName }}</span>
               </h1>
-              <p class="text-sm text-white/40 font-light">Your personal AI stylist is ready.</p>
+              <p class="text-sm text-white/50 font-light max-w-xs leading-relaxed">Your personal showroom is updated with the latest trends matching your profile.</p>
             </div>
-            <!-- Skin tone preview -->
-            <div class="hidden sm:flex flex-col items-center gap-2 bg-white/5 border border-white/10 rounded-2xl p-4">
-              <p class="text-[9px] uppercase tracking-widest text-white/40">Palette</p>
-              <div class="flex gap-2">
-                <div class="w-6 h-6 rounded-full bg-[#C68642] border-2 border-white/20"></div>
-                <div class="w-6 h-6 rounded-full bg-[#8D5524] border-2 border-white/20"></div>
-                <div class="w-6 h-6 rounded-full bg-[#E0AC69] border-2 border-white/20"></div>
+
+            <!-- Profile Overview (Latest Analysis) -->
+            <div *ngIf="latestProfile" class="flex items-center gap-6 bg-white/5 border border-white/10 p-6 rounded-[var(--radius-lg)] backdrop-blur-md animate-fade-in shadow-2xl">
+              <div class="relative">
+                <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40">
+                  <img [src]="latestProfile.photo_url" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-[#D4AF37] text-black w-7 h-7 rounded-lg flex items-center justify-center shadow-lg">
+                  <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5"></lucide-angular>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <p class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold">Detected Identity</p>
+                <h3 class="text-xl font-bold text-white">{{ latestProfile.skin_tone }}</h3>
+                <div class="flex gap-1.5 pt-1">
+                  <div *ngFor="let o of (latestProfile.recommended_outfits || []).slice(0, 4)" class="w-3 h-3 rounded-full border border-white/20" [style.background]="o.color"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State Profile (Show registered avatar if no analysis yet) -->
+            <div *ngIf="!latestProfile && !isLoading" class="hidden md:flex flex-col items-center gap-4 bg-white/5 border border-white/10 p-8 rounded-[var(--radius-lg)] text-center max-w-xs animate-fade-in">
+              <div class="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                 <img *ngIf="user?.profile_image" [src]="user?.profile_image" class="w-full h-full object-cover">
+                 <lucide-angular *ngIf="!user?.profile_image" [img]="UserIcon" class="w-6 h-6 text-white/20"></lucide-angular>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white/80">Analysis Pending</p>
+                <p class="text-[10px] text-white/40 mt-1 uppercase tracking-widest leading-relaxed">Complete your first analysis to unlock your palette</p>
               </div>
             </div>
           </div>
 
-          <!-- Quick Start CTA -->
-          <a routerLink="/upload" class="mt-8 flex items-center justify-between w-full bg-[var(--brand-gold)] text-[var(--brand-dark)] rounded-[var(--radius-md)] px-6 py-4 font-bold hover:bg-white transition-all duration-300 group">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-[var(--brand-dark)] rounded-xl flex items-center justify-center group-hover:bg-[var(--brand-gold)] transition-colors">
-                <lucide-angular [img]="CameraIcon" class="w-5 h-5 text-[var(--brand-gold)] group-hover:text-[var(--brand-dark)] transition-colors"></lucide-angular>
-              </div>
-              <div class="text-left">
-                <p class="text-[11px] uppercase tracking-widest font-black">Design My Palette</p>
-                <p class="text-[10px] font-normal opacity-70 mt-0.5">Upload a photo for AI analysis</p>
-              </div>
-            </div>
-            <lucide-angular [img]="ArrowIcon" class="w-5 h-5"></lucide-angular>
-          </a>
-        </div>
-      </div>
-
-      <!-- Stats Row -->
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-6">
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div *ngFor="let stat of stats; let i = index"
-            class="bg-white rounded-2xl border border-[#EDEDE9] p-5 animate-fade-in"
-            [style.animation-delay]="i * 60 + 'ms'">
-            <p class="text-2xl sm:text-3xl font-black text-black">{{ stat.value }}</p>
-            <p class="text-[9px] uppercase tracking-widest text-[#9A9A96] mt-1">{{ stat.label }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 pb-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-dark)] opacity-60">Services & Tools</h2>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <a routerLink="/upload"
-            class="group bg-white border border-[var(--border)] rounded-[var(--radius-md)] p-5 hover:border-[var(--brand-dark)] hover:shadow-lg transition-all duration-300 animate-fade-in">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-10 h-10 bg-[var(--brand-dark)] rounded-xl flex items-center justify-center group-hover:bg-[var(--brand-gold)] transition-colors">
-                <lucide-angular [img]="CameraIcon" class="w-5 h-5 text-white group-hover:text-[var(--brand-dark)] transition-colors"></lucide-angular>
-              </div>
-              <lucide-angular [img]="ArrowIcon" class="w-4 h-4 text-gray-200 group-hover:text-[var(--brand-dark)] group-hover:translate-x-1 transition-all"></lucide-angular>
-            </div>
-            <h3 class="text-xs font-black uppercase tracking-wider text-[var(--brand-dark)]">Analyze</h3>
-            <p class="text-[10px] text-[var(--muted)] mt-1 leading-relaxed">AI Skin Tone Scanner</p>
-          </a>
-
-          <a routerLink="/recommendations"
-            class="group bg-white border border-[var(--border)] rounded-[var(--radius-md)] p-5 hover:border-[var(--brand-dark)] hover:shadow-lg transition-all duration-300 animate-fade-in" style="animation-delay:80ms">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-10 h-10 bg-[var(--brand-gold-light)] rounded-xl flex items-center justify-center group-hover:bg-[var(--brand-gold)] transition-colors">
-                <lucide-angular [img]="SparklesIcon" class="w-5 h-5 text-[var(--brand-gold)] group-hover:text-[var(--brand-dark)] transition-colors"></lucide-angular>
-              </div>
-              <lucide-angular [img]="ArrowIcon" class="w-4 h-4 text-gray-200 group-hover:text-[var(--brand-dark)] group-hover:translate-x-1 transition-all"></lucide-angular>
-            </div>
-            <h3 class="text-xs font-black uppercase tracking-wider text-[var(--brand-dark)]">Catalog</h3>
-            <p class="text-[10px] text-[var(--muted)] mt-1 leading-relaxed">Curated Outfit Ideas</p>
-          </a>
-
-          <div class="col-span-2 bg-[var(--brand-gold-light)] border border-[var(--brand-gold)]/10 rounded-[var(--radius-md)] p-5 animate-fade-in" style="animation-delay:160ms">
-            <div class="flex items-center justify-between">
+          <!-- Quick Actions Grid within Hero -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-12">
+            <a routerLink="/upload" class="bg-[#D4AF37] text-black p-6 rounded-[var(--radius-md)] flex items-center justify-between hover:bg-white transition-all duration-500 group shadow-xl">
               <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-[var(--brand-gold)] rounded-xl flex items-center justify-center">
-                  <lucide-angular [img]="ZapIcon" class="w-5 h-5 text-[var(--brand-dark)]"></lucide-angular>
+                <div class="w-12 h-12 bg-black/10 rounded-xl flex items-center justify-center group-hover:bg-black/5">
+                  <lucide-angular [img]="CameraIcon" class="w-6 h-6"></lucide-angular>
                 </div>
-                <div>
-                  <h3 class="text-[10px] font-black uppercase tracking-wider text-[var(--brand-dark)]">Smart Tip</h3>
-                  <p class="text-[10px] text-[var(--brand-dark)] opacity-60 mt-0.5 max-w-xs leading-relaxed">Natural daylight photos yield the best skin tone accuracy.</p>
+                <div class="text-left">
+                  <p class="text-[11px] font-black uppercase tracking-widest">Start Analysis</p>
+                  <p class="text-[10px] opacity-70 mt-0.5">Detect skin tone & undertones</p>
                 </div>
               </div>
-            </div>
+              <lucide-angular [img]="ArrowIcon" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></lucide-angular>
+            </a>
+
+            <a routerLink="/recommendations" class="bg-white/10 border border-white/10 text-white p-6 rounded-[var(--radius-md)] flex items-center justify-between hover:bg-white hover:text-black transition-all duration-500 group shadow-lg backdrop-blur-sm">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-[#D4AF37]/20">
+                  <lucide-angular [img]="ShirtIcon" class="w-6 h-6 group-hover:text-[#D4AF37]"></lucide-angular>
+                </div>
+                <div class="text-left">
+                  <p class="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">My Showroom</p>
+                  <p class="text-[10px] opacity-50 mt-0.5">Explore your curated looks</p>
+                </div>
+              </div>
+              <lucide-angular [img]="ArrowIcon" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></lucide-angular>
+            </a>
           </div>
         </div>
       </div>
 
-      <!-- Trending Categories -->
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 pb-8">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-bold uppercase tracking-widest text-black">Explore Categories</h2>
-        </div>
-        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-          <a *ngFor="let cat of categories" [routerLink]="['/recommendations']" [queryParams]="{ category: cat.id }"
-            class="flex-shrink-0 flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-[#EDEDE9] hover:border-black transition-all duration-300 min-w-[80px]">
-            <span class="text-2xl">{{ cat.emoji }}</span>
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-center">{{ cat.name }}</span>
-          </a>
-        </div>
+      <!-- Main Content Container -->
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-10 space-y-12">
+        
+        <!-- Stats Summary Section -->
+        <section>
+          <div class="flex items-center gap-4 mb-6">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.3em] text-[#A0A09B]">Performance Stats</h2>
+            <div class="flex-1 h-px bg-[#EDEDE9]"></div>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div *ngFor="let stat of displayStats; let i = index" 
+              class="bg-white border border-[#F0F0EE] p-6 rounded-[var(--radius-md)] shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in"
+              [style.animation-delay]="i * 50 + 'ms'">
+              <div class="flex items-center justify-between mb-2">
+                <lucide-angular [img]="stat.icon" class="w-4 h-4 text-[#D4AF37]"></lucide-angular>
+                <span class="text-[9px] font-black text-[#A0A09B] uppercase tracking-widest">{{ stat.label }}</span>
+              </div>
+              <p class="text-3xl font-black text-[var(--brand-dark)]">{{ stat.value }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recommended For You Section -->
+        <section *ngIf="latestProfile?.recommended_outfits?.length" class="animate-slide-up">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-black mb-1">Tailored for you</p>
+              <h2 class="text-2xl luxury-font text-[var(--brand-dark)]">Recommended Dresses</h2>
+            </div>
+            <a routerLink="/recommendations" class="text-[11px] font-black uppercase tracking-widest text-[#A0A09B] hover:text-[#D4AF37] transition-colors flex items-center gap-2">
+              View All <lucide-angular [img]="ArrowIcon" class="w-3.5 h-3.5"></lucide-angular>
+            </a>
+          </div>
+
+          <div class="flex gap-5 overflow-x-auto no-scrollbar pb-6 -mx-5 px-5 sm:mx-0 sm:px-0">
+            <div *ngFor="let outfit of latestProfile.recommended_outfits.slice(0, 6)" 
+              class="flex-shrink-0 w-64 group">
+              <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-[#EDEDE9] mb-4 group-hover:shadow-2xl transition-all duration-500">
+                <img [src]="outfit.image_url" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
+                  <button (click)="buyNow(outfit.affiliate_link)" class="w-full bg-[#D4AF37] text-black py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-white transition-all">Buy Now</button>
+                </div>
+                <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-white/10">
+                  <span class="w-2 h-2 rounded-full" [style.background]="outfit.color"></span>
+                  {{ outfit.color }}
+                </div>
+              </div>
+              <h3 class="text-xs font-black text-[var(--brand-dark)] uppercase tracking-wider line-clamp-1 mb-1">{{ outfit.name }}</h3>
+              <p class="text-[10px] text-[#A0A09B] uppercase font-bold tracking-widest">{{ outfit.brand || 'Elite Series' }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tool Cards (Secondary Actions) -->
+        <section class="grid md:grid-cols-2 gap-6">
+          <div class="bg-[var(--brand-gold-light)] border border-[#D4AF37]/20 rounded-[var(--radius-lg)] p-8 flex items-center gap-8 group hover:shadow-xl transition-all duration-500">
+             <div class="w-20 h-20 bg-[#D4AF37] rounded-3xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-500">
+                <lucide-angular [img]="ZapIcon" class="w-10 h-10 text-black"></lucide-angular>
+             </div>
+             <div>
+                <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">Style Knowledge</h3>
+                <h2 class="text-2xl luxury-font text-black mb-3">Skin Tone Tips</h2>
+                <p class="text-sm text-black/50 leading-relaxed mb-5">Discover makeup shades and dress contrasts that elevate your look.</p>
+                <button class="text-[10px] font-black uppercase tracking-widest text-black flex items-center gap-2 group-hover:gap-3 transition-all">
+                  Read Guide <lucide-angular [img]="ArrowIcon" class="w-4 h-4"></lucide-angular>
+                </button>
+             </div>
+          </div>
+
+          <div class="bg-white border border-[#EDEDE9] rounded-[var(--radius-lg)] p-8 flex items-center gap-8 group hover:shadow-xl transition-all duration-500">
+             <div class="w-20 h-20 bg-[#1A1A1A] rounded-3xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-500">
+                <lucide-angular [img]="TrendingIcon" class="w-10 h-10 text-[#D4AF37]"></lucide-angular>
+             </div>
+             <div>
+                <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-[#A0A09B] mb-2">Editor's Pick</h3>
+                <h2 class="text-2xl luxury-font text-black mb-3">Today's Trends</h2>
+                <p class="text-sm text-[#A0A09B] leading-relaxed mb-5">See what's trending globally across our curated fashion partners.</p>
+                <button [routerLink]="['/recommendations']" class="text-[10px] font-black uppercase tracking-widest text-black flex items-center gap-2 group-hover:gap-3 transition-all">
+                  Explore Now <lucide-angular [img]="ArrowIcon" class="w-4 h-4"></lucide-angular>
+                </button>
+             </div>
+          </div>
+        </section>
+
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+  `]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
+  private outfitService = inject(OutfitService);
+
   readonly CameraIcon = Camera;
   readonly ShirtIcon = Shirt;
   readonly ArrowIcon = ArrowRight;
@@ -139,24 +204,57 @@ export class DashboardComponent {
   readonly SparklesIcon = Sparkles;
   readonly BagIcon = ShoppingBag;
   readonly ZapIcon = Zap;
+  readonly HeartIcon = Heart;
+  readonly ShieldIcon = ShieldCheck;
+  readonly HistoryIcon = History;
+  readonly UserIcon = User;
 
-  get userName() {
-    return this.authService.currentUser?.name || 'Fashionista';
+  latestProfile: any = null;
+  userStats: any = null;
+  isLoading = true;
+
+  displayStats = [
+    { label: 'Analyses', value: '0', icon: History },
+    { label: 'catalog', value: '500+', icon: ShoppingBag },
+    { label: 'Profiles', value: '1', icon: User },
+    { label: 'Accuracy', value: '98%', icon: Sparkles }
+  ];
+
+  ngOnInit() {
+    this.loadDashboardData();
   }
 
-  stats = [
-    { value: '0', label: 'Analyses Done' },
-    { value: '500+', label: 'Outfit Catalog' },
-    { value: '12', label: 'Skin Tones' },
-    { value: '98%', label: 'Match Rate' }
-  ];
+  loadDashboardData() {
+    this.isLoading = true;
+    
+    // Fetch stats
+    this.outfitService.getUserStats().subscribe({
+      next: (stats) => {
+        this.userStats = stats;
+        this.displayStats[0].value = stats.total_analyses.toString();
+        this.displayStats[2].value = stats.unique_tones.toString();
+      }
+    });
 
-  categories = [
-    { emoji: '👗', name: 'Dresses', id: 'Dress' },
-    { emoji: '👟', name: 'Shoes', id: 'Footwear' },
-    { emoji: '👜', name: 'Bags', id: 'Bag' },
-    { emoji: '🧥', name: 'Jackets', id: 'Outerwear' },
-    { emoji: '💄', name: 'Beauty', id: 'Beauty' },
-    { emoji: '🏋️', name: 'Gym', id: 'Activewear' },
-  ];
+    // Fetch latest analysis
+    this.outfitService.getLatestRecommendation().subscribe({
+      next: (profile) => {
+        this.latestProfile = profile;
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
+    });
+  }
+
+  get user() {
+    return this.authService.currentUser;
+  }
+
+  get userName() {
+    return this.user?.name || 'Fashionista';
+  }
+
+  buyNow(url: string) {
+    if (url) window.open(url, '_blank');
+  }
 }
