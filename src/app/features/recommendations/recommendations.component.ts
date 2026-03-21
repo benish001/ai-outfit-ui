@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -212,8 +212,12 @@ import { OutfitService } from '../../core/services/outfit.service';
           </div>
 
           <!-- End of list -->
-          <div class="text-center py-12 border-t border-[#EDEDE9]">
-            <p class="text-[10px] uppercase tracking-[0.4em] text-[#9A9A96] font-semibold">End of Curated Selection</p>
+          <div class="py-12 border-t border-[#EDEDE9] flex flex-col items-center justify-center gap-4">
+            <div *ngIf="isNextPageLoading" class="flex items-center gap-3 bg-white/50 backdrop-blur-md px-6 py-3 rounded-2xl border border-[#EDEDE9] shadow-sm animate-bounce">
+              <lucide-angular [img]="LoaderIcon" class="w-4 h-4 text-[#D4AF37] animate-spin"></lucide-angular>
+              <span class="text-[10px] uppercase tracking-widest font-black text-black">Curating more looks...</span>
+            </div>
+            <p *ngIf="!hasMore" class="text-[10px] uppercase tracking-[0.4em] text-[#9A9A96] font-semibold">End of Curated Selection</p>
           </div>
         </div>
 
@@ -264,8 +268,14 @@ export class RecommendationsComponent implements OnInit {
   lastSearchQuery: string = '';
   isSearching: boolean = false;
   isLoading: boolean = false;
+  isNextPageLoading: boolean = false;
   dataLoaded: boolean = false;
   analysisResult: any = null;
+
+  // Pagination
+  skip: number = 0;
+  limit: number = 40;
+  hasMore: boolean = true;
 
   categories: string[] = ['All', 'Dress'];
   activeCategory: string = 'All';
@@ -303,26 +313,7 @@ export class RecommendationsComponent implements OnInit {
   }
 
   get primaryOutfits() {
-    let outfits = [...this.trendingOutfits];
-    // Only keyword-filter if these are general trending items (not AI-personalized matches)
-    if (this.analysisResult?.gender && !this.analysisResult?.recommended_outfits?.length) {
-      const g = this.analysisResult.gender.toLowerCase();
-      if (g === 'male') {
-        outfits = outfits.filter(o => {
-          const cat = (o.category || '').toLowerCase();
-          const name = (o.name || '').toLowerCase();
-          return (cat.includes('men') || name.includes('men')) &&
-            !cat.includes('women') && !name.includes('women');
-        });
-      } else if (g === 'female') {
-        outfits = outfits.filter(o => {
-          const cat = (o.category || '').toLowerCase();
-          const name = (o.name || '').toLowerCase();
-          return cat.includes('women') || name.includes('women') || this.isDress(o.category);
-        });
-      }
-    }
-    return outfits.filter(o => this.isMainOutfit(o.category));
+    return this.trendingOutfits.filter(o => this.isMainOutfit(o.category));
   }
 
   get secondaryItems() {
@@ -348,46 +339,12 @@ export class RecommendationsComponent implements OnInit {
 
   get filteredTrending() {
     let outfits = [...this.trendingOutfits];
-    // Only apply keyword-based gender filter when NOT using AI-personalized results
-    // (AI recommendations are already gender-matched server-side)
-    if (this.analysisResult?.gender && !this.analysisResult?.recommended_outfits?.length) {
-      const g = this.analysisResult.gender.toLowerCase();
-      if (g === 'male') {
-        outfits = outfits.filter(o => {
-          const cat = (o.category || '').toLowerCase();
-          const name = (o.name || '').toLowerCase();
-          return (cat.includes('men') || name.includes('men')) &&
-            !cat.includes('women') && !name.includes('women');
-        });
-      } else if (g === 'female') {
-        outfits = outfits.filter(o => {
-          const cat = (o.category || '').toLowerCase();
-          const name = (o.name || '').toLowerCase();
-          return cat.includes('women') || name.includes('women') || this.isDress(o.category);
-        });
-      }
-    }
     if (this.activeCategory === 'All') return outfits;
     return outfits.filter(o => this.getCleanCategory(o.category, o.name) === this.activeCategory);
   }
 
   get filteredSearchResults() {
-    let results = [...this.searchResults];
-    if (this.analysisResult?.gender) {
-      const g = this.analysisResult.gender.toLowerCase();
-      if (g === 'male') {
-        results = results.filter(o => {
-          const name = (o.name || '').toLowerCase();
-          return name.includes('men') && !name.includes('women') && !name.includes('saree') && !name.includes('dress');
-        });
-      } else if (g === 'female') {
-        results = results.filter(o => {
-          const name = (o.name || '').toLowerCase();
-          return name.includes('women') || name.includes('girl') || name.includes('saree') || name.includes('dress');
-        });
-      }
-    }
-    return results;
+    return [...this.searchResults];
   }
 
   get groupedProducts() {
@@ -472,32 +429,85 @@ export class RecommendationsComponent implements OnInit {
     this.lastSearchQuery = '';
   }
 
-  loadTrendingOutfits() {
-    // Guard: don't re-fetch if already loading or data already loaded
-    if (this.isLoading || this.dataLoaded) return;
-    this.isLoading = true;
-    console.log('Fetching fresh trending outfits...');
-    this.outfitService.getTrendingOutfits(100).subscribe({
+
+
+  loadTrendingOutfits(isNextPage: boolean = false) {
+    // Guard: don't re-fetch if already loading or no more data
+    if (this.isLoading || this.isNextPageLoading || (isNextPage && !this.hasMore)) return;
+    
+    if (isNextPage) {
+      this.isNextPageLoading = true;
+    } else {
+      this.isLoading = true;
+    }
+
+    console.log(`Fetching trending outfits (skip=${this.skip}, limit=${this.limit})...`);
+    this.outfitService.getTrendingOutfits(this.skip, this.limit).subscribe({
       next: (data) => {
         console.log('Successfully loaded', data.length, 'outfits');
-        this.isLoading = false;
-        this.dataLoaded = true;
-        // Use AI-personalized results if available, otherwise fall back to trending
-        if (!this.analysisResult?.recommended_outfits?.length) {
+        
+        // Filter out items that are already in trendingOutfits (by ID or image_url)
+        const newItems = data.filter(item => 
+          !this.trendingOutfits.some(existing => (existing.id && item.id && existing.id === item.id) || (existing.image_url === item.image_url))
+        );
+
+        if (isNextPage || this.trendingOutfits.length > 0) {
+          this.trendingOutfits = [...this.trendingOutfits, ...newItems];
+          this.isNextPageLoading = false;
+        } else {
           this.trendingOutfits = data;
         }
+        
+        this.isLoading = false;
+        this.dataLoaded = true;
+
+        // Update pagination counter (based on what we actually fetched from server)
+        this.skip += data.length;
+        
+        // If we got fewer items than requested, we've reached the end
+        if (data.length < this.limit) {
+          this.hasMore = false;
+        }
+
         this.updateDynamicCategories();
+
+        // Safety: if we didn't add any new items because of deduplication, 
+        // but the server says there are more, we should fetch the next page immediately
+        // to avoid getting stuck in a scroll loop
+        if (newItems.length === 0 && this.hasMore && isNextPage) {
+           this.loadTrendingOutfits(true);
+        }
       },
-      error: () => { this.isLoading = false; }
+      error: () => { 
+        this.isLoading = false;
+        this.isNextPageLoading = false;
+      }
     });
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    // Trigger infinite scroll for all categories, as long as we aren't currently searching external
+    if (this.searchResults.length > 0) return;
+    if (!this.hasMore || this.isLoading || this.isNextPageLoading) return;
+
+    const pos = (document.documentElement.scrollTop || document.body.scrollTop) + document.documentElement.offsetHeight;
+    const max = document.documentElement.scrollHeight;
+    
+    // Load next page when 400px from bottom (slightly earlier for 40 items)
+    if (pos > max - 400) {
+      this.loadTrendingOutfits(true);
+    }
   }
 
   forceRefresh() {
     // Explicit user action - clear cache and reload fresh trending data
-    if (this.isLoading) return;
+    if (this.isLoading || this.isNextPageLoading) return;
     this.dataLoaded = false;
     this.analysisResult = null;
     this.trendingOutfits = [];
+    this.skip = 0;
+    this.hasMore = true;
     localStorage.removeItem('latest_recommendations');
     this.loadTrendingOutfits();
   }

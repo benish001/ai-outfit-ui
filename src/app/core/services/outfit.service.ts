@@ -14,8 +14,8 @@ export class OutfitService {
         return this.http.get<any[]>(`${environment.apiUrl}/outfits/`);
     }
 
-    getTrendingOutfits(limit: number = 100): Observable<any[]> {
-        return this.http.get<any[]>(`${environment.apiUrl}/outfits/trending?limit=${limit}`);
+    getTrendingOutfits(skip: number = 0, limit: number = 40): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/outfits/trending?skip=${skip}&limit=${limit}`);
     }
 
     searchExternalProducts(keyword: string, platform: string = 'amazon', limit: number = 10): Observable<any[]> {
