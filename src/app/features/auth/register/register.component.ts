@@ -169,8 +169,22 @@ export class RegisterComponent {
 
       this.authService.register(formData).subscribe({
         next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Account Created!', detail: 'Please sign in.' });
-          setTimeout(() => this.router.navigate(['/login']), 1800);
+          this.messageService.add({ severity: 'success', summary: 'Account Created!', detail: 'Welcome to SkinToneAI!' });
+          
+          // Auto-login after registration
+          const email = this.registerForm.get('email')?.value;
+          const password = this.registerForm.get('password')?.value;
+          
+          this.authService.login({ email, password }).subscribe({
+            next: () => {
+              this.isLoading = false;
+              this.router.navigate(['/upload']);
+            },
+            error: () => {
+              this.isLoading = false;
+              this.router.navigate(['/login']);
+            }
+          });
         },
         error: (err: any) => { 
           this.isLoading = false; 

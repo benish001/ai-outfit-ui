@@ -14,8 +14,9 @@ export class OutfitService {
         return this.http.get<any[]>(`${environment.apiUrl}/outfits/`);
     }
 
-    getTrendingOutfits(skip: number = 0, limit: number = 40): Observable<any[]> {
-        return this.http.get<any[]>(`${environment.apiUrl}/outfits/trending?skip=${skip}&limit=${limit}`);
+    getTrendingOutfits(skip: number = 0, limit: number = 40, gender?: string): Observable<any[]> {
+        const genderParam = gender ? `&gender=${gender}` : '';
+        return this.http.get<any[]>(`${environment.apiUrl}/outfits/trending?skip=${skip}&limit=${limit}${genderParam}`);
     }
 
     searchExternalProducts(keyword: string, platform: string = 'amazon', limit: number = 10): Observable<any[]> {

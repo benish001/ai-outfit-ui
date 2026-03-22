@@ -102,8 +102,14 @@ import { OutfitService } from '../../core/services/outfit.service';
           </div>
         </div>
 
+        <!-- Search Progress/Loading -->
+        <div *ngIf="isSearching" class="mb-10 animate-fade-in flex flex-col items-center justify-center py-12 bg-white/50 rounded-3xl border border-dashed border-[var(--border)]">
+          <lucide-angular [img]="LoaderIcon" class="w-8 h-8 text-[var(--brand-gold)] animate-spin mb-4"></lucide-angular>
+          <p class="text-[10px] uppercase tracking-[0.3em] text-[var(--brand-dark)] font-bold">Searching Global Catalogs...</p>
+        </div>
+
         <!-- Search Results -->
-        <div *ngIf="searchResults.length > 0 && !isLoading" id="search-results" class="mb-10 animate-fade-in">
+        <div *ngIf="searchResults.length > 0 && !isSearching" id="search-results" class="mb-10 animate-fade-in">
           <div class="flex items-center justify-between mb-5">
             <div>
               <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-1">Live Search</p>
@@ -143,6 +149,13 @@ import { OutfitService } from '../../core/services/outfit.service';
           </div>
         </div>
 
+        <!-- No Global Search Results -->
+        <div *ngIf="lastSearchQuery && searchResults.length === 0 && !isSearching && !isLoading" class="mb-10 py-12 text-center bg-[#F8F8F6] rounded-3xl border border-[#EDEDE9] animate-fade-in">
+           <p class="text-[10px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold italic">No matching items found in global fashion catalogs</p>
+           <p class="text-[9px] text-[var(--muted)] mt-1 uppercase tracking-widest font-medium">Showing items from our local curated collection below</p>
+           <button (click)="clearSearch()" class="mt-4 text-[10px] text-[var(--brand-gold)] font-bold uppercase tracking-widest hover:underline">Clear Search</button>
+        </div>
+
         <!-- Main Product Feed -->
         <div *ngIf="!isLoading && groupedProducts.length > 0" class="space-y-12">
           <div *ngFor="let group of groupedProducts; let groupIdx = index"
@@ -175,7 +188,7 @@ import { OutfitService } from '../../core/services/outfit.service';
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
 
                   <!-- Style match badge -->
-                  <div *ngIf="analysisResult?.recommended_outfits?.length && isMainOutfit(outfit.category, outfit.name)"
+                  <div *ngIf="analysisResult?.recommended_outfits?.length && isRecommended(outfit)"
                     class="absolute top-0 right-0 bg-[var(--brand-gold)] text-[var(--brand-dark)] text-[8px] uppercase tracking-widest px-2.5 py-1.5 font-black rounded-bl-xl shadow-lg border-l border-b border-black/10">
                     ✦ Match
                   </div>
@@ -382,7 +395,10 @@ export class RecommendationsComponent implements OnInit {
   }
 
   updateDynamicCategories() {
-    const cats = new Set<string>(['All', 'Dress']);
+    const isMale = this.analysisResult?.gender?.toLowerCase() === 'male';
+    const cats = new Set<string>(['All']);
+    if (!isMale) cats.add('Dress');
+    
     this.trendingOutfits.forEach(o => {
       const clean = this.getCleanCategory(o.category, o.name);
       if (clean && clean !== 'Dress') {
@@ -390,6 +406,27 @@ export class RecommendationsComponent implements OnInit {
       }
     });
     this.categories = Array.from(cats);
+  }
+
+  isRecommended(outfit: any): boolean {
+    if (!this.analysisResult) return false;
+    const colors = this.analysisResult.recommended_colors || [];
+    const userGender = this.analysisResult.gender?.toLowerCase();
+    const outfitGender = outfit.gender?.toLowerCase();
+
+    // Gender mismatch check (if both have gender info)
+    if (userGender && outfitGender && outfitGender !== 'unisex' && userGender !== outfitGender) {
+      return false;
+    }
+
+    // Heuristic fallback for non-gendered items
+    const nameLower = outfit.name.toLowerCase();
+    if (userGender === 'male' && (nameLower.includes('women') || nameLower.includes('lady') || outfit.category === 'Dress')) {
+      return false;
+    }
+
+    const combinedString = `${outfit.name} ${outfit.category}`.toLowerCase();
+    return colors.some((c: string) => combinedString.includes(c.toLowerCase()));
   }
 
   setActiveCategory(category: string) {
@@ -413,10 +450,17 @@ export class RecommendationsComponent implements OnInit {
         this.searchResults = data;
         this.isSearching = false;
         this.searchQuery = '';
+        
+        // Wait for Angular to render the results section, then scroll to it
         setTimeout(() => {
           const el = document.getElementById('search-results');
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            // Fallback: if search-results section is not in DOM yet, try scrolling to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }, 300);
       },
       error: () => { this.isSearching = false; }
     });
@@ -442,7 +486,7 @@ export class RecommendationsComponent implements OnInit {
     }
 
     console.log(`Fetching trending outfits (skip=${this.skip}, limit=${this.limit})...`);
-    this.outfitService.getTrendingOutfits(this.skip, this.limit).subscribe({
+    this.outfitService.getTrendingOutfits(this.skip, this.limit, this.analysisResult?.gender).subscribe({
       next: (data) => {
         console.log('Successfully loaded', data.length, 'outfits');
         
@@ -526,16 +570,18 @@ export class RecommendationsComponent implements OnInit {
       });
     };
 
-    // Priority 1: High-precision categories
+    // Priority 1: High-precision categories (Use wholeWord=true for short common strings like 'comb', 'pin', 'band')
     if (has(['gym', 'sport', 'workout', 'active', 'track', 'yoga', 'sweatpant', 'hoodie', 'resistance'], false)) return 'Activewear';
     if (has(['shoe', 'chappal', 'sandal', 'heel', 'sneaker', 'boot', 'jutti', 'mojari', 'flat', 'slipper', 'loafer', 'slide', 'flip flap'], true)) return 'Footwear';
-    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'comb', 'scrunchy', 'hairpin'], false) || (has(['band', 'bow'], true) && !has(['resistance'], false))) return 'Hair Accessories';
-    if (has(['jewelry', 'necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'pin', 'bindi', 'tikka', 'mangalsutra'], true) && !has(['hair', 'clip'], false)) return 'Jewelry';
+    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'scrunchy', 'hairpin'], false) || has(['comb', 'band', 'bow'], true)) return 'Hair Accessories';
+    if (has(['necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'bindi', 'tikka', 'mangalsutra'], true)) return 'Jewelry';
+    if (has(['jewelry'], false)) return 'Jewelry';
     if (has(['lipstick', 'serum', 'mask', 'cream', 'lotion', 'palette', 'perfume', 'skincare', 'makeup', 'cosmetic', 'beauty', 'eyeliner', 'kajal', 'face wash'], false)) return 'Beauty';
-    if (has(['watch', 'belt', 'wallet', 'purse', 'clutch'], true)) return 'Accessories';
+    if (has(['watch', 'belt', 'wallet', 'purse', 'clutch', 'pin'], true)) return 'Accessories';
     if (has(['bag', 'backpack', 'handbag', 'tote'], true)) return 'Bag';
 
     // Priority 2: Clothing categories
+    if (has(['bathrobe', 'robe', 'nightwear', 'sleepwear', 'pajama'], false)) return 'Loungewear';
     if (has(['dress', 'saree', 'kurta', 'suit', 'gown', 'lehenga', 'anarkali'], false)) return 'Dress';
     if (has(['jean', 'denim', 'trouser', 'pant', 'legging', 'jegging', 'short', 'skirt', 'palazzo', 'dhoti'], false)) return 'Bottom';
     if (has(['top', 'shirt', 'blouse', 'tee', 't-shirt', 'kurti', 'tunic', 'crop top'], false)) return 'Top';
