@@ -46,7 +46,10 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
                 <p class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold">Detected Identity</p>
                 <h3 class="text-xl font-bold text-white">{{ latestProfile.skin_tone }}</h3>
                 <div class="flex gap-1.5 pt-1">
-                  <div *ngFor="let o of (latestProfile.recommended_outfits || []).slice(0, 4)" class="w-3 h-3 rounded-full border border-white/20" [style.background]="o.color"></div>
+                  <div *ngFor="let color of getSkinTonePalette(latestProfile)" 
+                    class="w-3.5 h-3.5 rounded-full border border-white/20 shadow-sm transition-transform hover:scale-110" 
+                    [style.background]="color"
+                    [title]="color"></div>
                 </div>
               </div>
             </div>
@@ -138,7 +141,7 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
                   <button (click)="buyNow(outfit.affiliate_link)" class="w-full bg-[#D4AF37] text-black py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-white transition-all">Buy Now</button>
                 </div>
                 <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-white/10">
-                  <span class="w-2 h-2 rounded-full" [style.background]="outfit.color"></span>
+                  <span class="w-2 h-2 rounded-full shadow-sm" [style.background]="getBadgeColor(outfit.color)"></span>
                   {{ outfit.color }}
                 </div>
               </div>
@@ -256,5 +259,32 @@ export class DashboardComponent implements OnInit {
 
   buyNow(url: string) {
     if (url) window.open(url, '_blank');
+  }
+
+  getBadgeColor(colorStr: string): string {
+    if (!colorStr) return 'transparent';
+    if (colorStr.includes('&')) {
+      const colors = colorStr.split('&').map(c => c.trim().toLowerCase().replace(' ', ''));
+      return `linear-gradient(to right, ${colors[0]}, ${colors[1] || colors[0]})`;
+    }
+    return colorStr.toLowerCase().replace(' ', '');
+  }
+
+  getSkinTonePalette(profile: any): string[] {
+    if (!profile) return [];
+    
+    const tone = (profile.skin_tone || 'Medium').toLowerCase();
+    
+    // Define professional skin tone gradients for a luxury feel
+    if (tone.includes('fair') || tone.includes('light')) {
+      return ['#F9E4D4', '#F3D1BB', '#E7BDA2']; // Light Cream to Peach
+    } else if (tone.includes('medium') || tone.includes('tan')) {
+      return ['#D2B48C', '#BC8F8F', '#A0522D']; // Tan to Sienna
+    } else if (tone.includes('deep') || tone.includes('dark')) {
+      return ['#704139', '#532F29', '#3D221E']; // Warm Brown to Ebony
+    } else {
+      // Default / Warm Neutral
+      return ['#E5C29B', '#D4A373', '#9C6644'];
+    }
   }
 }

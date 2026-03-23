@@ -20,22 +20,22 @@ import { LucideAngularModule, ArrowRight, Sparkles, Camera } from 'lucide-angula
       <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--brand-dark)] opacity-[0.05] rounded-full blur-3xl"></div>
 
       <div class="w-full max-w-sm bg-white rounded-[var(--radius-lg)] shadow-2xl border border-[var(--border)] relative z-10 overflow-hidden animate-slide-up">
-        <div class="p-8 sm:p-10">
+        <div class="p-6 sm:p-8">
           <!-- Logo -->
-          <div class="flex flex-col items-center gap-2 mb-8">
-            <div class="w-11 h-11 bg-[var(--brand-dark)] rounded-2xl flex items-center justify-center shadow-lg">
-              <lucide-angular [img]="SparklesIcon" class="w-5 h-5 text-[var(--brand-gold)]"></lucide-angular>
+          <div class="flex flex-col items-center gap-2 mb-6">
+            <div class="w-10 h-10 bg-[var(--brand-dark)] rounded-2xl flex items-center justify-center shadow-lg">
+              <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[var(--brand-gold)]"></lucide-angular>
             </div>
             <div class="text-center">
-              <span class="text-lg font-black tracking-[0.25em] uppercase text-[var(--brand-dark)]">SkinTone</span>
-              <span class="text-lg luxury-font italic text-[var(--brand-gold)] ml-1">AI</span>
+              <span class="text-base font-black tracking-[0.25em] uppercase text-[var(--brand-dark)]">SkinTone</span>
+              <span class="text-base luxury-font italic text-[var(--brand-gold)] ml-1">AI</span>
             </div>
           </div>
 
           <!-- Heading -->
-          <div class="text-center space-y-1 mb-6">
-            <h1 class="text-2xl luxury-font text-[var(--brand-dark)]">Create Account</h1>
-            <p class="text-[9px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold">Join the Elite Fashion Community</p>
+          <div class="text-center space-y-1 mb-5">
+            <h1 class="text-xl luxury-font text-[var(--brand-dark)]">Create Account</h1>
+            <p class="text-[8px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold">Join the Elite Fashion Community</p>
           </div>
 
           <!-- Form -->
@@ -45,8 +45,8 @@ import { LucideAngularModule, ArrowRight, Sparkles, Camera } from 'lucide-angula
             <div class="space-y-1.5">
               <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Profile Photo</label>
               <div class="relative group cursor-pointer" (click)="fileInput.click()">
-                <div class="w-full h-24 bg-[var(--surface)] border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] flex items-center px-5 gap-4 group-hover:border-[var(--brand-gold)] transition-all overflow-hidden">
-                  <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center border border-[var(--border)] shadow-sm overflow-hidden flex-shrink-0">
+                <div class="w-full h-20 bg-[var(--surface)] border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] flex items-center px-4 gap-4 group-hover:border-[var(--brand-gold)] transition-all overflow-hidden">
+                  <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-[var(--border)] shadow-sm overflow-hidden flex-shrink-0">
                     <img *ngIf="photoPreview" [src]="photoPreview" class="w-full h-full object-cover">
                     <lucide-angular *ngIf="!photoPreview" [img]="CameraIcon" class="w-5 h-5 text-[var(--muted)]"></lucide-angular>
                   </div>
@@ -74,7 +74,7 @@ import { LucideAngularModule, ArrowRight, Sparkles, Camera } from 'lucide-angula
             <div class="space-y-1">
               <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Password</label>
               <input type="password" formControlName="password" placeholder="Min. 6 characters" 
-                class="w-full bg-[var(--surface)] border-2 border-transparent rounded-[var(--radius-md)] px-5 py-3 text-sm focus:border-[var(--brand-gold)] focus:bg-white transition-all outline-none">
+                class="w-full bg-[var(--surface)] border-2 border-transparent rounded-[var(--radius-md)] px-5 py-2.5 text-sm focus:border-[var(--brand-gold)] focus:bg-white transition-all outline-none">
               
               <!-- Strength indicators -->
               <div *ngIf="registerForm.get('password')?.value" class="flex gap-1.5 mt-2 px-1">
@@ -97,7 +97,7 @@ import { LucideAngularModule, ArrowRight, Sparkles, Camera } from 'lucide-angula
           </form>
 
           <!-- Footer Link -->
-          <p class="text-center text-[9px] text-[var(--muted)] uppercase tracking-widest mt-6">
+          <p class="text-center text-[9px] text-[var(--muted)] uppercase tracking-widest mt-5">
             Already registered? 
             <a routerLink="/login" class="text-[var(--brand-dark)] font-black hover:text-[var(--brand-gold)] transition-colors underline decoration-[var(--brand-gold)] underline-offset-4 ml-1">Sign In</a>
           </p>

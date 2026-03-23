@@ -20,11 +20,11 @@ import { LucideAngularModule, ArrowRight, Eye, EyeOff, Sparkles } from 'lucide-a
       <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--brand-dark)] opacity-[0.05] rounded-full blur-3xl"></div>
 
       <div class="w-full max-w-sm bg-white rounded-[var(--radius-lg)] shadow-2xl border border-[var(--border)] relative z-10 overflow-hidden animate-slide-up">
-        <div class="p-8 sm:p-10">
+        <div class="p-6 sm:p-8">
           <!-- Logo -->
-          <div class="flex flex-col items-center gap-2 mb-8">
-            <div class="w-11 h-11 bg-[var(--brand-dark)] rounded-2xl flex items-center justify-center shadow-lg">
-              <lucide-angular [img]="SparklesIcon" class="w-5 h-5 text-[var(--brand-gold)]"></lucide-angular>
+          <div class="flex flex-col items-center gap-2 mb-6">
+            <div class="w-10 h-10 bg-[var(--brand-dark)] rounded-2xl flex items-center justify-center shadow-lg">
+              <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[var(--brand-gold)]"></lucide-angular>
             </div>
             <div class="text-center">
               <span class="text-lg font-black tracking-[0.25em] uppercase text-[var(--brand-dark)]">SkinTone</span>
@@ -33,9 +33,9 @@ import { LucideAngularModule, ArrowRight, Eye, EyeOff, Sparkles } from 'lucide-a
           </div>
 
           <!-- Heading -->
-          <div class="text-center space-y-1 mb-6">
-            <h1 class="text-2xl luxury-font text-[var(--brand-dark)]">Welcome Back</h1>
-            <p class="text-[9px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold">Access Your Style Profile</p>
+          <div class="text-center space-y-1 mb-5">
+            <h1 class="text-xl luxury-font text-[var(--brand-dark)]">Welcome Back</h1>
+            <p class="text-[8px] uppercase tracking-[0.3em] text-[var(--muted)] font-bold">Access Your Style Profile</p>
           </div>
 
           <!-- Form -->

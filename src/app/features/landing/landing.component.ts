@@ -34,36 +34,22 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
               Upload your photo, let AI analyze your skin tone, and discover outfits curated specifically for you — with direct buy links.
             </p>
 
-            <!-- CTAs -->
-            <div class="flex flex-wrap gap-4">
-              <a routerLink="/register" class="btn-primary">
-                Get Started Free
-                <lucide-angular [img]="ArrowIcon" class="w-4 h-4"></lucide-angular>
+            <!-- CTAs with premium feel -->
+            <div class="flex flex-wrap gap-4 pt-4">
+              <a routerLink="/register" class="group relative px-8 py-4 bg-black text-white rounded-2xl text-[11px] uppercase tracking-[0.3em] font-black overflow-hidden transition-all hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1">
+                <span class="relative z-10 flex items-center gap-3">
+                  Get Started Free
+                  <lucide-angular [img]="ArrowIcon" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></lucide-angular>
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-r from-[var(--brand-gold)] to-transparent opacity-0 group-hover:opacity-20 transition-opacity"></div>
               </a>
-              <a routerLink="/login" class="btn-outline">Sign In</a>
+              <a routerLink="/login" class="px-8 py-4 border border-[#EDEDE9] text-black rounded-2xl text-[11px] uppercase tracking-[0.3em] font-black hover:border-black transition-all">Sign In</a>
             </div>
 
-            <!-- Social proof -->
-            <div class="flex items-center gap-3 pt-2">
-              <div class="flex -space-x-2">
-                <div *ngFor="let c of avatarColors" class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-[10px] font-bold" [style.background]="c">U</div>
-              </div>
-              <div>
-                <div class="flex items-center gap-1">
-                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]"></lucide-angular>
-                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]"></lucide-angular>
-                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]"></lucide-angular>
-                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]"></lucide-angular>
-                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]"></lucide-angular>
-                </div>
-                <p class="text-[10px] text-[#9A9A96] mt-0.5">Loved by 2,000+ users</p>
-              </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="flex flex-wrap gap-8 pt-4 border-t border-[#EDEDE9]">
-              <div *ngFor="let stat of stats">
-                <p class="text-2xl font-black text-black">{{ stat.value }}</p>
+            <!-- Stats with Glassmorphism -->
+            <div class="grid grid-cols-3 gap-4 pt-8 border-t border-[#EDEDE9]">
+              <div *ngFor="let stat of stats" class="bg-white/40 backdrop-blur-md border border-[#EDEDE9] p-4 rounded-2xl hover:border-[var(--brand-gold)] transition-colors group">
+                <p class="text-2xl font-black text-black group-hover:text-[var(--brand-gold)] transition-colors">{{ stat.value }}</p>
                 <p class="text-[9px] uppercase tracking-widest text-[#9A9A96] mt-0.5">{{ stat.label }}</p>
               </div>
             </div>
@@ -121,8 +107,8 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
                 AI Powered ✦
               </div>
 
-              <!-- Floating "5 matches" badge -->
-              <div class="absolute -bottom-5 -left-5 bg-white border border-[#EDEDE9] rounded-2xl shadow-xl p-4">
+              <!-- Floating "20 matches" badge -->
+              <div class="absolute -bottom-6 -right-5 bg-white border border-[#EDEDE9] rounded-2xl shadow-xl p-4 scale-90 sm:scale-100">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-xl bg-[#F9F3E3] flex items-center justify-center">
                     <lucide-angular [img]="ZapIcon" class="w-5 h-5 text-[#D4AF37]"></lucide-angular>
@@ -148,16 +134,20 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
           </div>
           <h2 class="text-3xl sm:text-4xl luxury-font text-black">Three Steps to Perfect Style</h2>
         </div>
-        <div class="grid sm:grid-cols-3 gap-6">
+        <div class="grid sm:grid-cols-3 gap-8">
           <div *ngFor="let step of steps; let i = index"
-            class="bg-white rounded-2xl border border-[#EDEDE9] p-8 space-y-5 hover:shadow-lg transition-all duration-300 animate-fade-in"
+            class="group bg-white rounded-[32px] border border-[#EDEDE9] p-10 space-y-6 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 animate-fade-in"
             [style.animation-delay]="i * 100 + 'ms'">
-            <div class="w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest group-hover:bg-[#D4AF37]">
-              {{ i + 1 }}
+            <div class="w-14 h-14 bg-[#F8F8F6] rounded-2xl flex items-center justify-center transition-colors group-hover:bg-black">
+              <lucide-angular [img]="step.icon" class="w-6 h-6 text-[#D4AF37] transition-colors group-hover:text-white"></lucide-angular>
             </div>
-            <div>
-              <h3 class="luxury-font text-xl text-black mb-2">{{ step.title }}</h3>
-              <p class="text-sm text-[#9A9A96] leading-relaxed">{{ step.desc }}</p>
+            <div class="space-y-3">
+              <h3 class="luxury-font text-2xl text-black">{{ step.title }}</h3>
+              <p class="text-sm text-[#9A9A96] leading-relaxed font-light">{{ step.desc }}</p>
+            </div>
+            <div class="pt-4 flex items-center gap-2 text-[9px] uppercase tracking-widest font-black text-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity">
+              <span>Explore Step</span>
+              <lucide-angular [img]="ArrowIcon" class="w-3 h-3"></lucide-angular>
             </div>
           </div>
         </div>
@@ -223,9 +213,9 @@ export class LandingComponent {
     { value: '10s', label: 'Analysis Time' },
   ];
   steps = [
-    { title: 'Upload Photo', desc: 'Take or upload a clear photo of yourself in natural lighting for best results.' },
-    { title: 'AI Analyzes', desc: 'Our AI instantly detects your skin tone and undertones with 98% accuracy.' },
-    { title: 'Shop Looks', desc: 'Browse curated outfits that complement your skin tone, with direct buy links.' }
+    { title: 'Upload Photo', desc: 'Take or upload a clear photo of yourself in natural lighting for best results.', icon: Camera },
+    { title: 'AI Analyzes', desc: 'Our AI instantly detects your skin tone and undertones with 98% accuracy.', icon: Sparkles },
+    { title: 'Shop Looks', desc: 'Browse curated outfits that complement your skin tone, with direct buy links.', icon: ShoppingBag }
   ];
   categories = ['👗 Dresses', '👟 Sneakers', '👜 Bags', '🧥 Jackets', '💄 Beauty', '🩱 Gym Wear', '⌚ Watches', '🩴 Sandals'];
 }
