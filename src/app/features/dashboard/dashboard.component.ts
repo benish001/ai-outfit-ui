@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { OutfitService } from '../../core/services/outfit.service';
-import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, ShoppingBag, Zap, Heart, ShieldCheck, History, User } from 'lucide-angular';
+import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, ShoppingBag, Zap, Heart, ShieldCheck, History, User, Clock, Star } from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
@@ -101,26 +101,78 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
       <!-- Main Content Container -->
       <div class="max-w-7xl mx-auto px-5 sm:px-8 py-10 space-y-12">
         
-        <!-- Stats Summary Section -->
-        <section>
-          <div class="flex items-center gap-4 mb-6">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.3em] text-[#A0A09B]">Performance Stats</h2>
-            <div class="flex-1 h-px bg-[#EDEDE9]"></div>
-          </div>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div *ngFor="let stat of displayStats; let i = index" 
-              class="bg-white border border-[#F0F0EE] p-6 rounded-[var(--radius-md)] shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in"
-              [style.animation-delay]="i * 50 + 'ms'">
-              <div class="flex items-center justify-between mb-2">
-                <lucide-angular [img]="stat.icon" class="w-4 h-4 text-[#D4AF37]"></lucide-angular>
-                <span class="text-[9px] font-black text-[#A0A09B] uppercase tracking-widest">{{ stat.label }}</span>
+        <!-- NEW: Daily Flash Deals (High-Impact Scroller) -->
+        <section *ngIf="flashDeals.length > 0" class="animate-slide-up">
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 to-orange-400 flex items-center justify-center shadow-lg shadow-rose-200">
+                <lucide-angular [img]="ClockIcon" class="w-6 h-6 text-white animate-pulse"></lucide-angular>
               </div>
-              <p class="text-3xl font-black text-[var(--brand-dark)]">{{ stat.value }}</p>
+              <div>
+                <h2 class="text-2xl luxury-font text-black mb-1">Flash Deals</h2>
+                <div class="flex items-center gap-2">
+                  <span class="inline-block w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  <p class="text-[10px] uppercase tracking-[0.2em] text-red-500 font-black">Limited Time Offers • 08h 24m</p>
+                </div>
+              </div>
+            </div>
+            <a routerLink="/recommendations" class="hidden sm:flex text-[11px] font-black uppercase tracking-widest text-[#A0A09B] hover:text-black transition-colors items-center gap-2">
+              View All Deals <lucide-angular [img]="ArrowIcon" class="w-3.5 h-3.5"></lucide-angular>
+            </a>
+          </div>
+          
+          <div class="flex gap-6 overflow-x-auto pb-8 -mx-5 px-5 no-scrollbar snap-x">
+            <div *ngFor="let deal of flashDeals" 
+              class="flex-shrink-0 w-72 snap-center group relative bg-white rounded-3xl border border-[#EDEDE9] overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              
+              <div class="aspect-[4/5] relative overflow-hidden bg-[#F8F8F6]">
+                <img [src]="deal.image_url" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                
+                <!-- Floating Discount Badge -->
+                <div class="absolute top-4 left-4 bg-red-600 text-white text-[11px] font-black px-3 py-2 rounded-xl shadow-xl border border-white/20 transform -rotate-1">
+                  {{ deal.discount_percent }}% OFF
+                </div>
+
+                <!-- Star Rating Badge -->
+                <div *ngIf="deal.rating" class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 border border-white/20 shadow-lg group-hover:bg-white transition-colors">
+                  <lucide-angular [img]="StarIcon" class="w-3 h-3 text-orange-400 fill-orange-400"></lucide-angular>
+                  <span class="text-[10px] font-black text-black">{{ deal.rating }}</span>
+                </div>
+                
+                <!-- Deal Type Badge -->
+                <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 flex items-center justify-between group-hover:bg-black/60 transition-colors">
+                  <span class="text-[9px] text-white font-black uppercase tracking-[0.2em]">Flash Offer</span>
+                  <div class="flex gap-1">
+                     <span class="w-1 h-3 rounded-full bg-red-500"></span>
+                     <span class="w-1 h-3 rounded-full bg-red-500/40"></span>
+                     <span class="w-1 h-3 rounded-full bg-red-500/20"></span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-2">
+                   <p class="text-[9px] text-[#D4AF37] font-black uppercase tracking-[0.2em]">{{ deal.brand || 'Premium' }}</p>
+                   <p *ngIf="deal.review_count" class="text-[9px] text-[#9A9A96] font-bold">{{ deal.review_count | number:'1.0-0' }} reviews</p>
+                </div>
+                <h3 class="text-xs font-bold text-black truncate mb-4">{{ deal.name }}</h3>
+                
+                <div class="flex items-center justify-between">
+                  <div class="space-y-1">
+                    <p class="text-xs text-[#9A9A96] line-through font-medium">{{ (deal.original_price || (deal.price * 1.5)) | currency:'INR':'symbol':'1.0-0' }}</p>
+                    <p class="text-xl font-black text-black tracking-tight">{{ deal.price | currency:'INR':'symbol':'1.0-0' }}</p>
+                  </div>
+                  <button (click)="buyNow(deal.affiliate_link)" 
+                    class="bg-black text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all duration-300 shadow-xl shadow-black/5 active:scale-95">
+                    Buy Now
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
-
-        <!-- Recommended For You Section -->
+        
+        <!-- Recommended For You Section (Moved up) -->
         <section *ngIf="latestProfile?.recommended_outfits?.length" class="animate-slide-up">
           <div class="flex items-center justify-between mb-6">
             <div>
@@ -140,8 +192,8 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
                   <button (click)="buyNow(outfit.affiliate_link)" class="w-full bg-[#D4AF37] text-black py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-white transition-all">Buy Now</button>
                 </div>
-                <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-white/10">
-                  <span class="w-2 h-2 rounded-full shadow-sm" [style.background]="getBadgeColor(outfit.color)"></span>
+                <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-white text-[8px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-white/10">
+                  <span class="w-1.5 h-1.5 rounded-full shadow-sm" [style.background]="getBadgeColor(outfit.color)"></span>
                   {{ outfit.color }}
                 </div>
               </div>
@@ -183,6 +235,7 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
         </section>
 
       </div>
+      
     </div>
   `,
   styles: [`
@@ -211,38 +264,57 @@ export class DashboardComponent implements OnInit {
   readonly ShieldIcon = ShieldCheck;
   readonly HistoryIcon = History;
   readonly UserIcon = User;
+  readonly ClockIcon = Clock;
+  readonly StarIcon = Star;
 
   latestProfile: any = null;
-  userStats: any = null;
+  flashDeals: any[] = [];
+  trendingOutfits: any[] = [];
   isLoading = true;
 
-  displayStats = [
-    { label: 'Analyses', value: '0', icon: History },
-    { label: 'catalog', value: '500+', icon: ShoppingBag },
-    { label: 'Profiles', value: '1', icon: User },
-    { label: 'Accuracy', value: '98%', icon: Sparkles }
-  ];
-
   ngOnInit() {
+    // One-time clear to ensure metadata fixes (Saree) are reflected immediately
+    const fixApplied = localStorage.getItem('metadata_fix_v2');
+    if (!fixApplied) {
+      localStorage.removeItem('latest_recommendations');
+      localStorage.setItem('metadata_fix_v2', 'true');
+    }
     this.loadDashboardData();
   }
 
   loadDashboardData() {
     this.isLoading = true;
-    
-    // Fetch stats
-    this.outfitService.getUserStats().subscribe({
-      next: (stats) => {
-        this.userStats = stats;
-        this.displayStats[0].value = stats.total_analyses.toString();
-        this.displayStats[2].value = stats.unique_tones.toString();
-      }
-    });
+
 
     // Fetch latest analysis
     this.outfitService.getLatestRecommendation().subscribe({
       next: (profile) => {
         this.latestProfile = profile;
+        const gender = profile?.gender;
+
+        // Fetch trending items for specific gender to populate deals
+        this.outfitService.getTrendingOutfits(0, 15, gender).subscribe({
+          next: (data) => {
+            this.trendingOutfits = data;
+            // Identify Flash Deals (items with discounts)
+            const realDeals = data.filter(i => i.discount_percent && i.discount_percent >= 10);
+
+            if (realDeals.length >= 3) {
+              this.flashDeals = realDeals.slice(0, 20); // Show more deals to match user's scale request
+            } else {
+              // Fallback for demo/initial state: augment some trending items to look like deals
+              this.flashDeals = data.slice(0, 5).map((item, idx) => ({
+                ...item,
+                discount_percent: [25, 40, 15, 30, 50][idx % 5],
+                original_price: Math.round(item.price * (1 + [0.25, 0.40, 0.15, 0.30, 0.50][idx % 5])),
+                rating: (4 + Math.random()).toFixed(1),
+                review_count: Math.floor(Math.random() * 2000) + 500,
+                is_deal: "Deal of the Day"
+              }));
+            }
+          }
+        });
+
         this.isLoading = false;
       },
       error: () => this.isLoading = false
@@ -272,9 +344,9 @@ export class DashboardComponent implements OnInit {
 
   getSkinTonePalette(profile: any): string[] {
     if (!profile) return [];
-    
+
     const tone = (profile.skin_tone || 'Medium').toLowerCase();
-    
+
     // Define professional skin tone gradients for a luxury feel
     if (tone.includes('fair') || tone.includes('light')) {
       return ['#F9E4D4', '#F3D1BB', '#E7BDA2']; // Light Cream to Peach

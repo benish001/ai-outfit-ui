@@ -573,11 +573,12 @@ export class RecommendationsComponent implements OnInit {
     // Priority 1: High-precision categories (Use wholeWord=true for short common strings like 'comb', 'pin', 'band')
     if (has(['gym', 'sport', 'workout', 'active', 'track', 'yoga', 'sweatpant', 'hoodie', 'resistance'], false)) return 'Activewear';
     if (has(['shoe', 'chappal', 'sandal', 'heel', 'sneaker', 'boot', 'jutti', 'mojari', 'flat', 'slipper', 'loafer', 'slide', 'flip flap'], true)) return 'Footwear';
-    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'scrunchy', 'hairpin'], false) || has(['comb', 'band', 'bow'], true)) return 'Hair Accessories';
-    if (has(['necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'bindi', 'tikka', 'mangalsutra'], true)) return 'Jewelry';
-    if (has(['jewelry'], false)) return 'Jewelry';
     if (has(['lipstick', 'serum', 'mask', 'cream', 'lotion', 'palette', 'perfume', 'skincare', 'makeup', 'cosmetic', 'beauty', 'eyeliner', 'kajal', 'face wash'], false)) return 'Beauty';
-    if (has(['watch', 'belt', 'wallet', 'purse', 'clutch', 'pin'], true)) return 'Accessories';
+    if (has(['watch'], true)) return 'Accessories';
+    if (has(['hair', 'clip', 'scrunchie', 'tiara', 'scrunchy', 'hairpin'], false) || has(['comb', 'band', 'bow'], true)) return 'Hair Accessories';
+    if (has(['jewelry'], false)) return 'Jewelry';
+    if (has(['necklace', 'earring', 'bracelet', 'bangle', 'pendant', 'brooch', 'ring', 'bindi', 'tikka', 'mangalsutra'], true)) return 'Jewelry';
+    if (has(['belt', 'wallet', 'purse', 'clutch', 'pin'], true)) return 'Accessories';
     if (has(['bag', 'backpack', 'handbag', 'tote'], true)) return 'Bag';
 
     // Priority 2: Clothing categories
