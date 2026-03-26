@@ -17,12 +17,6 @@ import { OutfitService } from '../../core/services/outfit.service';
       <div *ngIf="analysisResult" class="bg-[var(--brand-dark)] text-white animate-fade-in shadow-xl">
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-5">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40 flex-shrink-0">
-              <img *ngIf="analysisResult.photo?.url" [src]="analysisResult.photo?.url" class="w-full h-full object-cover">
-              <div *ngIf="!analysisResult.photo?.url" class="w-full h-full bg-[#D4AF37]/20 flex items-center justify-center">
-                <lucide-angular [img]="CameraIcon" class="w-6 h-6 text-[#D4AF37]"></lucide-angular>
-              </div>
-            </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-[9px] uppercase tracking-[0.3em] font-bold text-white">SkinTone Profile</span>
@@ -211,7 +205,29 @@ export class RecommendationsComponent implements OnInit {
   }
 
   get filteredTrending() {
-    return this.trendingOutfits;
+    return [...this.trendingOutfits].sort((a, b) => {
+      const aDress = this.isDress(a.category) || this.getCleanCategory(a.category, a.name) === 'Dress';
+      const bDress = this.isDress(b.category) || this.getCleanCategory(b.category, b.name) === 'Dress';
+      
+      if (aDress && !bDress) return -1;
+      if (!aDress && bDress) return 1;
+      return 0; // maintain original relative order otherwise
+    });
+  }
+
+  isMainOutfit(category: string, name: string = ''): boolean {
+    if (!category && !name) return true;
+    const clean = this.getCleanCategory(category, name);
+    // Clothing items are main outfits. Accessories, beauty, etc. are not.
+    const clothingCategories = ['Dress', 'Top', 'Bottom', 'Outerwear', 'Activewear'];
+    if (clean) return clothingCategories.includes(clean);
+    
+    // Fallback: if we can't categorize it, but it doesn't match known accessories, assume it's an outfit
+    return true; 
+  }
+
+  isDress(category: string): boolean {
+    return (category || '').toLowerCase().includes('dress');
   }
 
   isRecommended(outfit: any): boolean {
