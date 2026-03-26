@@ -172,36 +172,7 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
           </div>
         </section>
         
-        <!-- Recommended For You Section (Moved up) -->
-        <section *ngIf="latestProfile?.recommended_outfits?.length" class="animate-slide-up">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <p class="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-black mb-1">Tailored for you</p>
-              <h2 class="text-2xl luxury-font text-[var(--brand-dark)]">Recommended Dresses</h2>
-            </div>
-            <a routerLink="/recommendations" class="text-[11px] font-black uppercase tracking-widest text-[#A0A09B] hover:text-[#D4AF37] transition-colors flex items-center gap-2">
-              View All <lucide-angular [img]="ArrowIcon" class="w-3.5 h-3.5"></lucide-angular>
-            </a>
-          </div>
 
-          <div class="flex gap-5 overflow-x-auto no-scrollbar pb-6 -mx-5 px-5 sm:mx-0 sm:px-0">
-            <div *ngFor="let outfit of latestProfile.recommended_outfits.slice(0, 6)" 
-              class="flex-shrink-0 w-64 group">
-              <div class="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-[#EDEDE9] mb-4 group-hover:shadow-2xl transition-all duration-500">
-                <img [src]="outfit.image_url" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
-                  <button (click)="buyNow(outfit.affiliate_link)" class="w-full bg-[#D4AF37] text-black py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-white transition-all">Buy Now</button>
-                </div>
-                <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-white text-[8px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-white/10">
-                  <span class="w-1.5 h-1.5 rounded-full shadow-sm" [style.background]="getBadgeColor(outfit.color)"></span>
-                  {{ outfit.color }}
-                </div>
-              </div>
-              <h3 class="text-xs font-black text-[var(--brand-dark)] uppercase tracking-wider line-clamp-1 mb-1">{{ outfit.name }}</h3>
-              <p class="text-[10px] text-[#A0A09B] uppercase font-bold tracking-widest">{{ outfit.brand || 'Elite Series' }}</p>
-            </div>
-          </div>
-        </section>
 
         <!-- Tool Cards (Secondary Actions) -->
         <section class="grid md:grid-cols-2 gap-6">
