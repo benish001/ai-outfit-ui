@@ -132,28 +132,26 @@ import { OutfitService } from '../../core/services/outfit.service';
           </div>
         </div>
 
-        <!-- Empty State (No products in active category) -->
-        <div *ngIf="!isLoading && groupedProducts.length === 0 && (activeCategory !== 'All' || (trendingOutfits.length === 0 && searchResults.length === 0))" 
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && trendingOutfits.length === 0" 
           class="flex flex-col items-center justify-center py-24 space-y-6 animate-fade-in">
           <div class="w-24 h-24 bg-white border border-[#EDEDE9] rounded-3xl flex items-center justify-center shadow-sm">
             <lucide-angular [img]="BagIcon" class="w-10 h-10 text-[#EDEDE9]"></lucide-angular>
           </div>
           <div class="text-center space-y-2 max-w-xs">
             <h3 class="text-xl luxury-font text-[#9A9A96]">
-              {{ activeCategory === 'All' ? 'Discovering New Trends' : 'No ' + activeCategory + ' Found' }}
+              Discovering New Trends
             </h3>
             <p class="text-[11px] uppercase tracking-widest text-[#9A9A96]/60 leading-relaxed">
-              {{ activeCategory === 'All' 
-                  ? 'Our AI is syncing the latest fashion from premium catalogs.' 
-                  : 'We couldn\'t find any items in this category. Try refreshing or searching for something else.' }}
+              Our AI is syncing the latest fashion from premium catalogs.
             </p>
           </div>
           <div class="flex gap-3">
-            <a *ngIf="activeCategory === 'All'" routerLink="/upload" class="btn-primary text-[10px] px-6 py-3">
+            <a routerLink="/upload" class="bg-[var(--brand-dark)] text-white text-[10px] uppercase tracking-widest font-black px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-[var(--brand-gold)] hover:text-[var(--brand-dark)] transition-all shadow-md">
               <lucide-angular [img]="CameraIcon" class="w-4 h-4"></lucide-angular>
               Analyze Your Style
             </a>
-            <button (click)="forceRefresh()" class="btn-outline text-[10px] px-6 py-3">Refresh Catalog</button>
+            <button (click)="forceRefresh()" class="bg-white border border-[#EDEDE9] text-[var(--brand-dark)] text-[10px] uppercase tracking-widest font-black px-6 py-3 rounded-lg hover:border-black transition-all shadow-sm">Refresh Catalog</button>
           </div>
         </div>
       </div>
