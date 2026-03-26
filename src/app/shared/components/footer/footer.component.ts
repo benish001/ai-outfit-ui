@@ -9,7 +9,8 @@ import { LucideAngularModule } from 'lucide-angular';
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
     <footer *ngIf="!isAuthPage()" class="bg-[var(--brand-dark)] text-white">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 py-14 sm:py-20">
+      <!-- Added pb-28 md:pb-20 so mobile nav doesn't cover footer -->
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 pt-14 pb-32 md:py-20">
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
 
           <!-- Brand -->
