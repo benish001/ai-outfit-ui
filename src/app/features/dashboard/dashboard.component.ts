@@ -34,14 +34,6 @@ import { LucideAngularModule, Camera, Shirt, ArrowRight, TrendingUp, Sparkles, S
 
             <!-- Profile Overview (Latest Analysis) -->
             <div *ngIf="latestProfile" class="flex items-center gap-6 bg-white/5 border border-white/10 p-6 rounded-[var(--radius-lg)] backdrop-blur-md animate-fade-in shadow-2xl">
-              <div class="relative">
-                <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#D4AF37]/40">
-                  <img [src]="latestProfile.photo_url" class="w-full h-full object-cover">
-                </div>
-                <div class="absolute -bottom-2 -right-2 bg-[#D4AF37] text-black w-7 h-7 rounded-lg flex items-center justify-center shadow-lg">
-                  <lucide-angular [img]="SparklesIcon" class="w-3.5 h-3.5"></lucide-angular>
-                </div>
-              </div>
               <div class="space-y-1.5">
                 <p class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold">Detected Identity</p>
                 <h3 class="text-xl font-bold text-white">{{ latestProfile.skin_tone }}</h3>
