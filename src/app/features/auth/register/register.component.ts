@@ -13,13 +13,16 @@ import { LucideAngularModule, ArrowRight, Sparkles } from 'lucide-angular';
   imports: [CommonModule, RouterModule, ReactiveFormsModule, Toast, LucideAngularModule],
   providers: [MessageService],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-[var(--surface)] p-6 relative overflow-hidden">
+    <div class="min-h-[100dvh] flex flex-col bg-[var(--surface)] px-4 sm:px-6 relative overflow-x-hidden">
       <!-- Background Decorative Elements -->
-      <div class="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style="background-image:linear-gradient(var(--brand-dark) 1px,transparent 1px),linear-gradient(90deg,var(--brand-dark) 1px,transparent 1px);background-size:40px 40px"></div>
-      <div class="absolute -top-24 -right-24 w-96 h-96 bg-[var(--brand-gold)] opacity-[0.05] rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--brand-dark)] opacity-[0.05] rounded-full blur-3xl"></div>
+      <div class="fixed top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style="background-image:linear-gradient(var(--brand-dark) 1px,transparent 1px),linear-gradient(90deg,var(--brand-dark) 1px,transparent 1px);background-size:40px 40px"></div>
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-[var(--brand-gold)] opacity-[0.05] rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--brand-dark)] opacity-[0.05] rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="w-full max-w-sm bg-white rounded-[var(--radius-lg)] shadow-2xl border border-[var(--border)] relative z-10 overflow-hidden animate-slide-up">
+      <!-- Top Spacer -->
+      <div class="flex-1 min-h-[2rem]"></div>
+
+      <div class="w-full max-w-sm mx-auto bg-white rounded-[var(--radius-lg)] shadow-2xl border border-[var(--border)] relative z-10 overflow-hidden animate-slide-up my-auto">
         <div class="p-6 sm:p-8">
           <!-- Logo -->
           <div class="flex flex-col items-center gap-2 mb-6">
@@ -41,8 +44,6 @@ import { LucideAngularModule, ArrowRight, Sparkles } from 'lucide-angular';
           <!-- Form -->
           <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
             
-
-
             <div class="space-y-1">
               <label class="text-[9px] font-black tracking-[0.2em] uppercase text-[var(--muted)] px-1">Full Name</label>
               <input type="text" formControlName="name" placeholder="E.g. Alexander McQueen" 
@@ -88,9 +89,9 @@ import { LucideAngularModule, ArrowRight, Sparkles } from 'lucide-angular';
         </div>
       </div>
       
-      <!-- Bottom Branding -->
-      <div class="absolute bottom-6 left-0 w-full text-center">
-        <p class="text-[8px] uppercase tracking-[0.4em] text-[var(--muted)] opacity-50">© 2024 SkinToneAI · Luxury Fashion Curator</p>
+      <!-- Bottom Branding / Safe Area Spacer -->
+      <div class="flex-1 flex flex-col justify-end relative z-10 pb-8 sm:pb-12 pt-8">
+        <p class="text-[8px] uppercase tracking-[0.4em] text-[var(--muted)] opacity-50 text-center">© 2024 SkinToneAI · Luxury Fashion Curator</p>
       </div>
     </div>
     <p-toast></p-toast>
