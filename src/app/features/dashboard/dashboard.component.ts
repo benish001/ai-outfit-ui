@@ -264,6 +264,11 @@ export class DashboardComponent implements OnInit {
 
   buyNow(link: string) {
     if (link) {
+      // Append affiliate tag if it's an Amazon link and doesn't already have one
+      if (link.includes('amazon.in') && !link.includes('tag=')) {
+        const separator = link.includes('?') ? '&' : '?';
+        link = `${link}${separator}tag=skintoneai-21`;
+      }
       window.open(link, '_blank');
     }
   }

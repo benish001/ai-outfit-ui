@@ -368,5 +368,13 @@ export class RecommendationsComponent implements OnInit {
     event.target.classList.add('opacity-60');
   }
 
-  buyNow(link: string) { if (link) window.open(link, '_blank'); }
+  buyNow(link: string) {
+    if (link) {
+      if (link.includes('amazon.in') && !link.includes('tag=')) {
+        const separator = link.includes('?') ? '&' : '?';
+        link = `${link}${separator}tag=skintoneai-21`;
+      }
+      window.open(link, '_blank'); 
+    }
+  }
 }
