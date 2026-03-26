@@ -177,17 +177,6 @@ import { LucideAngularModule, Camera, Sparkles, ShoppingBag, ArrowRight, Star, Z
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="bg-[var(--brand-dark)] border-t border-white/5 py-12 px-5 text-center">
-      <div class="flex items-center justify-center gap-2 mb-4">
-        <div class="w-8 h-8 bg-[var(--brand-gold)] rounded-xl flex items-center justify-center">
-          <lucide-angular [img]="SparklesIcon" class="w-4 h-4 text-[var(--brand-dark)]"></lucide-angular>
-        </div>
-        <span class="text-white font-black tracking-widest text-sm uppercase">SkinTone</span>
-        <span class="luxury-font italic text-[var(--brand-gold)] text-sm">AI</span>
-      </div>
-      <p class="text-[9px] text-white/30 uppercase tracking-[0.3em]">© 2024 SkinToneAI · Curated with Intelligence</p>
-    </footer>
   `,
   styles: [`
     @keyframes marquee {
