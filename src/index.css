@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sunset-pink: #FF9A8B;
+  --color-purple-luxury: #A18CD1;
+  --color-orange-vibrant: #FF5F6D;
+  --color-brand-dark: #1A1A1A;
+  --color-muted: #9A9A96;
+  
+  --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.1), 0 10px 20px -10px rgba(0, 0, 0, 0.05);
+  --shadow-neumorphic-out: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+  --shadow-neumorphic-in: inset 8px 8px 16px #d1d1d1, inset -8px -8px 16px #ffffff;
+  
+  --radius-luxury: 18px;
+  --radius-xl: 32px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Inter:wght@100..900&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: #f8f8f8;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--color-brand-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+h1, h2, h3, h4, .luxury-font {
+  font-family: 'Poppins', sans-serif;
+}
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
