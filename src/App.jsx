@@ -63,7 +63,12 @@ function App() {
             <Login 
               onBack={() => setShowLogin(false)} 
               onRegister={() => { setShowLogin(false); setShowRegister(true); }}
-              onLoginSuccess={() => setShowLogin(false)}
+              onLoginSuccess={() => {
+                setShowLogin(false);
+                if (location.pathname === '/') {
+                  navigate('/gender');
+                }
+              }}
             />
           </motion.div>
         )}
@@ -77,7 +82,12 @@ function App() {
             <Register 
               onBack={() => setShowRegister(false)} 
               onLogin={() => { setShowRegister(false); setShowLogin(true); }}
-              onRegisterSuccess={() => setShowRegister(false)}
+              onRegisterSuccess={() => {
+                setShowRegister(false);
+                if (location.pathname === '/') {
+                  navigate('/gender');
+                }
+              }}
             />
           </motion.div>
         )}
@@ -93,7 +103,15 @@ function App() {
           className="w-full h-full"
         >
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Splash onNext={() => navigate('/gender')} />} />
+            <Route path="/" element={
+              <Splash onNext={() => {
+                if (!user) {
+                  setShowLogin(true);
+                } else {
+                  navigate('/gender');
+                }
+              }} />
+            } />
             <Route path="/gender" element={<GenderSelect onSelect={handleGenderSelect} />} />
             <Route path="/upload" element={<PhotoUpload onNext={() => navigate('/tone')} onBack={() => navigate('/gender')} />} />
             <Route path="/tone" element={<SkinToneSelect onNext={() => navigate('/analysis')} onBack={() => navigate('/upload')} />} />
