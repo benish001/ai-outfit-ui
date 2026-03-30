@@ -191,52 +191,55 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar space-y-8 min-h-0">
-        {/* Best Colors */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-               <div className="w-6 h-6 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
-                  <CheckCircle size={14} />
-               </div>
-               <h2 className="text-[9px] uppercase tracking-[0.2em] font-black">Complementary</h2>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-5 gap-3">
-            {palette.best.map((c, i) => (
-              <motion.div 
-                key={c.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.1 }}
-                className="group"
-              >
-                <div className="aspect-square rounded-xl shadow-soft border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
-                <p className="text-[7px] uppercase tracking-tighter font-extrabold text-center mt-2 opacity-30 truncate">{c.name}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Colors to Avoid */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-             <div className="w-6 h-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
-                <AlertCircle size={14} />
-             </div>
-             <h2 className="text-[9px] uppercase tracking-[0.2em] font-black opacity-40">Avoid</h2>
-          </div>
-          
-          <div className="grid grid-cols-4 gap-3">
-            {palette.avoid.map((c) => (
-              <div key={c.name} className="opacity-30">
-                <div className="aspect-square rounded-xl border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
-                <p className="text-[7px] uppercase tracking-tighter font-bold text-center mt-2 truncate italic">{c.name}</p>
+      <div className="flex-1 overflow-y-auto no-scrollbar space-y-8 min-h-0 pb-20">
+        {/* ... (keep existing sections) ... */}
+        {palette.best.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <div className="w-6 h-6 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+                    <CheckCircle size={14} />
+                 </div>
+                 <h2 className="text-[9px] uppercase tracking-[0.2em] font-black">Complementary</h2>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+            
+            <div className="grid grid-cols-5 gap-3">
+              {palette.best.map((c, i) => (
+                <motion.div 
+                  key={c.name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group"
+                >
+                  <div className="aspect-square rounded-xl shadow-soft border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
+                  <p className="text-[7px] uppercase tracking-tighter font-extrabold text-center mt-2 opacity-30 truncate">{c.name}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {palette.avoid.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-2">
+               <div className="w-6 h-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                  <AlertCircle size={14} />
+               </div>
+               <h2 className="text-[9px] uppercase tracking-[0.2em] font-black opacity-40">Avoid</h2>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-3">
+              {palette.avoid.map((c) => (
+                <div key={c.name} className="opacity-30">
+                  <div className="aspect-square rounded-xl border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
+                  <p className="text-[7px] uppercase tracking-tighter font-bold text-center mt-2 truncate italic">{c.name}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Action Card */}
         <Card variant="elevated" className="bg-brand-dark p-6 flex flex-col items-center text-center space-y-4 shrink-0 overflow-visible relative mt-4">
@@ -257,7 +260,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
       </div>
 
       {/* Info */}
-      <div className="mt-8 text-center opacity-20">
+      <div className="py-6 text-center opacity-20">
          <span className="text-[8px] uppercase tracking-widest font-black">Core Engine v5.0</span>
       </div>
     </div>

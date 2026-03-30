@@ -129,23 +129,34 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         }
       }
 
-      // Categorization Logic - Priority-based matching for legacy/manual items
-      const isOthers = cat.includes('others') || cat.includes('accessory') || cat.includes('watch') || cat.includes('gym') || cat.includes('jewelry') || cat.includes('bag') || cat.includes('shoe') || cat.includes('belt') || cat.includes('wallet') || 
-                       cat.includes('book') || cat.includes('camera') || cat.includes('tech') || cat.includes('home') || cat.includes('furniture') || cat.includes('health') || cat.includes('pad') || cat.includes('panty') || cat.includes('maternity') || cat.includes('wolf') ||
-                       cat.includes('gem') || cat.includes('stone') || cat.includes('diamond') || cat.includes('socks') || cat.includes('kids') || cat.includes('child') || cat.includes('baby');
-      const isEthnic = !isOthers && (cat.includes('ethnic') || cat.includes('saree') || cat.includes('kurta') || cat.includes('lehenga') || cat.includes('kurti'));
-      const isParty = !isOthers && !isEthnic && (cat.includes('party') || cat.includes('gown') || cat.includes('dress') || name.includes('party') || name.includes('wedding'));
-      const isFormal = !isOthers && !isEthnic && !isParty && (cat.includes('formal') || cat.includes('office') || cat.includes('trouser') || cat.includes('blazer') || cat.includes('suit') || cat.includes('business'));
-      const isCasual = !isOthers && !isEthnic && !isParty && !isFormal && (cat.includes('casual') || cat.includes('top') || cat.includes('tee') || cat.includes('jean') || cat.includes('shirt') || cat.includes('polo') || cat.includes('hoodie') || cat.includes('clothing') || cat.includes('apparel'));
+      // Smart Categorization Logic
+      const matches = (keywords) => {
+        return keywords.some(k => name.includes(k) || cat.includes(k));
+      };
+
+      const isOthers = matches([
+        'watch', 'belt', 'wallet', 'sunglass', 'jewelry', 'necklace', 'earring', 'ring', 
+        'bracelet', 'pendant', 'locket', 'bangle', 'accessory', 'gem', 'diamond', 'stone', 'crystal',
+        'gym', 'workout', 'active', 'yoga', 'sport', 'fitness', 'bag', 'handbag', 'backpack', 'tote', 'clutch',
+        'shoe', 'sneaker', 'sandal', 'heel', 'boot', 'flip flop', 'socks', 'book', 'camera', 'wifi', 'tech',
+        'table', 'chair', 'furniture', 'decor', 'home', 'kitchen', 'health', 'beauty', 'makeup', 'pad', 'panty',
+        'maternity', 'period', 'hygiene', 'cap', 'hat', 'mask', 'umbrella', 'wolf', 'kids', 'child', 'baby', 'toy'
+      ]) || cat.includes('accessories') || cat.includes('others');
+
+      const isEthnic = !isOthers && matches(['saree', 'lehenga', 'kurta', 'kurti', 'ethnic', 'anarkali', 'suit', 'sharara', 'dupatta', 'kaftan', 'sherwani']);
+      const isParty = !isOthers && !isEthnic && matches(['party', 'wedding', 'glitter', 'sequin', 'evening', 'cocktail', 'gown', 'dress', 'ceremony', 'festive']);
+      const isFormal = !isOthers && !isEthnic && !isParty && matches(['formal', 'office', 'business', 'blazer', 'tuxedo', 'trousers', 'oxford', 'derby', 'tie', 'cufflink', 'shirt']);
+      const isCasual = !isOthers && !isEthnic && !isParty && !isFormal && matches(['casual', 't-shirt', 'tee', 'jean', 'short', 'top', 'daily', 'regular', 'shirt', 'polo', 'hoodie', 'sweatshirt', 'legging', 'skirt', 'innerwear', 'vest', 'thermal', 'clothing', 'apparel', 'trending']);
       
+      const finalOthers = !isEthnic && !isParty && !isFormal && !isCasual;
+
       if (activeTab === 'Casual') return isCasual;
       if (activeTab === 'Formal') return isFormal;
       if (activeTab === 'Party') return isParty;
       if (activeTab === 'Ethnic') return isEthnic;
-      if (activeTab === 'Others') return isOthers;
+      if (activeTab === 'Others') return isOthers || finalOthers;
       
-      // Fallback to Others for miscellaneous items
-      return isOthers;
+      return false;
     });
   }, [products, activeTab, savedIds, profileData]);
 
@@ -168,44 +179,45 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
       
       {/* Sticky Combined Header */}
       <header className="sticky top-0 z-[100] bg-[#f8f8f8]/80 backdrop-blur-xl border-b border-black/5">
-        <nav className="px-6 py-4 md:px-8 md:py-8 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+        <nav className="px-6 py-4 md:px-8 md:py-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button onClick={() => navigate('/analysis')} className="p-2 -ml-2 hover:opacity-100 opacity-40 transition-opacity">
               <ChevronLeft size={24} />
             </button>
+            <div className="h-6 w-px bg-black/5 mx-1" />
             <button 
               onClick={() => navigate('/upload')} 
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full text-[9px] font-black uppercase tracking-widest shadow-soft hover:bg-black hover:text-white transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm hover:shadow-md hover:bg-black hover:text-white transition-all"
             >
               <Camera size={12} />
-              Scan
+              <span className="hidden xs:inline">Scan</span>
             </button>
             {isAdmin && (
               <button 
                 onClick={onAdminClick}
-                className="flex items-center gap-2 px-3 py-2 bg-[#A18CD1] text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-[#A18CD1]/20"
+                className="flex items-center gap-2 px-3 py-2 bg-purple-luxury text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-purple-luxury/20"
               >
                 <Shield size={14} />
-                <span className="hidden sm:inline">Dashboard</span>
+                <span className="hidden sm:inline">Admin</span>
               </button>
             )}
           </div>
           
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             {user ? (
-              <div className="flex items-center gap-6">
-                <div className="hidden lg:flex flex-col items-end">
-                  <span className="text-[10px] font-black uppercase tracking-widest">{user.name}</span>
-                  <span className="text-[8px] opacity-30 font-bold">Trendsetter</span>
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-[9px] font-black uppercase tracking-widest leading-tight">{user.name}</span>
+                  <span className="text-[7px] opacity-30 font-bold uppercase tracking-widest">Trendsetter</span>
                 </div>
-                <button onClick={handleLogout} className="p-3 bg-white border border-black/5 rounded-full shadow-soft hover:bg-black hover:text-white transition-all">
-                  <LogOut size={18} />
+                <button onClick={handleLogout} className="p-2.5 bg-white border border-black/5 rounded-full shadow-sm hover:bg-black hover:text-white transition-all">
+                  <LogOut size={16} />
                 </button>
               </div>
             ) : (
               <button 
                 onClick={onAuthClick}
-                className="flex items-center gap-3 px-6 py-3 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl"
+                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-xl"
               >
                 <UserIcon size={14} />
                 Sign In
@@ -214,23 +226,22 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           </div>
         </nav>
 
-        {/* Robust Category Scroll (FIXED) */}
-        <div className="flex overflow-x-auto no-scrollbar py-4 px-8 gap-3 scroll-smooth snap-x snap-mandatory touch-pan-x">
+        {/* Categories Tab Strip */}
+        <div className="flex overflow-x-auto no-scrollbar py-2 px-6 md:px-8 gap-2 scroll-smooth snap-x snap-mandatory touch-pan-x">
           {tabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all snap-start ${
+              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all snap-start border-2 ${
                 activeTab === tab 
-                  ? 'bg-black text-white shadow-lg' 
-                  : 'bg-white text-slate-400 border border-black/5 hover:border-black/20'
+                  ? 'bg-black text-white border-black shadow-md' 
+                  : 'bg-white text-slate-400 border-black/5 hover:border-black/20'
               }`}
             >
               {tab}
             </button>
           ))}
-          {/* Spacer to ensure padding at the end of the scroll */}
-          <div className="min-w-[32px] h-1 shrink-0" />
+          <div className="min-w-[24px] h-1 shrink-0" />
         </div>
       </header>
 
