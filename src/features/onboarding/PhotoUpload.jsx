@@ -1,26 +1,80 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, CheckCircle, X, ChevronLeft } from 'lucide-react';
+import { Camera, Image as ImageIcon, CheckCircle, X, ChevronLeft, Loader2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import { useAnalysis } from '../../context/AnalysisContext';
+import api from '../../services/api';
 
 const PhotoUpload = ({ onNext, onBack }) => {
   const [preview, setPreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+  const { setAnalysisResult, isAnalyzing, setIsAnalyzing, setError } = useAnalysis();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const removeImage = () => setPreview(null);
+  const removeImage = () => {
+    setPreview(null);
+    setSelectedFile(null);
+  };
+
+  const handleAnalyze = async () => {
+    if (!selectedFile) return;
+
+    setIsAnalyzing(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+
+    try {
+      const response = await api.post('/skin-tone/analyze-skin-tone', formData);
+      
+      setAnalysisResult(response.data.data);
+      onNext(); // Navigate forward to results
+    } catch (err) {
+      console.error('Analysis error:', err);
+      setError(err.response?.data?.detail || 'Failed to analyze skin tone. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  if (isAnalyzing) {
+    return (
+      <div className="h-[100dvh] w-full bg-[#f8f8f8] p-5 flex flex-col items-center justify-center max-w-2xl mx-auto">
+        <div className="w-full space-y-8">
+           <div className="space-y-4 text-center">
+             <div className="w-20 h-20 bg-orange-vibrant/10 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <Loader2 className="animate-spin text-orange-vibrant" size={40} />
+             </div>
+             <h2 className="text-2xl font-bold luxury-font">Analyzing Your Skin Tone</h2>
+             <p className="text-sm text-muted">We're using AI to find your perfect color palette...</p>
+           </div>
+           
+           <div className="space-y-4">
+             <div className="h-12 bg-white rounded-2xl animate-skeleton shadow-soft" />
+             <div className="h-32 bg-white rounded-[32px] animate-skeleton shadow-soft" />
+             <div className="grid grid-cols-2 gap-4">
+               <div className="h-24 bg-white rounded-2xl animate-skeleton shadow-soft" />
+               <div className="h-24 bg-white rounded-2xl animate-skeleton shadow-soft" />
+             </div>
+           </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-[100dvh] w-full bg-[#f8f8f8] p-5 flex flex-col max-w-2xl mx-auto overflow-hidden">
+    <div className="min-h-screen w-full bg-[#f8f8f8] p-5 flex flex-col max-w-2xl mx-auto overflow-x-hidden">
       
       {/* Mini Progress/Header */}
       <div className="flex items-center justify-between mb-8 shrink-0">
@@ -113,10 +167,10 @@ const PhotoUpload = ({ onNext, onBack }) => {
           variant="primary" 
           size="lg" 
           className="w-full bg-gradient-to-r from-orange-vibrant to-[#FF9A8B] text-white shadow-orange-500/20 py-5"
-          onClick={onNext}
-          disabled={!preview}
+          onClick={handleAnalyze}
+          disabled={!preview || isAnalyzing}
         >
-          Identify Palette
+          {isAnalyzing ? "Processing..." : "Identify Palette"}
         </Button>
       </div>
     </div>

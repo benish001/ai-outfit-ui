@@ -113,7 +113,7 @@ function App() {
               }} />
             } />
             <Route path="/gender" element={<GenderSelect onSelect={handleGenderSelect} />} />
-            <Route path="/upload" element={<PhotoUpload onNext={() => navigate('/tone')} onBack={() => navigate('/gender')} />} />
+            <Route path="/upload" element={<PhotoUpload onNext={() => navigate('/analysis')} onBack={() => navigate('/gender')} />} />
             <Route path="/tone" element={<SkinToneSelect onNext={() => navigate('/analysis')} onBack={() => navigate('/upload')} />} />
             <Route path="/analysis" element={<ColorRecommendations onNext={() => navigate('/discovery')} onBack={() => navigate('/tone')} />} />
             <Route path="/discovery" element={

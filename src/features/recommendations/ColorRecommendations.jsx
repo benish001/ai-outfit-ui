@@ -1,278 +1,243 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, Sparkles, AlertCircle, ShoppingBag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Sparkles, AlertCircle, ShoppingBag, ExternalLink, CheckCircle, RefreshCcw } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import { useAnalysis } from '../../context/AnalysisContext';
 
 const ColorRecommendations = ({ onNext, onBack }) => {
+  const { analysisResult, clearAnalysis } = useAnalysis();
   const [palette, setPalette] = useState({ best: [], avoid: [] });
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const onboardingSkin = JSON.parse(localStorage.getItem('tonewear_onboarding_skin') || '{}');
-    const gender = localStorage.getItem('tonewear_gender') || 'female';
-    const { tone = 'medium', undertone = 'neutral' } = onboardingSkin;
-
-    const getColorPalette = (g, t, u) => {
-      const data = {
-        light: {
-          warm: {
-            best: [
-              { name: 'Champagne Soft', hex: '#F7E7CE' },
-              { name: 'Peach Sorbet', hex: '#FFDAB9' },
-              { name: 'Golden Sand', hex: '#E6BE8A' },
-              { name: 'Sage Green', hex: '#9CA986' },
-              { name: 'Warm Cream', hex: '#FFFDD0' }
-            ],
-            avoid: [
-              { name: 'Electric Blue', hex: '#7DF9FF' },
-              { name: 'Magenta', hex: '#FF00FF' },
-              { name: 'Dark Ash', hex: '#54626F' }
-            ]
-          },
-          cool: {
-            best: [
-              { name: 'Sky Blue', hex: '#87CEEB' },
-              { name: 'Soft Lavender', hex: '#E6E6FA' },
-              { name: 'Dusty Rose', hex: '#C08081' },
-              { name: 'Silver Mist', hex: '#C0C0C0' },
-              { name: 'Mint Frost', hex: '#98FF98' }
-            ],
-            avoid: [
-              { name: 'Orange Burst', hex: '#FF4500' },
-              { name: 'Mustard Gold', hex: '#FFDB58' },
-              { name: 'Olive Drab', hex: '#6B8E23' }
-            ]
-          },
-          neutral: {
-            best: [
-              { name: 'Soft Jade', hex: '#00A86B' },
-              { name: 'Cornflower Blue', hex: '#6495ED' },
-              { name: 'Mauve Shadow', hex: '#915F6D' },
-              { name: 'Light Slate', hex: '#778899' },
-              { name: 'Blush Pink', hex: '#FFB6C1' }
-            ],
-            avoid: [
-              { name: 'Neon Green', hex: '#39FF14' },
-              { name: 'Bright Yellow', hex: '#FFFF00' }
-            ]
-          }
-        },
-        medium: {
-          warm: {
-            best: [
-              { name: 'Terracotta', hex: '#E2725B' },
-              { name: 'Warm Mustard', hex: '#E1AD01' },
-              { name: 'Burnt Coral', hex: '#E9897E' },
-              { name: 'Honey Gold', hex: '#AF8E44' },
-              { name: 'Earth Brown', hex: '#674D3C' }
-            ],
-            avoid: [
-              { name: 'Icy Blue', hex: '#AFEEEE' },
-              { name: 'Pale Lavender', hex: '#DCD0FF' }
-            ]
-          },
-          cool: {
-            best: [
-              { name: 'Emerald Green', hex: '#50C878' },
-              { name: 'Royal Blue', hex: '#4169E1' },
-              { name: 'Deep Plum', hex: '#673147' },
-              { name: 'Teal Depth', hex: '#008080' },
-              { name: 'Charcoal Noir', hex: '#333333' }
-            ],
-            avoid: [
-              { name: 'Pale Yellow', hex: '#FFFFE0' },
-              { name: 'Light Apricot', hex: '#FFB280' }
-            ]
-          },
-          neutral: {
-            best: [
-              { name: 'Dove Grey', hex: '#6D6E71' },
-              { name: 'Laguna Blue', hex: '#457B9D' },
-              { name: 'Warm Taupe', hex: '#483C32' },
-              { name: 'Sage Bush', hex: '#A89985' },
-              { name: 'Rustic Red', hex: '#BA0021' }
-            ],
-            avoid: [
-              { name: 'Hot Neon', hex: '#FF3131' },
-              { name: 'Bright Mint', hex: '#00FF7F' }
-            ]
-          }
-        },
-        dark: {
-          warm: {
-            best: [
-              { name: 'Rich Ochre', hex: '#CC7722' },
-              { name: 'Deep Magenta', hex: '#8B008B' },
-              { name: 'Forest Green', hex: '#228B22' },
-              { name: 'Burnt Copper', hex: '#B87333' },
-              { name: 'Gold Rush', hex: '#FFD700' }
-            ],
-            avoid: [
-              { name: 'Pale Pink', hex: '#FADADD' },
-              { name: 'Grey Ash', hex: '#B2BEB5' }
-            ]
-          },
-          cool: {
-            best: [
-              { name: 'Cobalt Night', hex: '#0047AB' },
-              { name: 'Cardinal Red', hex: '#C41E3A' },
-              { name: 'Royal Purple', hex: '#6A0DAD' },
-              { name: 'Ice Blue', hex: '#99FFFF' },
-              { name: 'Vibrant Mint', hex: '#16D081' }
-            ],
-            avoid: [
-              { name: 'Dull Brown', hex: '#5C4033' },
-              { name: 'Brick Tan', hex: '#D2B48C' }
-            ]
-          },
-          neutral: {
-            best: [
-              { name: 'Pure White', hex: '#FFFFFF' },
-              { name: 'Charcoal Luxe', hex: '#2E2E2E' },
-              { name: 'Bright Yellow', hex: '#FFFF00' },
-              { name: 'Rose Gold', hex: '#B76E79' },
-              { name: 'Electric Indigo', hex: '#6F00FF' }
-            ],
-            avoid: [
-              { name: 'Beige', hex: '#F5F5DC' },
-              { name: 'Muddy Grey', hex: '#708090' }
-            ]
-          }
-        }
+    if (analysisResult) {
+      // Robust mapping of API response to UI state
+      const recommendations = analysisResult.recommendations || {};
+      const apiProducts = analysisResult.products || [];
+      
+      const colorToHex = {
+        'Royal Blue': '#4169E1',
+        'Emerald Green': '#50C878',
+        'Amethyst': '#9966CC',
+        'Silver': '#C0C0C0',
+        'Icy Pink': '#F5F5DC',
+        'Orange': '#FFA500',
+        'Tomato Red': '#FF6347',
+        'Golden Yellow': '#FFD700',
+        'Olive Green': '#808000',
+        'Mustard Yellow': '#E1AD01',
+        'Terracotta': '#E2725B',
+        'Gold': '#FFD700',
+        'Cream': '#FFFDD0',
+        'Pastel Blue': '#AEC6CF',
+        'Magenta': '#FF00FF',
+        'Sage Green': '#9CA986',
+        'Dusty Pink': '#DCAE96',
+        'Navy Blue': '#000080',
+        'Jade': '#00A86B',
+        'Off-White': '#FAF9F6',
+        'Neon Yellow': '#CCFF00',
+        'Electric Blue': '#7DF9FF'
       };
 
-      let result = data[t]?.[u] || data.medium.neutral;
-      
-      // If gender is male, rename some colors to be more masculine/neutral if desired
-      if (g === 'male') {
-        result = {
-          best: result.best.map(c => ({
-            ...c,
-            name: c.name.replace('Pink', 'Rosewood').replace('Peach', 'Sandstone').replace('Blush', 'Misted')
-          })),
-          avoid: result.avoid.map(c => ({
-            ...c,
-            name: c.name.replace('Pink', 'Rosewood')
-          }))
-        };
-      }
-      return result;
-    };
+      setPalette({
+        best: (recommendations.colors_to_wear || []).map(name => ({ 
+          name, 
+          hex: colorToHex[name] || '#ccc' 
+        })),
+        avoid: (recommendations.colors_to_avoid || []).map(name => ({ 
+          name, 
+          hex: colorToHex[name] || '#ccc' 
+        }))
+      });
+      setProducts(apiProducts);
+    }
+  }, [analysisResult]);
 
-    const newPalette = getColorPalette(gender, tone, undertone);
-    setPalette(newPalette);
+  const handleRetake = () => {
+    clearAnalysis();
+    localStorage.removeItem('analysisResult');
+    onBack();
+  };
 
-    // Save for ProductDiscovery
-    localStorage.setItem('tonewear_onboarding', JSON.stringify({
-      bestColors: newPalette.best,
-      avoidColors: newPalette.avoid,
-      timestamp: new Date().getTime()
-    }));
-  }, []);
+  // If no data, show a clear message or redirect
+  if (!analysisResult) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-10 text-center gap-6">
+        <div className="w-20 h-20 bg-orange-vibrant/10 rounded-full flex items-center justify-center text-orange-vibrant">
+          <RefreshCcw size={40} className="animate-spin-slow" />
+        </div>
+        <h2 className="text-2xl font-bold luxury-font">No Active Analysis</h2>
+        <p className="text-muted text-sm max-w-xs">Please upload a photo to identify your ideal color palette.</p>
+        <Button variant="primary" onClick={onBack}>Start Analysis</Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-[100dvh] w-full bg-[#f8f8f8] p-5 flex flex-col max-w-3xl mx-auto overflow-hidden">
+    <div className="min-h-screen w-full bg-[#f8f8f8] p-5 flex flex-col max-w-3xl mx-auto overflow-x-hidden">
       
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 shrink-0">
-         <button onClick={onBack} className="p-2 -ml-2 hover:opacity-100 opacity-40 transition-opacity">
+      <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#f8f8f8]/80 backdrop-blur-md z-10 py-2 shrink-0">
+         <button onClick={onBack} className="p-2 -ml-2 hover:bg-white rounded-full transition-all">
             <ChevronLeft size={22} />
          </button>
-         <div className="bg-white border border-black/5 rounded-full px-3 py-1 flex items-center gap-2">
-            <Sparkles size={12} className="text-[#A18CD1]" />
-            <span className="text-[9px] uppercase tracking-widest font-black opacity-30 text-nowrap">Neural Analysis Ready</span>
+         <div className="bg-white border border-black/5 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-sm">
+            <Sparkles size={14} className="text-orange-vibrant" />
+            <span className="text-[10px] uppercase tracking-widest font-black text-brand-dark">Analysis Result</span>
          </div>
+         <button onClick={handleRetake} className="text-[9px] font-black uppercase text-orange-vibrant hover:opacity-70">
+            Retake
+         </button>
       </div>
 
-      <div className="space-y-1 mb-6 shrink-0">
-        <h1 className="text-2xl md:text-5xl font-bold luxury-font leading-tight text-center">
-          Your Personal<br />
+      <div className="space-y-2 mb-8 text-center shrink-0">
+        <p className="text-[10px] uppercase tracking-[0.4em] font-black text-orange-vibrant">
+          {analysisResult.skin_tone} • {analysisResult.undertone}
+        </p>
+        <h1 className="text-3xl md:text-5xl font-bold luxury-font leading-tight">
+          Your Ideal<br />
           <span className="italic text-brand-dark">Color Palette.</span>
         </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar space-y-8 min-h-0 pb-20">
-        {/* ... (keep existing sections) ... */}
-        {palette.best.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                 <div className="w-6 h-6 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
-                    <CheckCircle size={14} />
-                 </div>
-                 <h2 className="text-[9px] uppercase tracking-[0.2em] font-black">Complementary</h2>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-5 gap-3">
-              {palette.best.map((c, i) => (
-                <motion.div 
-                  key={c.name}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="group"
-                >
-                  <div className="aspect-square rounded-xl shadow-soft border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
-                  <p className="text-[7px] uppercase tracking-tighter font-extrabold text-center mt-2 opacity-30 truncate">{c.name}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {palette.avoid.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center gap-2">
-               <div className="w-6 h-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
-                  <AlertCircle size={14} />
-               </div>
-               <h2 className="text-[9px] uppercase tracking-[0.2em] font-black opacity-40">Avoid</h2>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-3">
-              {palette.avoid.map((c) => (
-                <div key={c.name} className="opacity-30">
-                  <div className="aspect-square rounded-xl border border-black/5" style={{ backgroundColor: c.hex }} title={c.name} />
-                  <p className="text-[7px] uppercase tracking-tighter font-bold text-center mt-2 truncate italic">{c.name}</p>
+      <div className="flex-1 space-y-10 pb-24">
+        {/* Color Palette Section */}
+        <section className="space-y-6">
+          <div className="flex flex-col gap-6">
+             {/* Wear */}
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className="bg-white p-6 rounded-[32px] shadow-soft border border-orange-vibrant/10"
+             >
+                <div className="flex items-center gap-2 mb-4">
+                   <div className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                      <CheckCircle size={16} />
+                   </div>
+                   <h2 className="text-[11px] uppercase tracking-[0.2em] font-black">Best Matches</h2>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                  {palette.best.length > 0 ? palette.best.map((c, i) => (
+                    <motion.div 
+                      key={`${c.name}-${i}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="group flex flex-col items-center"
+                    >
+                      <div className="w-full aspect-square rounded-2xl shadow-sm border border-black/5 mb-2 hover:scale-105 transition-transform cursor-pointer" style={{ backgroundColor: c.hex }} title={c.name} />
+                      <p className="text-[8px] font-bold text-center opacity-40 truncate w-full uppercase">{c.name}</p>
+                    </motion.div>
+                  )) : (
+                    <div className="col-span-full py-4 text-center opacity-30 text-[10px]">No colors identified</div>
+                  )}
+                </div>
+             </motion.div>
 
-        {/* Action Card */}
-        <Card variant="elevated" className="bg-brand-dark p-6 flex flex-col items-center text-center space-y-4 shrink-0 overflow-visible relative mt-4">
-           <div className="absolute -top-6 -right-6 w-16 h-16 bg-[#FF9A8B] rounded-full blur-2xl opacity-20" />
-           <ShoppingBag size={24} className="text-[#FF9A8B]" />
-           <h3 className="text-xl text-white luxury-font italic">Ready to Shop?</h3>
-           <p className="text-[11px] text-white/40 max-w-xs mx-auto">Neural crawler finds items that match your unique profile.</p>
-           
+             {/* Avoid */}
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               transition={{ delay: 0.2 }}
+               className="bg-white p-6 rounded-[32px] shadow-soft border border-black/5 opacity-80"
+             >
+                <div className="flex items-center gap-2 mb-4">
+                   <div className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                      <AlertCircle size={16} />
+                   </div>
+                   <h2 className="text-[11px] uppercase tracking-[0.2em] font-black opacity-40">Least Ideal</h2>
+                </div>
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                  {palette.avoid.length > 0 ? palette.avoid.map((c, i) => (
+                    <div key={`${c.name}-${i}`} className="flex flex-col items-center grayscale opacity-30">
+                      <div className="w-full aspect-square rounded-2xl border border-black/5 mb-2" style={{ backgroundColor: c.hex }} />
+                      <p className="text-[8px] font-bold text-center truncate w-full uppercase">{c.name}</p>
+                    </div>
+                  )) : (
+                    <div className="col-span-full py-4 text-center opacity-10 text-[10px]">No data available</div>
+                  )}
+                </div>
+             </motion.div>
+          </div>
+        </section>
+
+        {/* Product Grid Section */}
+        <section className="space-y-6">
+           <div className="flex items-center justify-between px-2">
+              <h2 className="text-xl font-bold luxury-font">Tailored Picks</h2>
+              <span className="text-[10px] uppercase font-black tracking-widest opacity-30">Real Results</span>
+           </div>
+
+           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.length > 0 ? products.map((product, i) => (
+                  <motion.div 
+                    key={product.id || i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-white rounded-[24px] overflow-hidden shadow-soft border border-black/5 group flex flex-col h-full hover:shadow-xl transition-shadow"
+                  >
+                     <div className="aspect-[4/5] relative overflow-hidden bg-gray-50 flex items-center justify-center p-2">
+                        <img 
+                          src={product.image_url} 
+                          alt={product.title} 
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 right-3">
+                           <div className="px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-[8px] font-black uppercase tracking-tighter shadow-sm border border-black/5">
+                              {product.color}
+                           </div>
+                        </div>
+                     </div>
+                     <div className="p-4 flex flex-col flex-1">
+                        <p className="text-[8px] uppercase tracking-widest font-black text-orange-vibrant mb-1">{product.brand}</p>
+                        <h3 className="text-[11px] leading-relaxed font-bold line-clamp-2 mb-3 flex-1">{product.title}</h3>
+                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/5">
+                           <span className="text-sm font-black">{product.price}</span>
+                           <a 
+                             href={product.affiliate_link} 
+                             target="_blank" 
+                             rel="noopener noreferrer"
+                             className="p-2.5 rounded-full bg-black text-white hover:bg-orange-vibrant transition-colors group/btn"
+                           >
+                              <ExternalLink size={14} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                           </a>
+                        </div>
+                     </div>
+                  </motion.div>
+              )) : (
+                <div className="col-span-full py-20 text-center bg-white rounded-[32px] border border-dashed border-black/10">
+                   <div className="bg-orange-vibrant/5 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ShoppingBag className="text-orange-vibrant" size={20} />
+                   </div>
+                   <p className="text-xs font-bold uppercase tracking-widest opacity-30">Generating dynamic picks...</p>
+                </div>
+              )}
+           </div>
+        </section>
+
+        {/* Explore More CTA */}
+        <section className="pt-4">
            <Button 
             variant="primary" 
             size="lg" 
-            className="w-full bg-white text-black py-4 text-[10px] uppercase font-black"
+            className="w-full bg-brand-dark text-white py-5 rounded-[24px] shadow-xl shadow-brand-dark/20 flex items-center justify-center gap-3 group"
             onClick={onNext}
            >
-              Browse Neural Looks
+              <ShoppingBag size={20} className="group-hover:rotate-12 transition-transform" />
+              <span className="uppercase text-[11px] font-black tracking-widest">Full Style Catalog</span>
            </Button>
-        </Card>
+        </section>
       </div>
 
-      {/* Info */}
-      <div className="py-6 text-center opacity-20">
-         <span className="text-[8px] uppercase tracking-widest font-black">Core Engine v5.0</span>
-      </div>
+      {/* Info Footer */}
+      <footer className="py-8 text-center shrink-0 border-t border-black/5">
+         <p className="text-[9px] uppercase tracking-widest font-bold opacity-20">Live Sync • Neural Engine v5.2</p>
+      </footer>
     </div>
   );
 };
-
-// Helper CheckCircle
-const CheckCircle = ({ size }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
 
 export default ColorRecommendations;
