@@ -175,62 +175,6 @@ const ColorRecommendations = ({ onNext, onBack }) => {
           </div>
         </section>
 
-        {/* Product Grid Section */}
-        <section className="space-y-6">
-           <div className="flex items-center justify-between px-2">
-              <h2 className="text-xl font-bold luxury-font">Tailored Picks</h2>
-              <span className="text-[10px] uppercase font-black tracking-widest opacity-30">Real Results</span>
-           </div>
-
-           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.length > 0 ? products.map((product, i) => (
-                  <motion.div 
-                    key={product.id || i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-white rounded-[24px] overflow-hidden shadow-soft border border-black/5 group flex flex-col h-full hover:shadow-xl transition-shadow"
-                  >
-                     <div className="aspect-[4/5] relative overflow-hidden bg-gray-50 flex items-center justify-center p-2">
-                        <img 
-                          src={product.image_url} 
-                          alt={product.title} 
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-3 right-3">
-                           <div className="px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-[8px] font-black uppercase tracking-tighter shadow-sm border border-black/5">
-                              {product.color}
-                           </div>
-                        </div>
-                     </div>
-                     <div className="p-4 flex flex-col flex-1">
-                        <p className="text-[8px] uppercase tracking-widest font-black text-orange-vibrant mb-1">{product.brand}</p>
-                        <h3 className="text-[11px] leading-relaxed font-bold line-clamp-2 mb-3 flex-1">{product.title}</h3>
-                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-black/5">
-                           <span className="text-sm font-black">{product.price}</span>
-                           <a 
-                             href={product.affiliate_link} 
-                             target="_blank" 
-                             rel="noopener noreferrer"
-                             className="p-2.5 rounded-full bg-black text-white hover:bg-orange-vibrant transition-colors group/btn"
-                           >
-                              <ExternalLink size={14} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                           </a>
-                        </div>
-                     </div>
-                  </motion.div>
-              )) : (
-                <div className="col-span-full py-20 text-center bg-white rounded-[32px] border border-dashed border-black/10">
-                   <div className="bg-orange-vibrant/5 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShoppingBag className="text-orange-vibrant" size={20} />
-                   </div>
-                   <p className="text-xs font-bold uppercase tracking-widest opacity-30">Generating dynamic picks...</p>
-                </div>
-              )}
-           </div>
-        </section>
-
         {/* Explore More CTA */}
         <section className="pt-4">
            <Button 

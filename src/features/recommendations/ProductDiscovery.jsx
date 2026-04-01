@@ -84,25 +84,16 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           user ? api.get('/users/saved') : Promise.resolve({ data: [] })
         ]);
         
-        // Custom Sorting Logic for Categories
-        const priority = ['Top', 'Bottom', 'Dress', 'Casual', 'Formal', 'Ethnic', 'Party', 'Trending'];
-        const lowPriority = ['Accessories', 'Footwear', 'Watch', 'Bags', 'Others'];
+        // Custom Sorting Logic for Categories (Only Occasion-based)
+        const priority = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories'];
+        const validCategories = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories'];
         
-        const sortedCats = catRes.data.sort((a, b) => {
+        const filteredCats = catRes.data.filter(cat => validCategories.includes(cat));
+
+        const sortedCats = filteredCats.sort((a, b) => {
            const aIdx = priority.indexOf(a);
            const bIdx = priority.indexOf(b);
-           const aLowIdx = lowPriority.indexOf(a);
-           const bLowIdx = lowPriority.indexOf(b);
-           
-           if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-           if (aIdx !== -1) return -1;
-           if (bIdx !== -1) return 1;
-           
-           if (aLowIdx !== -1 && bLowIdx !== -1) return aLowIdx - bLowIdx;
-           if (aLowIdx !== -1) return 1;
-           if (bLowIdx !== -1) return -1;
-           
-           return a.localeCompare(b);
+           return aIdx - bIdx;
         });
 
         setDynamicTabs(['All', ...sortedCats, 'Saved']);

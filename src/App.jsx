@@ -42,7 +42,7 @@ function App() {
     navigate('/upload');
   };
 
-  if (loading) return null;
+  if (loading) return <div className="min-h-screen bg-[#f8f8f8]" />;
 
   // Global Overlays (Auth/Admin)
   if (showAdmin && isAdmin) {
@@ -93,13 +93,12 @@ function App() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           className="w-full h-full"
         >
           <Routes location={location} key={location.pathname}>
