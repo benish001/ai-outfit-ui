@@ -16,12 +16,12 @@ const ColorRecommendations = ({ onNext, onBack }) => {
       const apiProducts = analysisResult.products || [];
       
       const colorToHex = {
-        'Royal Blue': '#4169E1',
+        'Royal Blue': '#002366',
         'Emerald Green': '#50C878',
         'Amethyst': '#9966CC',
-        'Silver': '#C0C0C0',
-        'Icy Pink': '#F5F5DC',
-        'Orange': '#FFA500',
+        'Silver': '#BEC2CB',
+        'Icy Pink': '#FADADD',
+        'Orange': '#FF8C00',
         'Tomato Red': '#FF6347',
         'Golden Yellow': '#FFD700',
         'Olive Green': '#808000',
@@ -31,13 +31,20 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         'Cream': '#FFFDD0',
         'Pastel Blue': '#AEC6CF',
         'Magenta': '#FF00FF',
-        'Sage Green': '#9CA986',
+        'Sage Green': '#8da399',
         'Dusty Pink': '#DCAE96',
         'Navy Blue': '#000080',
         'Jade': '#00A86B',
         'Off-White': '#FAF9F6',
         'Neon Yellow': '#CCFF00',
-        'Electric Blue': '#7DF9FF'
+        'Electric Blue': '#7DF9FF',
+        'Maroon': '#800000',
+        'Fuchsia': '#FF00FF',
+        'Sky Blue': '#87CEEB',
+        'Soft Pink': '#FFB6C1',
+        'Lavender': '#E6E6FA',
+        'Baby Blue': '#89CFF0',
+        'Mint Green': '#98FF98'
       };
 
       setPalette({
@@ -150,10 +157,16 @@ const ColorRecommendations = ({ onNext, onBack }) => {
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                   {palette.avoid.length > 0 ? palette.avoid.map((c, i) => (
-                    <div key={`${c.name}-${i}`} className="flex flex-col items-center grayscale opacity-30">
-                      <div className="w-full aspect-square rounded-2xl border border-black/5 mb-2" style={{ backgroundColor: c.hex }} />
-                      <p className="text-[8px] font-bold text-center truncate w-full uppercase">{c.name}</p>
-                    </div>
+                    <motion.div 
+                      key={`${c.name}-${i}`} 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 + i * 0.05 }}
+                      className="flex flex-col items-center group/avoid"
+                    >
+                      <div className="w-full aspect-square rounded-2xl border border-black/5 mb-2 opacity-60 shadow-inner group-hover/avoid:opacity-100 transition-opacity" style={{ backgroundColor: c.hex }} />
+                      <p className="text-[7px] font-bold text-center truncate w-full uppercase opacity-40">{c.name}</p>
+                    </motion.div>
                   )) : (
                     <div className="col-span-full py-4 text-center opacity-10 text-[10px]">No data available</div>
                   )}

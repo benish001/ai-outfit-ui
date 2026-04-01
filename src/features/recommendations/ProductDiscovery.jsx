@@ -44,31 +44,29 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
     else setLoadingMore(true);
 
     try {
-      const params = {
-        gender: profileData.gender,
-        skip: pageNum * 20,
-        limit: 20
-      };
-
-      // Only apply category filter if not "All" or "Saved"
-      if (currentTab !== 'All' && currentTab !== 'Saved') {
-        params.category = currentTab;
+      let res;
+      if (currentTab === 'Saved') {
+        // Fetch only saved items
+        res = await api.get('/users/saved');
+        setHasMore(false); // No pagination for saved items for now
+      } else {
+        const params = {
+          gender: profileData.gender,
+          skip: pageNum * 20,
+          limit: 20
+        };
+        if (currentTab !== 'All') params.category = currentTab;
+        if (profileData.colors.length > 0) params.colors = profileData.colors.join(',');
+        
+        res = await api.get('/outfits/trending', { params });
+        setHasMore(res.data.length === 20);
       }
-
-      // Apply Neural Color Filter
-      if (profileData.colors.length > 0) {
-        params.colors = profileData.colors.join(',');
-      }
-
-      const res = await api.get('/outfits/trending', { params });
       
       if (isInitial) {
         setProducts(res.data);
       } else {
         setProducts(prev => [...prev, ...res.data]);
       }
-      
-      setHasMore(res.data.length === 20);
     } catch (err) {
       console.error('Fetch failed', err);
     } finally {
@@ -86,7 +84,28 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           user ? api.get('/users/saved') : Promise.resolve({ data: [] })
         ]);
         
-        setDynamicTabs(['All', ...catRes.data.sort(), 'Saved']);
+        // Custom Sorting Logic for Categories
+        const priority = ['Top', 'Bottom', 'Dress', 'Casual', 'Formal', 'Ethnic', 'Party', 'Trending'];
+        const lowPriority = ['Accessories', 'Footwear', 'Watch', 'Bags', 'Others'];
+        
+        const sortedCats = catRes.data.sort((a, b) => {
+           const aIdx = priority.indexOf(a);
+           const bIdx = priority.indexOf(b);
+           const aLowIdx = lowPriority.indexOf(a);
+           const bLowIdx = lowPriority.indexOf(b);
+           
+           if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+           if (aIdx !== -1) return -1;
+           if (bIdx !== -1) return 1;
+           
+           if (aLowIdx !== -1 && bLowIdx !== -1) return aLowIdx - bLowIdx;
+           if (aLowIdx !== -1) return 1;
+           if (bLowIdx !== -1) return -1;
+           
+           return a.localeCompare(b);
+        });
+
+        setDynamicTabs(['All', ...sortedCats, 'Saved']);
         if (user) setSavedIds(new Set(savedRes.data.map(p => p.id)));
       } catch (e) { console.error(e); }
     };
@@ -96,14 +115,13 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   // Handle Tab Switch
   useEffect(() => {
     setPage(0);
-    setProducts([]);
     setHasMore(true);
     fetchProducts(0, activeTab, true);
   }, [activeTab, fetchProducts]);
 
   // Infinite Scroll Observer
   const lastElementRef = useCallback(node => {
-    if (loading || loadingMore) return;
+    if (loading || loadingMore || activeTab === 'Saved') return;
     if (observer.current) observer.current.disconnect();
     
     observer.current = new IntersectionObserver(entries => {
@@ -122,10 +140,21 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   const handleToggleSave = async (e, product) => {
     e.stopPropagation();
     if (!user) { onAuthClick(); return; }
+    
+    const isSaved = savedIds.has(product.id);
+    
     try {
-      if (savedIds.has(product.id)) {
+      if (isSaved) {
         await api.delete(`/users/saved/${product.id}`);
-        setSavedIds(prev => { const n = new Set(prev); n.delete(product.id); return n; });
+        setSavedIds(prev => {
+          const n = new Set(prev);
+          n.delete(product.id);
+          return n;
+        });
+        // If we are in Saved tab, remove it from the list instantly
+        if (activeTab === 'Saved') {
+          setProducts(prev => prev.filter(p => p.id !== product.id));
+        }
       } else {
         await api.post(`/users/saved/${product.id}`);
         setSavedIds(prev => new Set(prev).add(product.id));
@@ -170,7 +199,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           </div>
         </nav>
 
-        {/* Dynamic Nav Tabs */}
+        {/* Dynamic Nav Tabs - Prioritized List */}
         <div className="flex overflow-x-auto no-scrollbar py-3 px-6 md:px-8 gap-3 scroll-smooth touch-pan-x">
           {dynamicTabs.map(tab => (
             <button
@@ -178,7 +207,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
               onClick={() => setActiveTab(tab)}
               className={`whitespace-nowrap px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${
                 activeTab === tab 
-                  ? 'bg-black text-white border-black shadow-xl' 
+                  ? 'bg-black text-white border-black shadow-xl scale-105' 
                   : 'bg-white text-slate-400 border-black/5 hover:border-black/20'
               }`}
             >
@@ -194,7 +223,10 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         <header className="mb-12 flex items-center justify-between">
            <div>
               <p className="text-[10px] uppercase font-bold tracking-[0.4em] text-muted mb-2">Neural Curations</p>
-              <h2 className="text-4xl md:text-6xl font-black luxury-font leading-tight">Personalized<br /><span className="italic text-orange-vibrant">Looks.</span></h2>
+              <h2 className="text-4xl md:text-6xl font-black luxury-font leading-tight">
+                {activeTab === 'Saved' ? 'Your Saved' : 'Personalized'}<br />
+                <span className="italic text-orange-vibrant">{activeTab === 'Saved' ? 'Vault.' : 'Looks.'}</span>
+              </h2>
            </div>
         </header>
 
@@ -250,8 +282,8 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
             
             {products.length === 0 && !loading && (
               <div className="col-span-full py-40 text-center">
-                 <h3 className="text-xl font-bold luxury-font">No Looks Found</h3>
-                 <p className="text-[10px] text-muted uppercase tracking-widest">Matches your color profile & gender.</p>
+                 <h3 className="text-xl font-bold luxury-font">Collection Empty</h3>
+                 <p className="text-[10px] text-muted uppercase tracking-widest leading-loose">Items matching your profile will appear here.</p>
               </div>
             )}
           </div>
@@ -264,7 +296,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         )}
       </main>
 
-      {/* Global Bottom Tab Bar */}
+      {/* Reverted Original Mobile Footer */}
       <div className="md:hidden fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-xl border-t border-black/5 h-20 z-[300]">
         <div className="flex items-center justify-between max-w-lg mx-auto h-full px-6">
           <TabIcon icon={GridIcon} label="Explore" active={activeTab === 'All'} onClick={() => setActiveTab('All')} />
