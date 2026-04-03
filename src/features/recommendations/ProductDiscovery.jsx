@@ -123,7 +123,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           return next;
         });
       }
-    });
+    }, { rootMargin: '400px' });
 
     if (node) observer.current.observe(node);
   }, [loading, loadingMore, hasMore, fetchProducts, activeTab]);
@@ -232,7 +232,6 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
               {products.map((p, idx) => (
                 <motion.div
                   key={`${p.id}-${idx}`}
-                  ref={idx === products.length - 1 ? lastElementRef : null}
                   layout
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -254,17 +253,28 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
                       </button>
                     </div>
 
-                    <div className="pt-6 pb-2 space-y-1.5 px-3">
-                       <div className="flex justify-between items-start gap-3">
-                          <h3 className="text-sm font-bold luxury-font tracking-tighter leading-tight line-clamp-1 opacity-80">{p.name}</h3>
-                          <span className="text-lg font-black shrink-0 tracking-tighter">{p.price}</span>
+                    <div className="pt-6 pb-2 space-y-1.5 px-3 flex-1 flex flex-col justify-between">
+                       <div className="space-y-1">
+                          <div className="flex justify-between items-start gap-3">
+                             <h3 className="text-sm font-bold luxury-font tracking-tighter leading-tight line-clamp-2 opacity-80">{p.name}</h3>
+                             <span className="text-lg font-black shrink-0 tracking-tighter">{p.price}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                             <span className="text-[8px] uppercase tracking-widest font-black text-orange-vibrant">{p.brand}</span>
+                             <span className="text-[8px] uppercase tracking-widest font-black opacity-20">{p.category}</span>
+                          </div>
                        </div>
-                       <div className="flex items-center justify-between">
-                          <span className="text-[8px] uppercase tracking-widest font-black text-orange-vibrant">{p.brand}</span>
-                          <span className="text-[8px] uppercase tracking-widest font-black opacity-20">{p.category}</span>
-                       </div>
-                       <button onClick={(e) => {e.stopPropagation(); window.open(p.affiliate_link, '_blank');}} className="mt-4 w-full flex items-center justify-center gap-2 py-4 rounded-3xl bg-[#FFD814] hover:bg-[#F7CA00] text-black text-[9px] font-black uppercase tracking-widest transition-all shadow-xl shadow-yellow-200/50">
-                          <ShoppingCart size={14} /> Buy on Amazon
+                       
+                       {/* Dynamic Affiliate Button */}
+                       <button 
+                          onClick={(e) => {e.stopPropagation(); window.open(p.affiliate_link, '_blank');}} 
+                          className={`mt-4 w-full flex items-center justify-center gap-2 py-4 rounded-3xl text-[9px] font-black uppercase tracking-widest transition-all shadow-xl ${
+                             p.affiliate_link.includes('flipkart.com') 
+                               ? 'bg-[#2874f0] text-white shadow-blue-200/50 hover:bg-[#1a5bbd]' 
+                               : 'bg-[#FFD814] text-black shadow-yellow-200/50 hover:bg-[#F7CA00]'
+                          }`}
+                       >
+                          <ShoppingCart size={14} /> Buy on {p.affiliate_link.includes('flipkart.com') ? 'Flipkart' : 'Amazon'}
                        </button>
                     </div>
                   </Card>
@@ -281,9 +291,20 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           </div>
         )}
 
-        {loadingMore && (
-          <div className="py-20 flex justify-center w-full">
-            <Loader2 className="animate-spin text-orange-vibrant" size={32} />
+        {/* Improved Pagination Loader */}
+        {(loadingMore || hasMore) && (
+          <div 
+             ref={lastElementRef} 
+             className="py-20 flex flex-col items-center justify-center w-full gap-4"
+          >
+            {loadingMore ? (
+               <>
+                 <Loader2 className="animate-spin text-orange-vibrant" size={32} />
+                 <p className="text-[9px] uppercase font-black tracking-[0.2em] opacity-20">Gathering more looks...</p>
+               </>
+            ) : hasMore ? (
+               <div className="h-10 w-full" /> /* Trigger point */
+            ) : null}
           </div>
         )}
       </main>
