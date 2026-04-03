@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import Splash from './features/onboarding/Splash';
 import PhotoUpload from './features/onboarding/PhotoUpload';
-import SkinToneSelect from './features/onboarding/SkinToneSelect';
 import ColorRecommendations from './features/recommendations/ColorRecommendations';
 import ProductDiscovery from './features/recommendations/ProductDiscovery';
 import ProductDetail from './features/products/ProductDetail';
@@ -113,8 +112,7 @@ function App() {
             } />
             <Route path="/gender" element={<GenderSelect onSelect={handleGenderSelect} />} />
             <Route path="/upload" element={<PhotoUpload onNext={() => navigate('/analysis')} onBack={() => navigate('/gender')} />} />
-            <Route path="/tone" element={<SkinToneSelect onNext={() => navigate('/analysis')} onBack={() => navigate('/upload')} />} />
-            <Route path="/analysis" element={<ColorRecommendations onNext={() => navigate('/discovery')} onBack={() => navigate('/tone')} />} />
+            <Route path="/analysis" element={<ColorRecommendations onNext={() => navigate('/discovery')} onBack={() => navigate('/upload')} />} />
             <Route path="/discovery" element={
               <ProductDiscovery 
                 gender={gender}

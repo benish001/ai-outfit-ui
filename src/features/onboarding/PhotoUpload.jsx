@@ -83,9 +83,9 @@ const PhotoUpload = ({ onNext, onBack }) => {
            <button onClick={onBack} className="p-3 bg-white rounded-full shadow-sm border border-black/5 hover:bg-black hover:text-white transition-all">
               <ChevronLeft size={20} />
            </button>
-           <div className="flex gap-1.5">
+           <div className="flex gap-2">
               <div className="w-8 h-1 rounded-full bg-orange-vibrant" />
-              <div className="w-8 h-1 rounded-full bg-black/[0.03]" />
+              <div className="w-8 h-1 rounded-full bg-orange-vibrant" />
               <div className="w-8 h-1 rounded-full bg-black/[0.03]" />
            </div>
            <div className="w-10 h-10" />
@@ -143,22 +143,6 @@ const PhotoUpload = ({ onNext, onBack }) => {
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
         </div>
 
-        {/* Small Selection Row */}
-        <div className="w-full grid grid-cols-2 gap-4 max-w-sm">
-           <button 
-             onClick={() => fileInputRef.current?.click()}
-             className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white shadow-soft border border-black/5 hover:border-orange-vibrant/20 transition-all active:scale-95"
-           >
-              <ImageIcon size={18} className="text-orange-vibrant" />
-              <span className="text-[9px] uppercase font-black tracking-widest text-slate-800">Gallery</span>
-           </button>
-           <button 
-             className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white shadow-soft border border-black/5 opacity-40 cursor-not-allowed"
-           >
-              <Smartphone size={18} />
-              <span className="text-[9px] uppercase font-black tracking-widest">Scanner</span>
-           </button>
-        </div>
       </div>
 
       {/* Footer Button Section */}

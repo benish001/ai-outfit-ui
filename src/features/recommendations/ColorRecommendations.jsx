@@ -14,7 +14,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
       // Robust mapping of API response to UI state
       const recommendations = analysisResult.recommendations || {};
       const apiProducts = analysisResult.products || [];
-      
+
       const colorToHex = {
         'Royal Blue': '#002366',
         'Emerald Green': '#50C878',
@@ -48,13 +48,13 @@ const ColorRecommendations = ({ onNext, onBack }) => {
       };
 
       setPalette({
-        best: (recommendations.colors_to_wear || []).map(name => ({ 
-          name, 
-          hex: colorToHex[name] || '#ccc' 
+        best: (recommendations.colors_to_wear || []).map(name => ({
+          name,
+          hex: colorToHex[name] || '#ccc'
         })),
-        avoid: (recommendations.colors_to_avoid || []).map(name => ({ 
-          name, 
-          hex: colorToHex[name] || '#ccc' 
+        avoid: (recommendations.colors_to_avoid || []).map(name => ({
+          name,
+          hex: colorToHex[name] || '#ccc'
         }))
       });
       setProducts(apiProducts);
@@ -83,24 +83,24 @@ const ColorRecommendations = ({ onNext, onBack }) => {
 
   return (
     <div className="min-h-screen w-full bg-[#f8f8f8] p-5 flex flex-col max-w-3xl mx-auto overflow-x-hidden">
-      
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#f8f8f8]/80 backdrop-blur-md z-10 py-2 shrink-0">
-         <button onClick={onBack} className="p-2 -ml-2 hover:bg-white rounded-full transition-all">
-            <ChevronLeft size={22} />
-         </button>
-         <div className="bg-white border border-black/5 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-sm">
-            <Sparkles size={14} className="text-orange-vibrant" />
-            <span className="text-[10px] uppercase tracking-widest font-black text-brand-dark">Analysis Result</span>
-         </div>
-         <button onClick={handleRetake} className="text-[9px] font-black uppercase text-orange-vibrant hover:opacity-70">
-            Retake
-         </button>
+        <button onClick={onBack} className="p-2 -ml-2 hover:bg-white rounded-full transition-all">
+          <ChevronLeft size={22} />
+        </button>
+        <div className="bg-white border border-black/5 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-sm">
+          <Sparkles size={14} className="text-orange-vibrant" />
+          <span className="text-[10px] uppercase tracking-widest font-black text-brand-dark">Analysis Result</span>
+        </div>
+        <button onClick={handleRetake} className="text-[9px] font-black uppercase text-orange-vibrant hover:opacity-70">
+          Retake
+        </button>
       </div>
 
       <div className="space-y-2 mb-8 text-center shrink-0">
         <p className="text-[10px] uppercase tracking-[0.4em] font-black text-orange-vibrant">
-          {analysisResult.skin_tone} • {analysisResult.undertone}
+          {analysisResult.skin_tone}
         </p>
         <h1 className="text-3xl md:text-5xl font-bold luxury-font leading-tight">
           Your Ideal<br />
@@ -112,86 +112,56 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         {/* Color Palette Section */}
         <section className="space-y-6">
           <div className="flex flex-col gap-6">
-             {/* Wear */}
-             <motion.div 
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               className="bg-white p-6 rounded-[32px] shadow-soft border border-orange-vibrant/10"
-             >
-                <div className="flex items-center gap-2 mb-4">
-                   <div className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
-                      <CheckCircle size={16} />
-                   </div>
-                   <h2 className="text-[11px] uppercase tracking-[0.2em] font-black">Best Matches</h2>
+            {/* Wear */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white p-6 rounded-[32px] shadow-soft border border-orange-vibrant/10"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                  <CheckCircle size={16} />
                 </div>
-                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                  {palette.best.length > 0 ? palette.best.map((c, i) => (
-                    <motion.div 
-                      key={`${c.name}-${i}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="group flex flex-col items-center"
-                    >
-                      <div className="w-full aspect-square rounded-2xl shadow-sm border border-black/5 mb-2 hover:scale-105 transition-transform cursor-pointer" style={{ backgroundColor: c.hex }} title={c.name} />
-                      <p className="text-[8px] font-bold text-center opacity-40 truncate w-full uppercase">{c.name}</p>
-                    </motion.div>
-                  )) : (
-                    <div className="col-span-full py-4 text-center opacity-30 text-[10px]">No colors identified</div>
-                  )}
-                </div>
-             </motion.div>
+                <h2 className="text-[11px] uppercase tracking-[0.2em] font-black">Best Matches</h2>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                {palette.best.length > 0 ? palette.best.map((c, i) => (
+                  <motion.div
+                    key={`${c.name}-${i}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="group flex flex-col items-center"
+                  >
+                    <div className="w-full aspect-square rounded-2xl shadow-sm border border-black/5 mb-2 hover:scale-105 transition-transform cursor-pointer" style={{ backgroundColor: c.hex }} title={c.name} />
+                    <p className="text-[8px] font-bold text-center opacity-40 truncate w-full uppercase">{c.name}</p>
+                  </motion.div>
+                )) : (
+                  <div className="col-span-full py-4 text-center opacity-30 text-[10px]">No colors identified</div>
+                )}
+              </div>
+            </motion.div>
 
-             {/* Avoid */}
-             <motion.div 
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               transition={{ delay: 0.2 }}
-               className="bg-white p-6 rounded-[32px] shadow-soft border border-black/5 opacity-80"
-             >
-                <div className="flex items-center gap-2 mb-4">
-                   <div className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
-                      <AlertCircle size={16} />
-                   </div>
-                   <h2 className="text-[11px] uppercase tracking-[0.2em] font-black opacity-40">Least Ideal</h2>
-                </div>
-                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                  {palette.avoid.length > 0 ? palette.avoid.map((c, i) => (
-                    <motion.div 
-                      key={`${c.name}-${i}`} 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 + i * 0.05 }}
-                      className="flex flex-col items-center group/avoid"
-                    >
-                      <div className="w-full aspect-square rounded-2xl border border-black/5 mb-2 opacity-60 shadow-inner group-hover/avoid:opacity-100 transition-opacity" style={{ backgroundColor: c.hex }} />
-                      <p className="text-[7px] font-bold text-center truncate w-full uppercase opacity-40">{c.name}</p>
-                    </motion.div>
-                  )) : (
-                    <div className="col-span-full py-4 text-center opacity-10 text-[10px]">No data available</div>
-                  )}
-                </div>
-             </motion.div>
           </div>
         </section>
 
         {/* Explore More CTA */}
         <section className="pt-4">
-           <Button 
-            variant="primary" 
-            size="lg" 
+          <Button
+            variant="primary"
+            size="lg"
             className="w-full bg-brand-dark text-white py-5 rounded-[24px] shadow-xl shadow-brand-dark/20 flex items-center justify-center gap-3 group"
             onClick={onNext}
-           >
-              <ShoppingBag size={20} className="group-hover:rotate-12 transition-transform" />
-              <span className="uppercase text-[11px] font-black tracking-widest">Full Style Catalog</span>
-           </Button>
+          >
+            <ShoppingBag size={20} className="group-hover:rotate-12 transition-transform" />
+            <span className="uppercase text-[11px] font-black tracking-widest">Full Style Catalog</span>
+          </Button>
         </section>
       </div>
 
       {/* Info Footer */}
       <footer className="py-8 text-center shrink-0 border-t border-black/5">
-         <p className="text-[9px] uppercase tracking-widest font-bold opacity-20">Live Sync • Neural Engine v5.2</p>
+        <p className="text-[9px] uppercase tracking-widest font-bold opacity-20">Live Sync • Neural Engine v5.2</p>
       </footer>
     </div>
   );

@@ -159,9 +159,10 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   return (
     <div className="min-h-screen w-full bg-[#f8f8f8] flex flex-col pb-24 selection:bg-black selection:text-white">
       
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-[100] bg-[#f8f8f8]/80 backdrop-blur-xl border-b border-black/5">
-        <nav className="px-6 py-4 md:px-8 md:py-6 flex items-center justify-between">
+      {/* Fixed Top Header - More robust than sticky */}
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#f8f8f8] border-b border-black/5 shadow-sm">
+        {/* Top Navbar */}
+        <nav className="px-6 py-4 md:px-8 md:py-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/analysis')} className="p-2 -ml-2 opacity-40 hover:opacity-100 transition-opacity">
               <ChevronLeft size={24} />
@@ -191,14 +192,14 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         </nav>
 
         {/* Dynamic Nav Tabs - Prioritized List */}
-        <div className="flex overflow-x-auto no-scrollbar py-3 px-6 md:px-8 gap-3 scroll-smooth touch-pan-x">
+        <div className="flex overflow-x-auto no-scrollbar pb-5 pt-1 px-6 md:px-8 gap-3 scroll-smooth touch-pan-x">
           {dynamicTabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`whitespace-nowrap px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${
                 activeTab === tab 
-                  ? 'bg-black text-white border-black shadow-xl scale-105' 
+                  ? 'bg-black text-white border-black shadow-lg scale-105' 
                   : 'bg-white text-slate-400 border-black/5 hover:border-black/20'
               }`}
             >
@@ -209,8 +210,8 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         </div>
       </header>
 
-      {/* Product List */}
-      <main className="flex-1 px-8 pt-12 pb-20 max-w-7xl mx-auto w-full">
+      {/* Product List - Offset for fixed header */}
+      <main className="flex-1 px-8 pt-44 md:pt-48 pb-20 max-w-7xl mx-auto w-full">
         <header className="mb-12 flex items-center justify-between">
            <div>
               <p className="text-[10px] uppercase font-bold tracking-[0.4em] text-muted mb-2">Neural Curations</p>
