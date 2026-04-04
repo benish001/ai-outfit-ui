@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, LogIn, ChevronLeft, ArrowRight, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 /**
  * Login — Soft-pink gradient background, glassmorphism card.
@@ -13,6 +14,13 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Memoized handlers prevent unnecessary re-renders in children
+  const handleInputChange = useCallback((e) => {
+    const { id, value } = e.target;
+    const field = id.replace('login-', '');
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +38,7 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
 
   return (
     <div
-      className="auth-page"
+      className="auth-page overflow-hidden"
       style={{ background: 'linear-gradient(155deg, #FFF0F3 0%, #FFF4F7 45%, #FFF7F5 100%)' }}
     >
       {/* Depth blobs — pointer-events:none so they never block touches */}
@@ -58,13 +66,11 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="rounded-[28px] p-8 md:p-10 space-y-7"
+          className="rounded-[28px] p-8 md:p-10 space-y-7 backdrop-blur-3xl card-contained"
           style={{
             background: 'rgba(255,255,255,0.82)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
             border: '1.5px solid rgba(254,205,211,0.45)',
-            boxShadow: '0 20px 48px rgba(244,63,94,0.10), 0 4px 16px rgba(0,0,0,0.04)',
+            boxShadow: '0 20px 48px rgba(244,63,94,0.10)',
           }}
         >
           <div className="text-center space-y-1.5">
@@ -77,52 +83,35 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-5 flex items-center text-rose-200 group-focus-within:text-rose-400 transition-colors">
-                <Mail size={18} />
-              </div>
-              <input
-                id="login-email"
-                type="email"
-                placeholder="Email Address"
-                className="w-full pl-14 pr-6 py-4 rounded-2xl text-sm text-[#1C1917] placeholder:text-[#C4A0A8] outline-none transition-all"
-                style={{
-                  background: 'rgba(255,241,242,0.6)',
-                  border: '1.5px solid rgba(254,205,211,0.5)',
-                }}
-                onFocus={(e) => { e.target.style.borderColor = '#FB7185'; e.target.style.boxShadow = '0 0 0 3px rgba(251,113,133,0.12)'; }}
-                onBlur={(e) => { e.target.style.borderColor = 'rgba(254,205,211,0.5)'; e.target.style.boxShadow = 'none'; }}
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
+            <Input
+              id="login-email"
+              type="email"
+              icon={Mail}
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={handleInputChange}
+              inputMode="email"
+              autoComplete="email"
+              enterKeyHint="next"
+              required
+            />
 
-            {/* Password */}
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-5 flex items-center text-rose-200 group-focus-within:text-rose-400 transition-colors">
-                <Lock size={18} />
-              </div>
-              <input
+            <div className="relative">
+              <Input
                 id="login-password"
                 type={showPassword ? 'text' : 'password'}
+                icon={Lock}
                 placeholder="Password"
-                className="w-full pl-14 pr-14 py-4 rounded-2xl text-sm text-[#1C1917] placeholder:text-[#C4A0A8] outline-none transition-all"
-                style={{
-                  background: 'rgba(255,241,242,0.6)',
-                  border: '1.5px solid rgba(254,205,211,0.5)',
-                }}
-                onFocus={(e) => { e.target.style.borderColor = '#FB7185'; e.target.style.boxShadow = '0 0 0 3px rgba(251,113,133,0.12)'; }}
-                onBlur={(e) => { e.target.style.borderColor = 'rgba(254,205,211,0.5)'; e.target.style.boxShadow = 'none'; }}
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={handleInputChange}
+                enterKeyHint="done"
+                autoComplete="current-password"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-5 flex items-center text-rose-200 hover:text-rose-400 transition-colors"
+                className="absolute top-1/2 -translate-y-1/2 right-5 flex items-center text-rose-200 hover:text-rose-400 transition-colors z-10"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -138,7 +127,7 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
               id="login-submit"
               variant="rose"
               size="lg"
-              className="w-full"
+              className="w-full mt-2"
               disabled={loading}
               type="submit"
             >
@@ -160,7 +149,7 @@ const Login = ({ onBack, onRegister, onLoginSuccess }) => {
           </div>
         </motion.div>
 
-        <p className="text-center text-[9px] uppercase tracking-widest font-bold text-rose-200">
+        <p className="text-center text-[9px] uppercase tracking-widest font-bold text-rose-200 px-8">
           Secured · Private · Encrypted
         </p>
       </div>

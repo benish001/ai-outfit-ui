@@ -42,6 +42,11 @@
   --shadow-premium: 0 20px 40px -15px rgba(244,63,94,0.12), 0 10px 20px -10px rgba(0,0,0,0.06);
   --shadow-card:   0 8px 24px rgba(244,63,94,0.08), 0 2px 8px rgba(0,0,0,0.04);
   
+  /* ── Gradient Presets ── */
+  --bg-gradient-soft:    linear-gradient(135deg, #FFF1F2 0%, #FFF7F0 100%);
+  --bg-gradient-vibrant: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 45%, #FFF7F0 100%);
+  --bg-gradient-deep:    linear-gradient(155deg, #FF6B8A 0%, #FFB8C6 65%, #B07087 100%);
+
   /* ── Neumorphic (Pink base) ── */
   --shadow-neumorphic-out: 8px 8px 20px rgba(207,128,152,0.25), -8px -8px 20px rgba(255,255,255,0.9);
   --shadow-neumorphic-in:  inset 6px 6px 12px rgba(207,128,152,0.2), inset -6px -6px 12px rgba(255,255,255,0.8);
@@ -55,6 +60,20 @@
   --radius-3xl:   40px;
   --radius-luxury:18px;
   --radius-pill:  9999px;
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE UTILITIES
+   ============================================================ */
+@media (hover: none) {
+  .hover-none {
+    &:hover { background-color: inherit; transform: none; box-shadow: inherit; }
+  }
+}
+
+/* Base resets for mobile */
+input, select, textarea {
+  font-size: 16px !important; /* Prevents auto-zoom on iOS focus */
 }
 
 /* ============================================================
