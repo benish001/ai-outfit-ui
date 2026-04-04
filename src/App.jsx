@@ -15,10 +15,10 @@ const Register = lazy(() => import('./features/auth/Register'));
 const AdminDashboard = lazy(() => import('./features/admin/AdminDashboard'));
 const GenderSelect = lazy(() => import('./features/onboarding/GenderSelect'));
 
-// Minimal loading fallback to avoid layout shift
+// Minimal loading fallback to avoid layout shift (Performance Fix #3)
 const PageLoader = () => (
-  <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-gradient-to-br from-[#FFF1F2] to-[#FFF7F0]">
-    <div className="w-8 h-8 border-4 border-rose-200 border-t-rose-500 rounded-full animate-spin" />
+  <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-white/30 backdrop-blur-md">
+    <div className="w-10 h-10 border-[3px] border-rose-100 border-t-rose-500 rounded-full animate-spin" />
   </div>
 );
 
@@ -45,7 +45,7 @@ function App() {
 
   // Scroll to top on route change
   React.useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [location.pathname]);
 
   const goToProduct = (product) => {
@@ -70,9 +70,9 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#FFF1F2] via-[#FFF4F6] to-[#FFF7F0] bg-fixed selection:bg-rose-100 selection:text-[#1C1917]">
+    <div className="min-h-screen w-full bg-[#FFF1F2] selection:bg-rose-100 selection:text-[#1C1917]">
       {/* Auth Overlays */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {showLogin && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -110,12 +110,12 @@ function App() {
       </AnimatePresence>
 
       <Suspense fallback={<PageLoader />}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence initial={false}>
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.1, ease: "linear" }}
             className="w-full min-h-screen"
           >
             <Routes location={location} key={location.pathname}>

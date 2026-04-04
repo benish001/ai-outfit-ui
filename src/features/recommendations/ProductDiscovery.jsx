@@ -49,11 +49,11 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         res = await api.get('/users/saved');
         setHasMore(false);
       } else {
-        const params = { gender: profileData.gender, skip: pageNum * 20, limit: 20 };
+        const params = { gender: profileData.gender, skip: pageNum * 40, limit: 40 };
         if (currentTab !== 'All') params.category = currentTab;
         if (profileData.colors.length > 0) params.colors = profileData.colors.join(',');
         res = await api.get('/outfits/trending', { params });
-        setHasMore(res.data.length === 20);
+        setHasMore(res.data.length === 40);
       }
       if (isInitial) setProducts(res.data);
       else setProducts(prev => [...prev, ...res.data]);
@@ -91,8 +91,10 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   }, [activeTab, fetchProducts]);
 
   const lastElementRef = useCallback(node => {
-    if (loading || loadingMore || activeTab === 'Saved') return;
     if (observer.current) observer.current.disconnect();
+    
+    if (loading || loadingMore || activeTab === 'Saved' || !hasMore) return;
+
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
         setPage(prev => {
@@ -101,7 +103,8 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           return next;
         });
       }
-    }, { rootMargin: '400px' });
+    }, { rootMargin: '600px', threshold: 0.1 });
+    
     if (node) observer.current.observe(node);
   }, [loading, loadingMore, hasMore, fetchProducts, activeTab]);
 
