@@ -180,39 +180,34 @@ const ColorRecommendations = ({ onNext, onBack }) => {
           </motion.div>
         </section>
 
-        {/* ── Tip Card ── */}
-        <div
-          className="rounded-2xl p-4 flex items-start gap-3"
-          style={{
-            background: 'rgba(254,205,211,0.2)',
-            border: '1px solid rgba(254,205,211,0.5)',
-          }}
-        >
-          <Info size={14} className="text-rose-400 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-[#6B6560] leading-relaxed">
-            <strong className="text-[#1C1917]">Tip:</strong> These colours are selected to harmonise with your natural undertones and enhance your glow.
-          </p>
-        </div>
 
         {/* ── CTA ── */}
-        <Button
-          id="color-rec-shop"
-          variant="rose"
-          size="lg"
-          className="w-full"
-          onClick={onNext}
-        >
-          <ShoppingBag size={18} />
-          Explore Full Catalogue
-        </Button>
-      </div>
+        <div className="space-y-4 pt-4">
+          <Button
+            id="color-rec-shop"
+            variant="rose"
+            size="lg"
+            className="w-full shadow-rose-glow"
+            onClick={onNext}
+          >
+            <ShoppingBag size={18} />
+            Explore Full Catalogue
+          </Button>
 
-      {/* Footer */}
-      <footer className="py-6 text-center shrink-0 border-t border-rose-100/50">
-        <p className="text-[8px] uppercase tracking-widest font-bold text-rose-200">
-          Neural Engine v5 · Live Sync
-        </p>
-      </footer>
+          <p className="text-center text-[8px] uppercase tracking-widest font-bold text-rose-200">
+            Neural Engine v5 · Live Sync
+          </p>
+          
+          <div className="flex justify-center pb-8">
+            <button 
+              onClick={handleRetake}
+              className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF] hover:text-rose-400 transition-colors"
+            >
+              Not right? Retake Analysis
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

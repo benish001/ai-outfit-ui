@@ -46,14 +46,14 @@ const Register = ({ onBack, onLogin, onRegisterSuccess }) => {
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      className="auth-page"
       style={{ background: 'linear-gradient(155deg, #FFF0F3 0%, #FFF4F7 45%, #FFF7F5 100%)' }}
     >
-      {/* Depth blobs */}
+      {/* Depth blobs — pointer-events:none so they never block touches */}
       <div className="absolute -top-24 right-0 w-80 h-80 rounded-full bg-pink-100/60 blur-[90px] pointer-events-none" />
       <div className="absolute bottom-0 -left-16 w-72 h-72 rounded-full bg-rose-100/50 blur-[80px] pointer-events-none" />
 
-      <div className="relative w-full max-w-sm space-y-6">
+      <div className="auth-card-wrapper space-y-6">
         {/* Top bar */}
         <div className="flex items-center justify-between">
           <button

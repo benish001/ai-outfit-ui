@@ -60,7 +60,8 @@
 /* ============================================================
    FONTS
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Fonts are loaded via <link> in index.html (preconnect + display=swap). */
+/* Do NOT add @import font here — it blocks CSS parsing & duplicates the load. */
 
 /* ============================================================
    BASE STYLES
@@ -69,21 +70,32 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Reverted to Poppins as the primary font */
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--color-brand-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scrollbar-gutter: stable;
 }
 
-/* Global pink gradient background */
+/*
+  Global pink gradient background.
+  NOTE: background-attachment:fixed is removed — it triggers a GPU compositing
+  bug on iOS Safari (black/white flash, incorrect paint). Use ::before pseudo
+  approach or repeat the gradient on each wrapper instead.
+*/
 body {
+  background-color: #FFF0F3; /* solid fallback for very old devices */
   background: linear-gradient(135deg, #FFF0F3 0%, #FFF5F7 40%, #FFF7F0 70%, #FFF0F3 100%);
-  background-attachment: fixed;
+  min-height: 100dvh; /* dvh: dynamic viewport height — correct on mobile browsers */
 }
 
 h1, h2, h3, h4, .luxury-font {
-  font-family: 'Playfair Display', 'Georgia', serif;
+  /* Reverted to Poppins for headings for consistency. */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
 /* ============================================================
@@ -122,10 +134,10 @@ h1, h2, h3, h4, .luxury-font {
   background: var(--gradient-warm-pink);
 }
 
-/* The canonical page background */
+/* The canonical page background — no background-attachment:fixed (iOS bug) */
 .bg-page {
   background: var(--bg-page);
-  background-attachment: fixed;
+  /* Use min-height: 100dvh on the wrapper instead of background-attachment:fixed */
 }
 
 /* ============================================================
@@ -184,17 +196,23 @@ h1, h2, h3, h4, .luxury-font {
 
 /* ============================================================
    ANIMATIONS
+   Performance rules:
+   • Only animate transform & opacity — no layout-triggering properties
+   • will-change promotes element to its own compositor layer
+   • prefers-reduced-motion: disables all motion for accessibility
    ============================================================ */
 .animate-float {
+  will-change: transform;
   animation: float 7s ease-in-out infinite;
 }
 .animate-float-slow {
+  will-change: transform;
   animation: float 10s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-14px); }
+  0%, 100% { transform: translateY(0px) translateZ(0); }
+  50%       { transform: translateY(-14px) translateZ(0); }
 }
 
 @keyframes pulse-ring {
@@ -204,6 +222,7 @@ h1, h2, h3, h4, .luxury-font {
 }
 
 .animate-pulse-ring {
+  will-change: box-shadow;
   animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
 }
 
@@ -215,8 +234,24 @@ h1, h2, h3, h4, .luxury-font {
 .skeleton {
   background: linear-gradient(90deg, #FFE4E6 25%, #FECDD3 50%, #FFE4E6 75%);
   background-size: 200% 100%;
+  will-change: background-position;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 12px;
+}
+
+/* Accessibility: remove all motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-ring,
+  .skeleton,
+  .best-deal-badge {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* ============================================================
@@ -259,13 +294,62 @@ h1, h2, h3, h4, .luxury-font {
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .safe-top    { padding-top:    env(safe-area-inset-top, 0px); }
 
-/* Minimum touch target helper */
+/* Minimum touch target helper (WCAG 2.5.5) */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ============================================================
+   AUTH PAGE — Mobile-safe centering
+   Fixes:
+   • Vertical centering on all mobile viewports (dvh handles browser chrome)
+   • Scrollable when soft keyboard pushes view (overflow-y: auto)
+   • iOS Safari safe area padding (viewport-fit=cover is set in HTML)
+   • Prevents card cutoff on very small screens (350px min)
+   ============================================================ */
+.auth-page {
+  /* dvh = dynamic viewport height (excludes mobile browser chrome) */
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Scroll when content taller than viewport (soft keyboard open) */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* iOS safe areas */
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: 24px;
+  padding-right: 24px;
+  position: relative;
+}
+
+/* Inner card wrapper: controlled max-width, never overflows */
+.auth-card-wrapper {
+  width: 100%;
+  max-width: 420px; /* comfortable on tablet */
+  /* on very small screens (350px phone), give the form room to breathe */
+  min-width: 0;
+}
+
+/* ============================================================
+   CSS CONTAINMENT — prevents card animations from dirtying
+   adjacent paint layers (key mobile perf fix)
+   ============================================================ */
+.card-contained {
+  contain: layout style paint;
+}
+
+/* Product grid: contain each card to isolate hover repaints */
+.product-grid-card {
+  contain: layout style;
+  transform: translateZ(0); /* own compositor layer */
 }
 
 /* ============================================================
