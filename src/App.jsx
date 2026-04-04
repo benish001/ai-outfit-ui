@@ -41,7 +41,7 @@ function App() {
     navigate('/upload');
   };
 
-  if (loading) return <div className="min-h-screen bg-[#f8f8f8]" />;
+  if (loading) return <div className="min-h-screen bg-gradient-to-br from-[#FFF1F2] via-[#FFF4F6] to-[#FFF7F0]" />;
 
   // Global Overlays (Auth/Admin)
   if (showAdmin && isAdmin) {
@@ -49,7 +49,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#f8f8f8] selection:bg-black selection:text-white">
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#FFF1F2] via-[#FFF4F6] to-[#FFF7F0] bg-fixed selection:bg-rose-100 selection:text-[#1C1917]">
       {/* Auth Modals */}
       <AnimatePresence>
         {showLogin && (

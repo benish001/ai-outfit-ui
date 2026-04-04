@@ -1,10 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, CheckCircle, X, ChevronLeft, Loader2, Smartphone } from 'lucide-react';
+import { Camera, CheckCircle, X, ChevronLeft, Loader2, Upload, ShieldCheck } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { useAnalysis } from '../../context/AnalysisContext';
 import api from '../../services/api';
 
+/**
+ * PhotoUpload — Pink-gradient background with neumorphic upload circle.
+ * Includes skeleton loading state and smooth state transitions.
+ */
 const PhotoUpload = ({ onNext, onBack }) => {
   const [preview, setPreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -28,141 +32,194 @@ const PhotoUpload = ({ onNext, onBack }) => {
 
   const handleAnalyze = async () => {
     if (!selectedFile) return;
-
     setIsAnalyzing(true);
     setError(null);
-
     const formData = new FormData();
     formData.append('image', selectedFile);
-
     try {
       const response = await api.post('/skin-tone/analyze-skin-tone', formData);
       setAnalysisResult(response.data.data);
       onNext();
     } catch (err) {
       console.error('Analysis error:', err);
-      setError(err.response?.data?.detail || 'Failed to analyze skin tone. Please try again.');
+      setError(err.response?.data?.detail || 'Analysis failed. Please try again.');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
+  /* ── Analyzing State ── */
   if (isAnalyzing) {
     return (
-      <div className="min-h-screen w-full bg-[#f8f8f8] p-6 flex flex-col items-center justify-center max-w-2xl mx-auto">
-        <div className="w-full space-y-12">
-           <div className="space-y-6 text-center">
-             <div className="w-24 h-24 bg-orange-vibrant/10 rounded-full flex items-center justify-center mx-auto">
-                <Loader2 className="animate-spin text-orange-vibrant" size={48} />
-             </div>
-             <div className="space-y-2">
-                <h2 className="text-3xl font-black luxury-font">Analyzing Skin...</h2>
-                <p className="text-[10px] uppercase font-black tracking-widest opacity-30">Our Neural Engine is processing your photo</p>
-             </div>
-           </div>
-           
-           <div className="space-y-4 px-4 opacity-30">
-             <div className="h-10 bg-black/5 rounded-full animate-pulse" />
-             <div className="h-40 bg-black/5 rounded-[40px] animate-pulse" />
-             <div className="grid grid-cols-2 gap-4">
-                <div className="h-20 bg-black/5 rounded-3xl animate-pulse" />
-                <div className="h-20 bg-black/5 rounded-3xl animate-pulse" />
-             </div>
-           </div>
+      <div
+        className="min-h-screen w-full flex flex-col items-center justify-center p-6"
+        style={{ background: 'linear-gradient(135deg, #FFF1F2 0%, #FFF5F7 50%, #FFF7F0 100%)' }}
+      >
+        <div className="w-full max-w-sm space-y-10 text-center">
+          {/* Pulsing rose spinner */}
+          <div className="relative mx-auto w-24 h-24">
+            <div className="absolute inset-0 rounded-full bg-rose-100 animate-ping opacity-40" />
+            <div className="relative w-24 h-24 rounded-full bg-white shadow-card flex items-center justify-center border border-rose-100">
+              <Loader2 className="animate-spin text-rose-400" size={36} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold luxury-font text-[#1C1917]">Analysing Skin…</h2>
+            <p className="text-[10px] uppercase font-black tracking-[0.3em] text-rose-300">
+              Neural Engine Processing
+            </p>
+          </div>
+          {/* Skeleton placeholders */}
+          <div className="space-y-4 opacity-40">
+            <div className="skeleton h-10 rounded-full" />
+            <div className="skeleton h-36 rounded-3xl" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="skeleton h-20 rounded-2xl" />
+              <div className="skeleton h-20 rounded-2xl" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
+  /* ── Upload State ── */
   return (
-    <div className="min-h-[100dvh] w-full bg-[#f8f8f8] p-6 flex flex-col justify-between max-w-2xl mx-auto overflow-x-hidden safe-area-inset">
-      
-      {/* Top Header Section */}
-      <div className="shrink-0 space-y-8">
+    <div
+      className="min-h-[100dvh] w-full flex flex-col justify-between p-6 max-w-lg mx-auto overflow-x-hidden"
+      style={{ background: 'linear-gradient(135deg, #FFF1F2 0%, #FFF5F7 50%, #FFF7F0 100%)' }}
+    >
+      {/* Fixed background blobs */}
+      <div className="fixed -top-20 -right-20 w-60 h-60 rounded-full bg-rose-100/60 blur-[70px] pointer-events-none" />
+      <div className="fixed bottom-0 -left-10 w-56 h-56 rounded-full bg-pink-100/50 blur-[70px] pointer-events-none" />
+
+      {/* ── Header ── */}
+      <div className="relative z-10 pt-4 space-y-6">
         <div className="flex items-center justify-between">
-           <button onClick={onBack} className="p-3 bg-white rounded-full shadow-sm border border-black/5 hover:bg-black hover:text-white transition-all">
-              <ChevronLeft size={20} />
-           </button>
-           <div className="flex gap-2">
-              <div className="w-8 h-1 rounded-full bg-orange-vibrant" />
-              <div className="w-8 h-1 rounded-full bg-orange-vibrant" />
-              <div className="w-8 h-1 rounded-full bg-black/[0.03]" />
-           </div>
-           <div className="w-10 h-10" />
+          <button
+            id="photo-upload-back"
+            onClick={onBack}
+            className="w-11 h-11 bg-white/80 rounded-full shadow-card border border-rose-100 flex items-center justify-center text-[#4B5563] hover:text-rose-500 hover:border-rose-200 transition-all backdrop-blur-sm"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Progress dots */}
+          <div className="flex gap-2">
+            <div className="w-8 h-1.5 rounded-full bg-rose-400" />
+            <div className="w-8 h-1.5 rounded-full bg-rose-400" />
+            <div className="w-8 h-1.5 rounded-full bg-rose-100" />
+          </div>
+
+          <div className="w-11" />
         </div>
 
         <div className="space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-muted-luxury">Neural Phase 01</p>
-          <h1 className="text-4xl md:text-6xl font-black luxury-font leading-tight">
-            Neural Skin<br />
-            <span className="italic text-orange-vibrant">Scanner.</span>
+          <p className="text-[9px] uppercase tracking-[0.4em] font-black text-rose-300">Phase 01 of 03</p>
+          <h1 className="text-4xl md:text-5xl font-bold luxury-font text-[#1C1917] leading-tight">
+            Upload Your<br />
+            <span className="italic text-rose-400">Photo.</span>
           </h1>
         </div>
       </div>
 
-      {/* Main Interaction Area */}
-      <div className="flex-1 flex flex-col items-center justify-center py-8 min-h-0">
-        <div className="relative mb-8">
-          <AnimatePresence mode="wait">
-            {!preview ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                onClick={() => fileInputRef.current?.click()}
-                className="w-56 h-56 xs:w-64 xs:h-64 md:w-80 md:h-80 rounded-full bg-[#f8f8f8] shadow-neumorphic-out flex flex-col items-center justify-center cursor-pointer transition-all duration-700 active:scale-95 group relative overflow-hidden"
+      {/* ── Upload Circle ── */}
+      <div className="relative z-10 flex flex-col items-center justify-center flex-1 py-10">
+        <AnimatePresence mode="wait">
+          {!preview ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.88 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.88 }}
+              transition={{ duration: 0.4 }}
+              onClick={() => fileInputRef.current?.click()}
+              id="photo-upload-circle"
+              className="w-56 h-56 md:w-64 md:h-64 rounded-full flex flex-col items-center justify-center cursor-pointer group relative"
+              style={{
+                boxShadow: 'var(--shadow-neumorphic-out)',
+                background: 'linear-gradient(145deg, #FFF0F3, #FFE4E6)',
+              }}
+            >
+              <div className="absolute inset-3 rounded-full border-2 border-dashed border-rose-200/60 group-hover:border-rose-300 transition-colors" />
+
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-rose-400 mb-3 group-hover:scale-110 transition-transform shadow-sm"
+                style={{ background: 'rgba(255,255,255,0.8)' }}
               >
-                <div className="h-full w-full absolute inset-0 bg-gradient-to-tr from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="w-16 h-16 rounded-full bg-white shadow-soft flex items-center justify-center text-orange-vibrant mb-4 group-hover:scale-110 transition-transform">
-                   <Camera size={28} />
-                </div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black opacity-30 px-6 text-center">Scan Facial Profile</span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="preview"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-56 h-56 xs:w-64 xs:h-64 md:w-80 md:h-80 rounded-full p-4 bg-[#f8f8f8] shadow-neumorphic-out relative"
+                <Upload size={28} />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-300">
+                Tap to Upload
+              </span>
+              <span className="text-[8px] text-rose-200 mt-1">JPG, PNG, WEBP</span>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0, scale: 0.88 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="relative"
+            >
+              <div
+                className="w-56 h-56 md:w-64 md:h-64 rounded-full p-4"
+                style={{ boxShadow: 'var(--shadow-neumorphic-out)', background: 'linear-gradient(145deg, #FFF0F3, #FFE4E6)' }}
               >
-                <div className="w-full h-full rounded-full overflow-hidden shadow-inner relative group ring-4 ring-white">
+                <div className="w-full h-full rounded-full overflow-hidden ring-4 ring-white shadow-inner group relative">
                   <img src={preview} className="w-full h-full object-cover" alt="Preview" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                      <button onClick={removeImage} className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center border border-white/40 hover:bg-red-500 hover:border-red-500 transition-all">
-                        <X size={24} />
-                      </button>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 backdrop-blur-sm rounded-full">
+                    <button
+                      onClick={removeImage}
+                      className="w-12 h-12 rounded-full bg-white/20 border border-white/40 text-white flex items-center justify-center hover:bg-red-500/80 transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
                 </div>
-                <div className="absolute top-2 right-2 w-14 h-14 rounded-full bg-green-500 border-4 border-[#f8f8f8] flex items-center justify-center text-white shadow-2xl scale-100 animate-in zoom-in-50 duration-300">
-                  <CheckCircle size={24} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-        </div>
+              </div>
+              {/* Success badge */}
+              <div className="absolute -top-1 -right-1 w-12 h-12 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center text-white shadow-xl">
+                <CheckCircle size={20} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {!preview && (
+          <p className="mt-6 text-xs text-[#9CA3AF] text-center font-medium max-w-[200px] leading-relaxed">
+            Use a clear, well-lit selfie or face photo for best results.
+          </p>
+        )}
       </div>
 
-      {/* Footer Button Section */}
-      <div className="pb-8 shrink-0">
-        <Button 
-          variant="primary" 
-          size="lg" 
-          className={`w-full py-6 rounded-3xl font-black uppercase tracking-widest text-[11px] transition-all duration-500 shadow-2xl ${
-            !preview 
-            ? 'bg-slate-200 text-slate-400 border-none' 
-            : 'bg-black text-white hover:bg-orange-vibrant shadow-orange-vibrant/20 translate-y-[-4px]'
-          }`}
+      {/* ── Footer CTA ── */}
+      <div className="relative z-10 pb-4 space-y-3">
+        <Button
+          id="photo-upload-analyze"
+          variant={preview ? 'rose' : 'ghost'}
+          size="lg"
+          className={`w-full ${!preview ? 'bg-rose-50 text-rose-200 border border-rose-100 cursor-not-allowed' : ''}`}
           onClick={handleAnalyze}
           disabled={!preview || isAnalyzing}
         >
-          {isAnalyzing ? "Processing Neural Profile..." : "Analyze Skin Complexion"}
+          {isAnalyzing ? 'Processing…' : 'Analyse Skin Tone'}
+          <span className="ml-1 opacity-60">→</span>
         </Button>
-        <p className="text-center mt-6 text-[8px] uppercase tracking-widest opacity-20 font-bold">Encrypted & Confidential Analysis</p>
-      </div>
 
+        <div className="flex items-center justify-center gap-2 text-[8px] uppercase tracking-widest font-bold text-[#C4A0A8]">
+          <ShieldCheck size={10} />
+          <span>Your photo is never stored</span>
+        </div>
+      </div>
     </div>
   );
 };

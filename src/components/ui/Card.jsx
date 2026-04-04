@@ -7,25 +7,35 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const Card = ({ children, className, variant = 'elevated', animate = true, ...props }) => {
+/**
+ * Card — Premium card component for the soft-pink design system.
+ * Pink-tinted glassmorphism and soft elevation shadows.
+ */
+const Card = ({ children, className, variant = 'elevated', animate = true, onClick, ...props }) => {
   const variants = {
-    elevated: "bg-white shadow-premium border border-black/5",
-    glass: "glass-morphism rounded-xl",
-    flat: "bg-white/50 border border-black/5",
-    outline: "bg-transparent border border-black/10",
-    neumorphic: "bg-[#F8F8F8] shadow-neumorphic-out border-none"
+    elevated:   "bg-white/85 shadow-card border border-rose-50 backdrop-blur-sm",
+    glass:      "glass-pink rounded-2xl",
+    'glass-white': "glass rounded-2xl",
+    flat:       "bg-white/60 border border-rose-100/60 backdrop-blur-sm",
+    outline:    "bg-transparent border border-rose-100",
+    neumorphic: "bg-[#FFF1F2]/80 shadow-neumorphic-out border-none",
+    pink:       "bg-gradient-to-br from-rose-50/80 to-pink-50/60 border border-rose-100/50 backdrop-blur-sm",
+    dark:       "bg-[#1C1917] border border-white/5",
   };
 
   const Component = animate ? motion.div : 'div';
+  const motionProps = animate
+    ? { initial: { opacity: 0, y: 16 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.4, ease: 'easeOut' } }
+    : {};
 
   return (
     <Component
-      initial={animate ? { opacity: 0, y: 20 } : undefined}
-      whileInView={animate ? { opacity: 1, y: 0 } : undefined}
-      viewport={{ once: true }}
+      {...motionProps}
+      onClick={onClick}
       className={cn(
-        "rounded-[18px] p-6 lg:p-8 overflow-hidden transition-all duration-500",
+        "rounded-[20px] p-6 lg:p-8 overflow-hidden transition-all duration-400",
         variants[variant],
+        onClick && "cursor-pointer",
         className
       )}
       {...props}

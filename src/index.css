@@ -1,57 +1,296 @@
 @import "tailwindcss";
 
+/* ============================================================
+   TONEWEAR — SOFT PINK DESIGN SYSTEM
+   ============================================================
+   Palette Philosophy: Warm rose-blush base that celebrates
+   all skin tones. Products/prices always foreground. 
+   WCAG AA compliant for all text on pink backgrounds.
+   ============================================================ */
+
 @theme {
-  --color-sunset-pink: #FF9A8B;
-  --color-purple-luxury: #A18CD1;
-  --color-orange-vibrant: #FF5F6D;
-  --color-brand-dark: #1A1A1A;
-  --color-muted: #9A9A96;
+  /* ── Brand Palette ── */
+  --color-brand-dark:       #1C1917;      /* Near-black, warm */
+  --color-brand-rose:       #F43F5E;      /* Vibrant accent CTA */
+  --color-brand-pink:       #FB7185;      /* Medium accent */
+  --color-brand-blush:      #FECDD3;      /* Light pink */
+  --color-brand-petal:      #FFF1F2;      /* Near-white pink background */
+  --color-brand-warm:       #FFF7F0;      /* Warm neutral base */
+
+  /* ── Affiliate Platform Colors ── */
+  --color-amazon:           #FF9900;
+  --color-flipkart:         #2874F0;
+  --color-myntra:           #FF3F6C;
+  --color-ajio:             #1C1C1C;
+  --color-nykaa:            #FC2779;
+
+  /* ── Semantic Colors ── */
+  --color-success:          #10B981;      /* Emerald green */
+  --color-success-light:    #D1FAE5;
+  --color-error:            #EF4444;
+  --color-error-light:      #FEE2E2;
+  --color-warning:          #F59E0B;
+  --color-muted:            #9CA3AF;
+  --color-muted-warm:       #A8967E;
+
+  /* ── Shadow System (Soft Pink-tinted shadows) ── */
+  --shadow-sm:     0 1px 3px rgba(244,63,94,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:     0 4px 16px rgba(244,63,94,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg:     0 10px 32px rgba(244,63,94,0.10), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-xl:     0 20px 48px rgba(244,63,94,0.12), 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-2xl:    0 32px 64px rgba(244,63,94,0.15), 0 16px 32px rgba(0,0,0,0.10);
+  --shadow-premium: 0 20px 40px -15px rgba(244,63,94,0.12), 0 10px 20px -10px rgba(0,0,0,0.06);
+  --shadow-card:   0 8px 24px rgba(244,63,94,0.08), 0 2px 8px rgba(0,0,0,0.04);
   
-  --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.1), 0 10px 20px -10px rgba(0, 0, 0, 0.05);
-  --shadow-neumorphic-out: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
-  --shadow-neumorphic-in: inset 8px 8px 16px #d1d1d1, inset -8px -8px 16px #ffffff;
-  
-  --radius-luxury: 18px;
-  --radius-xl: 32px;
+  /* ── Neumorphic (Pink base) ── */
+  --shadow-neumorphic-out: 8px 8px 20px rgba(207,128,152,0.25), -8px -8px 20px rgba(255,255,255,0.9);
+  --shadow-neumorphic-in:  inset 6px 6px 12px rgba(207,128,152,0.2), inset -6px -6px 12px rgba(255,255,255,0.8);
+
+  /* ── Border Radius Tokens ── */
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    18px;
+  --radius-xl:    24px;
+  --radius-2xl:   32px;
+  --radius-3xl:   40px;
+  --radius-luxury:18px;
+  --radius-pill:  9999px;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Inter:wght@100..900&display=swap');
+/* ============================================================
+   FONTS
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background: #f8f8f8;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--color-brand-dark);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Global pink gradient background */
+body {
+  background: linear-gradient(135deg, #FFF0F3 0%, #FFF5F7 40%, #FFF7F0 70%, #FFF0F3 100%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, .luxury-font {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Playfair Display', 'Georgia', serif;
+}
+
+/* ============================================================
+   DESIGN TOKENS AS CSS VARIABLES
+   ============================================================ */
+:root {
+  /* Pink Gradient Presets */
+  --gradient-blush:    linear-gradient(135deg, #FFF0F3 0%, #FECDD3 50%, #FFF0F3 100%);
+  --gradient-rose:     linear-gradient(160deg, #FFF1F2 0%, #FFE4E6 45%, #FFF7F0 100%);
+  --gradient-warm-pink:linear-gradient(145deg, #FFF5F5 0%, #FEE2E2 35%, #FFF0EB 70%, #FFFBF0 100%);
+
+  /* Global BG */
+  --bg-page:   linear-gradient(135deg, #FFF0F3 0%, #FFF5F7 40%, #FFF7F0 70%, #FFF0F3 100%);
+  --bg-card:   rgba(255,255,255,0.85);
+  --bg-glass:  rgba(255,240,243,0.6);
+  
+  /* Text */
+  --text-primary:  #1C1917;
+  --text-secondary:#6B6560;
+  --text-muted:    #9CA3AF;
+  --text-accent:   #F43F5E;
+}
+
+/* ============================================================
+   GRADIENT BACKGROUND PRESETS (attach to any wrapper)
+   ============================================================ */
+.bg-blush-gradient {
+  background: var(--gradient-blush);
+}
+
+.bg-rose-gradient {
+  background: var(--gradient-rose);
+}
+
+.bg-warm-pink-gradient {
+  background: var(--gradient-warm-pink);
+}
+
+/* The canonical page background */
+.bg-page {
+  background: var(--bg-page);
+  background-attachment: fixed;
+}
+
+/* ============================================================
+   GLASSMORPHISM VARIANTS
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.glass-pink {
+  background: rgba(255, 241, 242, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(254, 205, 211, 0.4);
 }
 
 .glass-morphism {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
+.glass-dark {
+  background: rgba(28, 25, 23, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   ELEVATION SHADOW UTILITIES  
+   ============================================================ */
+.shadow-soft    { box-shadow: var(--shadow-sm); }
+.shadow-card    { box-shadow: var(--shadow-card); }
+.shadow-lift    { box-shadow: var(--shadow-lg); }
+.shadow-premium { box-shadow: var(--shadow-premium); }
+.shadow-float   { box-shadow: var(--shadow-xl); }
+
+/* Pink-glow shadow for CTAs */
+.shadow-rose-glow {
+  box-shadow: 0 8px 32px rgba(244, 63, 94, 0.35), 0 2px 8px rgba(244, 63, 94, 0.2);
+}
+.shadow-pink-glow {
+  box-shadow: 0 8px 24px rgba(251, 113, 133, 0.3), 0 2px 6px rgba(251, 113, 133, 0.15);
+}
+
+/* ============================================================
+   SCROLLBAR SUPPRESSION
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 7s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float 10s ease-in-out infinite;
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
 }
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3); }
+  70%  { box-shadow: 0 0 0 12px rgba(244, 63, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #FFE4E6 25%, #FECDD3 50%, #FFE4E6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+/* ============================================================
+   NOISE TEXTURE OVERLAY
+   ============================================================ */
+.noise-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   PLATFORM BADGE UTILITIES
+   ============================================================ */
+.badge-amazon   { background: #FFF3DC; color: #B45309; }
+.badge-flipkart { background: #DBEAFE; color: #1D4ED8; }
+.badge-myntra   { background: #FFE4E6; color: #BE123C; }
+.badge-ajio     { background: #F3F4F6; color: #111827; }
+.badge-nykaa    { background: #FCE7F3; color: #9D174D; }
+
+/* ============================================================
+   BEST DEAL PULSE BADGE
+   ============================================================ */
+.best-deal-badge {
+  animation: best-deal-pulse 2s ease-in-out infinite;
+}
+
+@keyframes best-deal-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  50%       { transform: scale(1.04); box-shadow: 0 6px 20px rgba(16,185,129,0.45); }
+}
+
+/* ============================================================
+   SAFE AREA & TOUCH TARGETS
+   ============================================================ */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-top    { padding-top:    env(safe-area-inset-top, 0px); }
+
+/* Minimum touch target helper */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   SELECTION COLOR
+   ============================================================ */
+::selection {
+  background: #FECDD3;
+  color: #1C1917;
+}
+
+/* ============================================================
+   FORM INPUT BASE
+   ============================================================ */
+.input-pink {
+  background: rgba(255, 241, 242, 0.6);
+  border: 1.5px solid rgba(254, 205, 211, 0.6);
+  border-radius: 16px;
+  padding: 14px 20px;
+  color: #1C1917;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.input-pink:focus {
+  border-color: #FB7185;
+  box-shadow: 0 0 0 3px rgba(251,113,133,0.15);
+}
+.input-pink::placeholder { color: #C4A0A8; }

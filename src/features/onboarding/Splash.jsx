@@ -1,84 +1,163 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Heart } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
 
+/**
+ * Splash — Hero landing screen.
+ * Gradient: Warm rose-pink → blush → soft coral.
+ * Celebrates all skin tones; product-neutral background.
+ */
 const Splash = ({ onNext }) => {
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#FF9A8B] via-[#FF6A88] to-[#A18CD1] overflow-hidden">
-      
-      {/* Background Decorative Particles */}
-      <div className="absolute top-[-10%] right-[-10%] w-96 h-96 rounded-full bg-white/10 blur-[100px]" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-luxury/20 blur-[120px]" />
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden"
+      style={{
+        background: 'linear-gradient(155deg, #FF6B8A 0%, #FF8C9E 20%, #FFAAB8 45%, #FFB8C6 65%, #D4939E 85%, #B07087 100%)'
+      }}
+    >
+      {/* ── Background depth blobs ── */}
+      <div className="absolute top-[-15%] right-[-10%] w-[400px] h-[400px] rounded-full bg-white/10 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-12%] left-[-8%] w-[500px] h-[500px] rounded-full bg-[#8B1A4A]/15 blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-white/5 blur-[60px] pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md flex flex-col items-center space-y-8 md:space-y-12 py-8">
-        
-        {/* Animated Brand Identity */}
-        <motion.div 
-          animate={{ scale: [0.95, 1, 0.95] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="w-28 h-28 md:w-40 md:h-40 glass-morphism rounded-[32px] md:rounded-[40px] flex items-center justify-center p-6 md:p-8 shadow-2xl"
+      {/* ── Floating decorative circles ── */}
+      <motion.div
+        animate={{ scale: [1, 1.15, 1], opacity: [0.06, 0.12, 0.06] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute top-20 left-10 w-24 h-24 rounded-full border border-white/30"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], opacity: [0.04, 0.09, 0.04] }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        className="absolute bottom-32 right-8 w-40 h-40 rounded-full border border-white/20"
+      />
+
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center space-y-8 py-10">
+
+        {/* ── Brand Logo ── */}
+        <motion.div
+          animate={{ scale: [0.96, 1.02, 0.96] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-24 h-24 md:w-32 md:h-32 rounded-[28px] md:rounded-[36px] flex items-center justify-center shadow-2xl"
+          style={{
+            background: 'rgba(255,255,255,0.18)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1.5px solid rgba(255,255,255,0.35)',
+          }}
         >
-          <div className="w-full h-full text-white">
-            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full stroke-current stroke-[4]">
-              <path d="M50 10V90M10 50H90M20 20L80 80M80 20L20 80" strokeWidth="2" opacity="0.3"/>
-              <motion.path 
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, ease: "easeInOut" }}
-                d="M30 40C30 30 40 20 50 20C60 20 70 30 70 40C70 50 50 70 50 70C50 70 30 50 30 40Z" 
-                className="fill-white/80"
-              />
-            </svg>
-          </div>
+          {/* Abstract skin-tone shape */}
+          <svg viewBox="0 0 80 80" fill="none" className="w-12 h-12 md:w-16 md:h-16">
+            <circle cx="40" cy="30" r="16" fill="rgba(255,255,255,0.9)" />
+            <path d="M15 64C15 50.745 26.193 40 40 40C53.807 40 65 50.745 65 64" stroke="rgba(255,255,255,0.9)" strokeWidth="4" strokeLinecap="round"/>
+          </svg>
         </motion.div>
 
-        <div className="text-center space-y-2 md:space-y-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
+        {/* ── Wordmark ── */}
+        <div className="text-center space-y-2">
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-7xl font-bold text-white tracking-tight"
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-none luxury-font"
           >
-            Tone<span className="italic font-light opacity-80">Wear</span>
+            Tone<span className="italic font-light opacity-75">Wear</span>
           </motion.h1>
-          <motion.p 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 0.8 }}
-             className="text-[10px] md:text-[13px] uppercase tracking-[0.4em] md:tracking-[0.5em] font-bold text-white leading-relaxed"
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.7 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-[9px] md:text-[10px] uppercase tracking-[0.45em] font-bold text-white"
           >
-            Find Your Perfect Color
+            Your Skin · Your Style
           </motion.p>
         </div>
 
-        {/* CTA Card */}
-        <Card variant="glass" className="w-full p-6 md:p-10 space-y-6 md:space-y-8 mt-6 md:mt-12 animate-float">
-          <div className="space-y-3 md:space-y-4">
-            <div className="flex items-center gap-3">
-               <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-orange-vibrant flex items-center justify-center text-white shadow-lg">
-                  <Sparkles size={14} />
-               </div>
-               <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-black text-white/90">AI Powered Analysis</span>
+        {/* ── Feature Chips ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="flex flex-wrap items-center justify-center gap-2"
+        >
+          {['AI Skin Analysis', 'Best Price Finder', '5 Platforms'].map((chip) => (
+            <div
+              key={chip}
+              className="px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider text-white"
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.25)',
+              }}
+            >
+              {chip}
             </div>
-            <p className="text-xs md:text-sm text-white/70 leading-relaxed font-medium">
-              Join 50k+ fashion enthusiasts using neural complexion analysis to elevate their personal style.
-            </p>
+          ))}
+        </motion.div>
+
+        {/* ── CTA Card ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.7 }}
+          className="w-full animate-float"
+          style={{
+            background: 'rgba(255,255,255,0.18)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1.5px solid rgba(255,255,255,0.3)',
+            borderRadius: '28px',
+            padding: '28px 24px',
+          }}
+        >
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg"
+                style={{ background: 'rgba(255,255,255,0.25)' }}
+              >
+                <Heart size={15} fill="white" />
+              </div>
+              <p className="text-white/80 text-xs leading-snug font-medium">
+                Discover beauty products curated <br className="hidden sm:block" />
+                for <strong className="text-white">your unique skin tone.</strong>
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Skin tone swatches — celebrating diversity */}
+              {['#F5CBA7', '#E59866', '#CA6F1E', '#9A7D0A', '#784212', '#4A235A'].map((hex) => (
+                <div
+                  key={hex}
+                  className="w-6 h-6 rounded-full border-2 border-white/40 shadow-sm"
+                  style={{ backgroundColor: hex }}
+                />
+              ))}
+              <span className="text-white/50 text-[9px] font-bold ml-1 uppercase tracking-widest">All Tones</span>
+            </div>
+
+            <Button
+              variant="secondary"
+              size="lg"
+              className="w-full bg-white text-[#1C1917] hover:bg-rose-50 border-0 group"
+              onClick={onNext}
+              id="splash-get-started"
+            >
+              Get Started
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
+        </motion.div>
 
-          <Button 
-            variant="primary" 
-            size="lg" 
-            className="w-full bg-white text-black hover:bg-black hover:text-white group py-4 md:py-6"
-            onClick={onNext}
-          >
-            Get Started
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </Card>
-
-        <div className="pt-6 md:pt-12 opacity-30">
-          <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-[0.3em] text-white text-center">Luxury Fashion Intelligence</p>
-        </div>
+        {/* ── Footer ── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ delay: 1.2 }}
+          className="text-[8px] uppercase tracking-[0.35em] font-bold text-white text-center"
+        >
+          Luxury Beauty Intelligence
+        </motion.p>
       </div>
     </div>
   );
