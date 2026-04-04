@@ -124,7 +124,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         <SkinToneBadge
           tone={analysisResult.skin_tone || 'Unknown'}
           hex={skinHex}
-          confidence={analysisResult.confidence || 96}
+          confidence={analysisResult.confidence}
         />
 
         {/* ── Best Match Colors ── */}
