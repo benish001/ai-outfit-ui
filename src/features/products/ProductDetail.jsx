@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { ChevronLeft, Share2, Heart, Award, ShieldCheck, Sparkles, ExternalLink } from 'lucide-react';
 import api from '../../services/api';
 import Button from '../../components/ui/Button';
 
+import PriceComparison from '../recommendations/PriceComparison';
+
 const ProductDetail = ({ product: initialProduct, onBack }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(initialProduct);
   const [loading, setLoading] = useState(!initialProduct);
+  const [showComparison, setShowComparison] = useState(false);
 
   useEffect(() => {
     if (!product && id) {
@@ -39,8 +42,15 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
     </div>
   );
 
+  const isFlipkart = product.affiliate_link?.includes('flipkart.com');
+
   return (
     <div className="min-h-screen w-full bg-white flex flex-col md:flex-row">
+      <AnimatePresence>
+        {showComparison && (
+            <PriceComparison outfit={product} onClose={() => setShowComparison(false)} />
+        )}
+      </AnimatePresence>
       
       {/* Visual Side (Mobile Top) */}
       <div className="w-full md:w-1/2 h-[70vh] md:h-screen sticky top-0 bg-white overflow-hidden">
@@ -59,11 +69,11 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
               <ChevronLeft size={24} />
            </button>
         </div>
-        <div className="absolute top-8 right-8 flex flex-col gap-4">
-           <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-white">
+        <div className="absolute top-8 right-8 flex flex-col gap-4 text-white">
+           <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center">
               <Share2 size={20} />
            </button>
-           <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-white group">
+           <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center group">
               <Heart size={20} className="group-hover:fill-red-500 group-hover:text-red-500 transition-colors" />
            </button>
         </div>
@@ -127,12 +137,28 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
 
         {/* Primary Action */}
         <div className="pt-12 md:pt-20 space-y-6 sticky bottom-8 md:relative">
-           <button className="w-full py-6 rounded-3xl bg-[#FFD814] hover:bg-[#F7CA00] text-black text-[13px] font-black uppercase tracking-[0.3em] shadow-2xl flex items-center justify-center gap-4 group transition-all">
-              <span className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center">
-                 <ExternalLink size={14} />
-              </span>
-              <span>Checkout on Amazon</span>
-           </button>
+           <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => window.open(product.affiliate_link, '_blank')}
+                className={`w-full py-6 rounded-3xl text-black text-[13px] font-black uppercase tracking-[0.3em] shadow-2xl flex items-center justify-center gap-4 group transition-all ${
+                  isFlipkart ? 'bg-[#2874f0] text-white' : 'bg-[#FFD814]'
+                }`}
+              >
+                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center ${isFlipkart ? 'bg-white text-[#2874f0]' : 'bg-black text-white'}`}>
+                    <ExternalLink size={14} />
+                  </span>
+                  <span>Buy on {isFlipkart ? 'Flipkart' : 'Amazon'}</span>
+              </button>
+
+              <button 
+                onClick={() => setShowComparison(true)}
+                className="w-full py-5 rounded-3xl bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              >
+                 <ShieldCheck size={16} className="text-orange-vibrant" />
+                 Compare with Myntra & Ajio
+              </button>
+           </div>
+
            <p className="text-center text-[9px] uppercase tracking-widest font-bold opacity-30">
               Prices and availability may vary. Affiliate commissions support our AI training.
            </p>
