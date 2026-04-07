@@ -20,32 +20,62 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle token expiration
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
     
+    // Check if 401 error and not a retry
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
+
       const refreshToken = localStorage.getItem('refresh_token');
-      
       if (refreshToken) {
         try {
-          const response = await api.post('/auth/refresh', { refresh_token: refreshToken });
-          const { access_token, refresh_token: newRefreshToken, ...userData } = response.data;
+          // Use a clean axios call for refresh to avoid interceptor recursion
+          const res = await axios.post(`${API_BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
+          const { access_token, refresh_token: newRefreshToken, ...userData } = res.data;
           
           localStorage.setItem('token', access_token);
           localStorage.setItem('refresh_token', newRefreshToken);
           localStorage.setItem('user', JSON.stringify(userData));
           
+          processQueue(null, access_token);
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Refresh failed, clear session
+          processQueue(refreshError, null);
           localStorage.clear();
           window.location.reload();
           return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
         }
       }
     }
