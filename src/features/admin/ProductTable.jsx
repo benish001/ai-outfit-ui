@@ -45,44 +45,56 @@ const ProductTable = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-black/5 text-sm">
-          {products.map((product) => (
-            <motion.tr 
-              key={product.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="hover:bg-black/[0.02] transition-colors"
-            >
-              <td className="px-10 py-8">
-                <div className="flex items-center gap-6">
-                   <div className="w-16 h-20 rounded-2xl bg-[#f8f8f8] border border-black/5 overflow-hidden shadow-inner flex items-center justify-center">
-                      {product.image_url ? (
-                        <img src={product.image_url} className="w-full h-full object-cover" />
-                      ) : (
-                        <ImageIcon size={20} className="text-black/10" />
-                      )}
+          {products.map((product) => {
+            const getPlatform = (link = '') => {
+              const l = link.toLowerCase();
+              if (l.includes('amazon')) return { name: 'Amazon', color: '#FF9900' };
+              if (l.includes('flipkart')) return { name: 'Flipkart', color: '#2874F0' };
+              if (l.includes('myntra')) return { name: 'Myntra', color: '#FF3F6C' };
+              if (l.includes('ajio')) return { name: 'Ajio', color: '#1C1C1C' };
+              if (l.includes('nykaa')) return { name: 'Nykaa', color: '#FC2779' };
+              return { name: 'External', color: '#6B7280' };
+            };
+            const platform = getPlatform(product.affiliate_link);
+
+            return (
+              <motion.tr 
+                key={product.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="hover:bg-black/[0.02] transition-colors"
+              >
+                <td className="px-10 py-8">
+                  <div className="flex items-center gap-6">
+                     <div className="w-16 h-20 rounded-2xl bg-[#f8f8f8] border border-black/5 overflow-hidden shadow-inner flex items-center justify-center">
+                        {product.image_url ? (
+                          <img src={product.image_url} className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <ImageIcon size={20} className="text-black/10" />
+                        )}
+                     </div>
+                     <div className="space-y-1">
+                        <p className="font-bold luxury-font text-lg tracking-tight">{product.name}</p>
+                        <div className="flex items-center gap-3">
+                           <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-30">{product.brand}</span>
+                           <div className="w-2.5 h-2.5 rounded-full border border-black/5" style={{ backgroundColor: product.color }} />
+                        </div>
+                     </div>
+                  </div>
+                </td>
+                <td className="px-10 py-8">
+                   <div className="flex flex-col">
+                      <span className="font-black text-lg">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                      <span className="text-[9px] font-black tracking-widest px-2 py-0.5 rounded-full inline-block mt-1 text-center" style={{ backgroundColor: `${platform.color}15`, color: platform.color }}>
+                        {platform.name}
+                      </span>
                    </div>
-                   <div className="space-y-1">
-                      <p className="font-bold luxury-font text-lg tracking-tight">{product.name}</p>
-                      <div className="flex items-center gap-3">
-                         <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-30">{product.brand}</span>
-                         <div className="w-2.5 h-2.5 rounded-full border border-black/5" style={{ backgroundColor: product.color }} />
-                      </div>
-                   </div>
-                </div>
-              </td>
-              <td className="px-10 py-8">
-                 <div className="flex flex-col">
-                    <span className="font-black text-lg">${Math.round(product.price)}</span>
-                    <span className={`text-[9px] uppercase font-black tracking-widest ${product.affiliate_link?.includes('amazon') ? 'text-[#FF9900]' : 'text-[#2874F0]'}`}>
-                      {product.affiliate_link?.includes('amazon') ? 'Amazon' : 'Flipkart'} Link Active
-                    </span>
-                 </div>
-              </td>
-              <td className="px-10 py-8">
-                <span className="px-5 py-2 rounded-full bg-black/5 text-[9px] font-black uppercase tracking-widest">
-                  {product.category}
-                </span>
-              </td>
+                </td>
+                <td className="px-10 py-8">
+                  <span className="px-5 py-2 rounded-full bg-black/5 text-[9px] font-black uppercase tracking-widest">
+                    {product.category}
+                  </span>
+                </td>
               <td className="px-10 py-8">
                  <div className="flex items-center gap-4">
                     <button 
@@ -100,7 +112,8 @@ const ProductTable = () => {
                  </div>
               </td>
             </motion.tr>
-          ))}
+              );
+            })}
         </tbody>
       </table>
     </div>

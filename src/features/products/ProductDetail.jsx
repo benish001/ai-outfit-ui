@@ -162,15 +162,15 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
 
           <div className="flex items-center gap-6">
             <div>
-              <span className="text-3xl font-black text-[#1C1917]">{product.price}</span>
-              <p className="text-[9px] uppercase tracking-widest font-bold text-[#9CA3AF] mt-0.5">Direct Price</p>
+              <span className="text-3xl font-black text-[#1C1917]">₹{Number(product.price).toLocaleString('en-IN')}</span>
+              <p className="text-[9px] uppercase tracking-widest font-bold text-[#9CA3AF] mt-1">Direct Price</p>
             </div>
             <div className="h-10 w-px bg-rose-100" />
             <div>
               <div className="flex gap-0.5 text-amber-400">
-                {[1,2,3,4,5].map(i => <StarIcon key={i} size={13} />)}
+                {[1,2,3,4,5].map(i => <StarIcon key={i} size={13} strokeWidth={2.5} />)}
               </div>
-              <p className="text-[9px] uppercase tracking-widest font-bold text-[#9CA3AF] mt-1">1.2k Reviews</p>
+              <p className="text-[9px] uppercase tracking-widest font-bold text-[#9CA3AF] mt-1.5">1.2k Reviews</p>
             </div>
           </div>
         </div>
@@ -194,22 +194,22 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
         </div>
 
         {/* CTA Section */}
-        <div className="space-y-3 pb-8 md:pb-4">
+        <div className="space-y-4 pb-8 md:pb-4">
           {/* Primary affiliate CTA */}
           <button
             id="product-buy"
             onClick={() => window.open(product.affiliate_link, '_blank')}
-            className="w-full py-5 rounded-3xl text-sm font-black uppercase tracking-[0.25em] flex items-center justify-center gap-4 group transition-all active:scale-[0.98] min-h-[58px]"
+            className="w-full py-5 rounded-3xl text-sm font-black uppercase tracking-[0.25em] flex items-center justify-center gap-4 group transition-all active:scale-[0.98] min-h-[64px]"
             style={isFlipkart
-              ? { background: '#2874f0', color: 'white', boxShadow: '0 8px 28px rgba(40,116,240,0.35)' }
-              : { background: '#FFD814', color: '#1C1917', boxShadow: '0 8px 28px rgba(255,216,20,0.35)' }
+              ? { background: '#2874f0', color: 'white', boxShadow: '0 8px 28px rgba(40,116,240,0.30)' }
+              : { background: '#FFD814', color: '#1C1917', boxShadow: '0 8px 28px rgba(255,216,20,0.30)' }
             }
           >
             <span
-              className="w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110"
               style={isFlipkart ? { background: 'rgba(255,255,255,0.2)', color: 'white' } : { background: 'rgba(0,0,0,0.1)', color: '#1C1917' }}
             >
-              <ExternalLink size={14} />
+              <ExternalLink size={16} />
             </span>
             Buy on {isFlipkart ? 'Flipkart' : 'Amazon'}
           </button>
@@ -218,7 +218,7 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
           <button
             id="product-compare"
             onClick={() => setShowComparison(true)}
-            className="w-full py-4 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[52px]"
+            className="w-full py-5 rounded-3xl flex flex-col items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-[0.98] min-h-[82px]"
             style={{
               background: 'rgba(255,255,255,0.85)',
               border: '1.5px solid rgba(254,205,211,0.5)',
@@ -227,8 +227,18 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
               backdropFilter: 'blur(12px)',
             }}
           >
-            <TrendingDown size={15} className="text-rose-400" />
-            Compare Prices · Myntra · Ajio · Nykaa
+            <div className="flex items-center gap-2">
+               <TrendingDown size={14} className="text-rose-400" />
+               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Compare Best Deals</span>
+            </div>
+            
+            <div className="flex items-center gap-2 opacity-80 scale-110">
+               <PlatformBadge label="A" color="#FFD814" text="#1C1917" />
+               <PlatformBadge label="F" color="#2874F0" text="#fff" />
+               <PlatformBadge label="M" color="#FF3F6C" text="#fff" />
+               <PlatformBadge label="A" color="#1C1C1C" text="#fff" />
+               <PlatformBadge label="N" color="#FC2779" text="#fff" />
+            </div>
           </button>
 
           <p className="text-center text-[8px] uppercase tracking-widest font-bold text-rose-200 pt-1">
@@ -241,6 +251,15 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
 };
 
 /* ── Helper components ── */
+const PlatformBadge = ({ label, color, text }) => (
+  <div
+    className="w-5 h-5 rounded-md flex items-center justify-center text-[7.5px] font-black shadow-sm"
+    style={{ background: color, color: text }}
+  >
+    {label}
+  </div>
+);
+
 const HighlightCard = ({ icon: Icon, title, desc }) => (
   <div
     className="flex gap-3 p-4 rounded-2xl"
@@ -256,8 +275,8 @@ const HighlightCard = ({ icon: Icon, title, desc }) => (
   </div>
 );
 
-const StarIcon = ({ size }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+const StarIcon = ({ size, strokeWidth = 2 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={strokeWidth} strokeLinejoin="round">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );

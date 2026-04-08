@@ -37,17 +37,17 @@ const DiscoveryView = () => {
       {/* 1. Header/Nav Section */}
       <header className="py-6 flex items-center justify-between sticky top-0 md:relative z-20 backdrop-blur-md -mx-4 px-4 md:mx-0 md:px-0">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-[#8E7B73] tracking-[0.2em] uppercase mb-0.5">GLOWTECH</span>
-          <h1 className="text-xl font-black text-[#1A1A1A] tracking-tighter">AI DISCOVERY</h1>
+          <span className="text-[10px] font-bold text-rose-400 tracking-[0.2em] uppercase mb-0.5">ToneWear AI</span>
+          <h1 className="text-xl font-black text-[#1C1917] tracking-tighter luxury-font">STYLE DISCOVERY</h1>
         </div>
         
         <div className="flex items-center gap-2">
-          <button className="bg-white/80 p-3 rounded-2xl shadow-sm border border-slate-200/50 hover:bg-white transition-colors">
-            <Search size={20} className="text-slate-600" />
+          <button className="bg-white/80 p-3 rounded-2xl shadow-sm border border-rose-100 hover:bg-white transition-colors">
+            <Search size={20} className="text-rose-400" />
           </button>
-          <button className="bg-[#1A1A1A] text-white p-3 rounded-2xl shadow-xl shadow-slate-300 hover:bg-[#333] transition-colors relative group">
+          <button className="bg-[#1C1917] text-white p-3 rounded-2xl shadow-rose-glow hover:bg-rose-500 transition-all relative group">
              <Camera size={20} />
-             <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#D4A373] border-2 border-[#1A1A1A] rounded-full" />
+             <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-400 border-2 border-[#1C1917] rounded-full" />
           </button>
         </div>
       </header>
@@ -56,9 +56,9 @@ const DiscoveryView = () => {
       <section className="mb-10 md:mb-14">
         <div className="mt-4">
           <SkinToneBadge 
-            tone="Sun-Kissed Amber" 
-            hex="#D1A074" 
-            confidence={99.4} 
+            tone="Medium Honey" 
+            hex="#C8845C" 
+            confidence={99.8} 
           />
         </div>
       </section>
@@ -66,17 +66,17 @@ const DiscoveryView = () => {
       {/* 3. Grid Filters & Controls */}
       <section className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-md font-bold text-[#1A1A1A]">Beauty Picks</h3>
-          <span className="text-xs font-bold text-slate-400 bg-slate-100/50 px-2.5 py-0.5 rounded-full">142 Matches</span>
+          <h3 className="text-md font-bold text-[#1C1917] luxury-font">Curated Lookbook</h3>
+          <span className="text-[10px] font-bold text-rose-400 bg-rose-50 border border-rose-100 px-3 py-1 rounded-full uppercase tracking-widest">142 Matches</span>
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#1A1A1A] transition-colors border-r pr-3 border-slate-200">
-            <SlidersHorizontal size={14} />
+          <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#9CA3AF] hover:text-rose-500 transition-colors border-r pr-3 border-rose-100">
+            <SlidersHorizontal size={14} strokeWidth={2.5} />
             Filters
           </button>
-          <button className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]">
-             Sort: Rebates
+          <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#1C1917]">
+             Sort: Best Deals
           </button>
         </div>
       </section>

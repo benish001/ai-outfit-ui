@@ -72,7 +72,7 @@ const AdminDashboard = ({ onBack }) => {
                  <span className="text-[9px] uppercase font-black tracking-widest text-white/40">Manual Override</span>
               </div>
               <p className="text-[10px] text-white/60 font-medium leading-relaxed">
-                Trigger neural crawler to fetch latest products from Amazon & Flipkart.
+                Trigger neural crawler to fetch latest products from Amazon, Flipkart, Myntra, Ajio & Nykaa.
               </p>
               <Button 
                 variant="primary" 

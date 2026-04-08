@@ -380,9 +380,23 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   );
 };
 
+/* ── Platform Profiles ── */
+const PLATFORMS = [
+  { id: 'amazon',   label: 'A', color: '#FFD814', text: '#1C1917', match: 'amazon.in' },
+  { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff',    match: 'flipkart.com' },
+  { id: 'myntra',   label: 'M', color: '#FF3F6C', text: '#fff',    match: 'myntra.com' },
+  { id: 'ajio',     label: 'A', color: '#1C1C1C', text: '#fff',    match: 'ajio.com' },
+  { id: 'nykaa',    label: 'N', color: '#FC2779', text: '#fff',    match: 'nykaa.com' },
+];
+
+const detectPlatform = (link = '') => {
+  const l = link.toLowerCase();
+  return PLATFORMS.find(p => l.includes(p.match)) || PLATFORMS[0]; // default Amazon
+};
+
 /* ── Product Card ── */
 const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
-  const isFlipkart = p.affiliate_link?.includes('flipkart.com');
+  const platform = detectPlatform(p.affiliate_link);
 
   return (
     <div
@@ -416,35 +430,68 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
         >
           <Heart size={15} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
+
+        {/* Platform tag — top left */}
+        <div
+          className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-xl text-[8px] font-black uppercase tracking-wider shadow-sm"
+          style={{ background: platform.color, color: platform.text }}
+        >
+          <ShoppingCart size={9} />
+          {platform.id === 'amazon' ? 'Amazon' :
+           platform.id === 'flipkart' ? 'Flipkart' :
+           platform.id === 'myntra' ? 'Myntra' :
+           platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
+        </div>
       </div>
 
       {/* Info */}
-      <div className="p-4 space-y-3">
+      <div className="p-3.5 space-y-2.5">
         <div className="space-y-0.5">
           <p className="text-[8px] font-black uppercase tracking-widest text-rose-400">{p.brand}</p>
           <h3 className="text-sm font-bold text-[#1C1917] line-clamp-2 leading-snug luxury-font">{p.name}</h3>
         </div>
+
+        {/* Price row */}
         <div className="flex items-center justify-between">
-          <span className="text-base font-black text-[#1C1917]">{p.price}</span>
+          <span className="text-base font-black text-[#1C1917]">₹{Number(p.price).toLocaleString('en-IN')}</span>
           <span className="text-[8px] font-bold uppercase tracking-wider text-[#9CA3AF]">{p.category}</span>
         </div>
+
+        {/* Platform comparison strip */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[7px] font-bold uppercase tracking-widest text-[#9CA3AF] shrink-0">Also on</span>
+          <div className="flex items-center gap-1">
+            {PLATFORMS.filter(pl => pl.id !== platform.id).map(pl => (
+              <div
+                key={pl.id}
+                title={pl.id}
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[7px] font-black shadow-sm opacity-60 hover:opacity-100 transition-opacity"
+                style={{ background: pl.color, color: pl.text }}
+              >
+                {pl.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Affiliate CTA */}
         <button
           id={`buy-${p.id}`}
           onClick={(e) => { e.stopPropagation(); window.open(p.affiliate_link, '_blank'); }}
-          className={`mt-1 w-full flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all min-h-[40px] ${
-            isFlipkart
-              ? 'bg-[#2874f0] text-white hover:bg-[#1858c4] shadow-sm hover:shadow-md'
-              : 'bg-[#FFD814] text-[#1C1917] hover:bg-[#F7CA00] shadow-sm'
-          }`}
+          className="w-full flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all min-h-[40px] hover:opacity-90 active:scale-95"
+          style={{ background: platform.color, color: platform.text }}
         >
           <ShoppingCart size={12} />
-          {isFlipkart ? 'Flipkart' : 'Amazon'}
+          Buy on {platform.id === 'amazon' ? 'Amazon' :
+                  platform.id === 'flipkart' ? 'Flipkart' :
+                  platform.id === 'myntra' ? 'Myntra' :
+                  platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
         </button>
       </div>
     </div>
   );
 };
+
 
 /* ── Tab Icons ── */
 const TabIcon = ({ icon: Icon, label, active = false, onClick }) => (

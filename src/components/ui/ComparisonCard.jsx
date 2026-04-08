@@ -6,21 +6,27 @@ import { ShoppingCart, TrendingDown, ExternalLink, Zap } from 'lucide-react';
  * Pink-tinted glass elevation. "Best Deal" badge pulses with emerald glow.
  */
 
-const PLATFORM_STYLES = {
-  Amazon:   { bg: 'badge-amazon',   label: 'Amazon',   abbr: 'Az' },
-  Flipkart: { bg: 'badge-flipkart', label: 'Flipkart', abbr: 'Fk' },
-  Myntra:   { bg: 'badge-myntra',   label: 'Myntra',   abbr: 'My' },
-  Ajio:     { bg: 'badge-ajio',     label: 'Ajio',     abbr: 'Aj' },
-  Nykaa:    { bg: 'badge-nykaa',    label: 'Nykaa',    abbr: 'Ny' },
+const PLATFORMS = [
+  { id: 'amazon',   label: 'A', color: '#FFD814', text: '#1C1917', match: 'amazon.in' },
+  { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff',    match: 'flipkart.com' },
+  { id: 'myntra',   label: 'M', color: '#FF3F6C', text: '#fff',    match: 'myntra.com' },
+  { id: 'ajio',     label: 'A', color: '#1C1C1C', text: '#fff',    match: 'ajio.com' },
+  { id: 'nykaa',    label: 'N', color: '#FC2779', text: '#fff',    match: 'nykaa.com' },
+];
+
+const getPlatformConfig = (name = '') => {
+  const n = name.toLowerCase();
+  return PLATFORMS.find(p => n.includes(p.id) || n.includes(p.match)) || PLATFORMS[0];
 };
 
-const PlatformDot = ({ platform }) => {
-  const style = PLATFORM_STYLES[platform] || { bg: 'bg-gray-100 text-gray-600', abbr: platform?.[0] ?? '?' };
+const PlatformIcon = ({ platform }) => {
+  const cfg = getPlatformConfig(platform);
   return (
     <div
-      className={`w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black ${style.bg}`}
+      className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-black shadow-sm transition-transform hover:scale-110"
+      style={{ background: cfg.color, color: cfg.text }}
     >
-      {style.abbr}
+      {cfg.label}
     </div>
   );
 };
@@ -106,8 +112,11 @@ const ComparisonCard = ({ product }) => {
                   style={isBest ? { background: 'rgba(209,250,229,0.35)' } : { background: 'rgba(255,241,242,0.4)' }}
                 >
                   <div className="flex items-center gap-2.5">
-                    <PlatformDot platform={deal.platform} />
-                    <span className="text-xs font-bold text-[#374151]">{deal.platform}</span>
+                    <PlatformIcon platform={deal.platform} />
+                    <span className="text-xs font-bold text-[#374151]">{getPlatformConfig(deal.platform).id === 'amazon' ? 'Amazon' :
+                                                                       getPlatformConfig(deal.platform).id === 'flipkart' ? 'Flipkart' :
+                                                                       getPlatformConfig(deal.platform).id === 'myntra' ? 'Myntra' :
+                                                                       getPlatformConfig(deal.platform).id === 'ajio' ? 'AJIO' : 'Nykaa'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={`text-xs font-black ${isBest ? 'text-emerald-600' : 'text-[#1C1917]'}`}>
