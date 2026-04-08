@@ -16,8 +16,15 @@ const PLATFORM_CONFIG = {
   nykaa:    { label: 'Nykaa',    color: '#FC2779', bg: '#FCE7F3', text: '#9D174D', abbr: 'Ny' },
 };
 
+const PLATFORM_ORDER = ['amazon', 'flipkart', 'myntra', 'ajio', 'nykaa'];
+
+const normalizePlatformKey = (platform = '') => {
+  const key = String(platform).toLowerCase();
+  return key === 'myndra' ? 'myntra' : key;
+};
+
 const getConfig = (platform = '') => {
-  const key = platform.toLowerCase();
+  const key = normalizePlatformKey(platform);
   return PLATFORM_CONFIG[key] || { label: platform, color: '#9CA3AF', bg: '#F9FAFB', text: '#374151', abbr: platform?.[0]?.toUpperCase() ?? '?' };
 };
 
@@ -45,9 +52,20 @@ const PriceComparison = ({ outfit, onClose }) => {
 
   if (!outfit) return null;
 
-  const allItems = comparison
-    ? [comparison.base_product, ...(comparison.competitors || [])].sort((a, b) => a.price - b.price)
-    : [];
+  const availableByPlatform = comparison
+    ? [comparison.base_product, ...(comparison.competitors || [])].reduce((acc, item) => {
+        const key = normalizePlatformKey(item?.platform);
+        if (!PLATFORM_ORDER.includes(key)) return acc;
+        if (!acc[key] || Number(item.price) < Number(acc[key].price)) {
+          acc[key] = item;
+        }
+        return acc;
+      }, {})
+    : {};
+
+  const allItems = Object.values(availableByPlatform).sort((a, b) => a.price - b.price);
+  const unavailablePlatforms = PLATFORM_ORDER.filter((platform) => !availableByPlatform[platform]);
+  const availableStoresCount = PLATFORM_ORDER.length - unavailablePlatforms.length;
 
   const savings = comparison?.base_product && comparison?.best_deal
     ? Math.max(0, comparison.base_product.price - comparison.best_deal.price)
@@ -85,6 +103,11 @@ const PriceComparison = ({ outfit, onClose }) => {
               </span>
             </div>
             <h2 className="text-2xl font-bold luxury-font text-[#1C1917]">Best Deal Finder</h2>
+            {!loading && !error && (
+              <p className="text-[10px] font-bold mt-1 text-[#9CA3AF] uppercase tracking-wider">
+                {availableStoresCount}/{PLATFORM_ORDER.length} stores available
+              </p>
+            )}
             {savings > 0 && !loading && (
               <p className="text-xs text-emerald-600 font-bold mt-1 flex items-center gap-1">
                 <TrendingDown size={12} />
@@ -237,6 +260,43 @@ const PriceComparison = ({ outfit, onClose }) => {
                 </motion.div>
               );
             })}
+
+            {/* Unavailable Platforms */}
+            {unavailablePlatforms.length > 0 && (
+              <div className="pt-3 space-y-2">
+                <p className="text-[9px] font-black uppercase tracking-widest text-[#9CA3AF]">
+                  Not Available Right Now
+                </p>
+                {unavailablePlatforms.map((platform) => {
+                  const cfg = getConfig(platform);
+                  return (
+                    <div
+                      key={`unavailable-${platform}`}
+                      className="p-4 rounded-3xl border flex items-center justify-between"
+                      style={{ background: 'rgba(249,250,251,0.75)', borderColor: 'rgba(229,231,235,0.9)' }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className="w-14 h-14 rounded-2xl shrink-0 border flex items-center justify-center text-sm font-black"
+                          style={{ background: cfg.bg, borderColor: `${cfg.color}25`, color: cfg.color }}
+                        >
+                          {cfg.abbr}
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: cfg.color }}>
+                            {cfg.label}
+                          </p>
+                          <p className="text-xs font-semibold text-[#9CA3AF]">No comparable result found yet</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#D1D5DB]">
+                        Unavailable
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -6,6 +6,43 @@ import api from '../../services/api';
 import Button from '../../components/ui/Button';
 import PriceComparison from '../recommendations/PriceComparison';
 
+const PLATFORM_STYLES = {
+  amazon: {
+    label: 'Amazon',
+    button: { background: '#FFD814', color: '#1C1917', boxShadow: '0 8px 28px rgba(255,216,20,0.30)' },
+    icon: { background: 'rgba(0,0,0,0.1)', color: '#1C1917' },
+  },
+  flipkart: {
+    label: 'Flipkart',
+    button: { background: '#2874F0', color: 'white', boxShadow: '0 8px 28px rgba(40,116,240,0.30)' },
+    icon: { background: 'rgba(255,255,255,0.2)', color: 'white' },
+  },
+  myntra: {
+    label: 'Myntra',
+    button: { background: '#FF3F6C', color: 'white', boxShadow: '0 8px 28px rgba(255,63,108,0.28)' },
+    icon: { background: 'rgba(255,255,255,0.2)', color: 'white' },
+  },
+  ajio: {
+    label: 'AJIO',
+    button: { background: '#1C1C1C', color: 'white', boxShadow: '0 8px 28px rgba(28,28,28,0.28)' },
+    icon: { background: 'rgba(255,255,255,0.2)', color: 'white' },
+  },
+  nykaa: {
+    label: 'Nykaa',
+    button: { background: '#FC2779', color: 'white', boxShadow: '0 8px 28px rgba(252,39,121,0.28)' },
+    icon: { background: 'rgba(255,255,255,0.2)', color: 'white' },
+  },
+};
+
+const detectPlatform = (link = '') => {
+  const l = String(link).toLowerCase();
+  if (l.includes('flipkart')) return 'flipkart';
+  if (l.includes('myntra')) return 'myntra';
+  if (l.includes('ajio')) return 'ajio';
+  if (l.includes('nykaa')) return 'nykaa';
+  return 'amazon';
+};
+
 /**
  * ProductDetail — Split-layout product page with pink theme.
  * Left: full-bleed image with glass overlays.
@@ -58,7 +95,8 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
     </div>
   );
 
-  const isFlipkart = product.affiliate_link?.includes('flipkart.com');
+  const platformKey = detectPlatform(product.affiliate_link);
+  const platformStyle = PLATFORM_STYLES[platformKey] || PLATFORM_STYLES.amazon;
 
   return (
     <div
@@ -200,18 +238,15 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
             id="product-buy"
             onClick={() => window.open(product.affiliate_link, '_blank')}
             className="w-full py-5 rounded-3xl text-sm font-black uppercase tracking-[0.25em] flex items-center justify-center gap-4 group transition-all active:scale-[0.98] min-h-[64px]"
-            style={isFlipkart
-              ? { background: '#2874f0', color: 'white', boxShadow: '0 8px 28px rgba(40,116,240,0.30)' }
-              : { background: '#FFD814', color: '#1C1917', boxShadow: '0 8px 28px rgba(255,216,20,0.30)' }
-            }
+            style={platformStyle.button}
           >
             <span
               className="w-10 h-10 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110"
-              style={isFlipkart ? { background: 'rgba(255,255,255,0.2)', color: 'white' } : { background: 'rgba(0,0,0,0.1)', color: '#1C1917' }}
+              style={platformStyle.icon}
             >
               <ExternalLink size={16} />
             </span>
-            Buy on {isFlipkart ? 'Flipkart' : 'Amazon'}
+            Buy on {platformStyle.label}
           </button>
 
           {/* Compare CTA */}
