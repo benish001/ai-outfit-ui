@@ -33,22 +33,29 @@ const PriceComparison = ({ outfit, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const lastFetchedIdRef = React.useRef(null);
+
   useEffect(() => {
+    if (!outfit?.id || lastFetchedIdRef.current === outfit.id) return;
+
     const fetchComparison = async () => {
       setLoading(true);
       setError(null);
       try {
+        lastFetchedIdRef.current = outfit.id;
         const res = await api.get(`/outfits/comparison/${outfit.id}`);
         setComparison(res.data);
       } catch (err) {
         console.error('Comparison fetch failed', err);
         setError('Could not load comparison data. Please try again.');
+        lastFetchedIdRef.current = null; // Allow retry
       } finally {
         setLoading(false);
       }
     };
-    if (outfit) fetchComparison();
-  }, [outfit]);
+    
+    fetchComparison();
+  }, [outfit?.id]);
 
   if (!outfit) return null;
 
@@ -208,7 +215,12 @@ const PriceComparison = ({ outfit, onClose }) => {
                       className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 border"
                       style={{ background: cfg.bg, borderColor: `${cfg.color}20` }}
                     >
-                      <img src={item.image_url} alt={item.platform} className="w-full h-full object-contain p-1" />
+                      <img 
+                        src={item.image_url || `https://via.placeholder.com/150?text=${cfg.abbr}`} 
+                        alt={item.platform} 
+                        className="w-full h-full object-contain p-1"
+                        onError={(e) => { e.target.src = `https://via.placeholder.com/150?text=${cfg.abbr}`; }}
+                      />
                     </div>
 
                     {/* Info */}

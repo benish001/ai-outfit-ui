@@ -71,6 +71,13 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
     }
   }, [id, product]);
 
+  useEffect(() => {
+    if (product?.id) {
+      // PREFETCH: Warm up the comparison cache while user views details
+      api.get(`/outfits/comparison/${product.id}`).catch(() => {});
+    }
+  }, [product?.id]);
+
   if (loading) return (
     <div
       className="min-h-screen w-full flex items-center justify-center"
