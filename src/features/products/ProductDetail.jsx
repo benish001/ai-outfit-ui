@@ -135,8 +135,8 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
           <button
             id="product-back"
             onClick={onBack}
-            className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-all"
-            style={{ background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.3)' }}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
+            style={{ background: 'rgba(28, 25, 23, 0.4)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)' }}
           >
             <ChevronLeft size={22} />
           </button>
@@ -144,8 +144,8 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
 
         <div className="absolute top-6 right-6 flex flex-col gap-3 text-white">
           <button
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all"
-            style={{ background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.3)' }}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
+            style={{ background: 'rgba(28, 25, 23, 0.4)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)' }}
           >
             <Share2 size={18} />
           </button>
