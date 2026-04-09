@@ -278,6 +278,18 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
     return 'amazon';
   })();
 
+  // Build a direct search URL on each platform using the product name
+  const getPlatformSearchUrl = (platId, productName) => {
+    const q = encodeURIComponent(productName || '');
+    switch (platId) {
+      case 'myntra':   return `https://www.myntra.com/${q.replace(/%20/g, '-')}`;
+      case 'flipkart': return `https://www.flipkart.com/search?q=${q}`;
+      case 'ajio':     return `https://www.ajio.com/search/?text=${q}`;
+      case 'amazon':   return `https://www.amazon.in/s?k=${q}`;
+      default:         return `https://www.google.com/search?q=${q}+${platId}`;
+    }
+  };
+
   const allPrices = [
     outfit.price,
     ...matches.map(m => m.price).filter(Boolean)
@@ -344,10 +356,12 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
               </button>
             ) : (
               <button
-                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(outfit.name + ' ' + plat.name)}`, '_blank')}
-                className="px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-wider border border-[#E5E7EB] text-[#9CA3AF] hover:border-rose-200 hover:text-rose-400 transition-all shrink-0"
+                onClick={() => window.open(getPlatformSearchUrl(plat.id, outfit.name), '_blank')}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[8px] font-black uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 shrink-0 shadow-sm"
+                style={{ background: plat.color, color: plat.textColor }}
               >
-                Search
+                <ExternalLink size={11} />
+                Buy
               </button>
             )}
           </motion.div>
