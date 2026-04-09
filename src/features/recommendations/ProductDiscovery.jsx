@@ -400,43 +400,42 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
 
   return (
     <div
-      className="group flex flex-col cursor-pointer rounded-3xl overflow-hidden transition-all duration-400 hover:scale-[1.025] hover:shadow-lift"
+      className="group flex flex-col cursor-pointer rounded-3xl overflow-hidden transition-all duration-400 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
       onClick={onSelect}
       style={{
-        background: 'rgba(255,255,255,0.82)',
-        border: '1.5px solid rgba(254,205,211,0.35)',
-        boxShadow: '0 4px 16px rgba(244,63,94,0.07)',
+        background: 'rgba(255,255,255,0.92)',
+        border: '1px solid rgba(254,205,211,0.3)',
+        boxShadow: '0 4px 20px rgba(244,63,94,0.06)',
       }}
     >
-      {/* Image */}
-      <div className="aspect-[3/4] w-full overflow-hidden relative"
-        style={{ background: 'rgba(255,241,242,0.5)' }}
-      >
+      {/* ── Image ── */}
+      <div className="aspect-[3/4] w-full overflow-hidden relative" style={{ background: 'rgba(255,241,242,0.5)' }}>
         <img
           src={p.image_url}
           alt={p.name}
-          className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-600"
+          className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-600"
           loading="lazy"
         />
-        {/* Save button */}
+
+        {/* Heart */}
         <button
           id={`save-${p.id}`}
           onClick={onToggleSave}
-          className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
+          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center border transition-all ${
             isSaved
-              ? 'bg-rose-500 border-rose-500 text-white shadow-pink-glow'
-              : 'bg-white/70 border-rose-100 text-rose-300 hover:bg-white hover:text-rose-500 hover:border-rose-200 backdrop-blur-sm'
+              ? 'bg-rose-500 border-rose-500 text-white'
+              : 'bg-white/80 border-rose-100 text-rose-300 hover:text-rose-500 backdrop-blur-sm'
           }`}
         >
-          <Heart size={15} fill={isSaved ? 'currentColor' : 'none'} />
+          <Heart size={14} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
 
-        {/* Platform tag — top left */}
+        {/* Platform tag */}
         <div
-          className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-xl text-[8px] font-black uppercase tracking-wider shadow-sm"
+          className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1 rounded-lg text-[7px] font-black uppercase tracking-wider shadow-sm"
           style={{ background: platform.color, color: platform.text }}
         >
-          <ShoppingCart size={9} />
+          <ShoppingCart size={8} />
           {platform.id === 'amazon' ? 'Amazon' :
            platform.id === 'flipkart' ? 'Flipkart' :
            platform.id === 'myntra' ? 'Myntra' :
@@ -444,44 +443,45 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
         </div>
       </div>
 
-      {/* Info */}
-      <div className="p-3.5 space-y-2.5">
-        <div className="space-y-0.5">
-          <p className="text-[8px] font-black uppercase tracking-widest text-rose-400">{p.brand}</p>
-          <h3 className="text-sm font-bold text-[#1C1917] line-clamp-2 leading-snug luxury-font">{p.name}</h3>
-        </div>
+      {/* ── Info ── */}
+      <div className="p-3 flex flex-col gap-2">
 
-        {/* Price row */}
+        {/* Brand */}
+        <p className="text-[7px] font-black uppercase tracking-[0.2em] text-rose-400 leading-none">{p.brand}</p>
+
+        {/* Name — clamp to exactly 2 lines for alignment */}
+        <h3 className="text-[11px] md:text-xs font-bold text-[#1C1917] line-clamp-2 leading-snug luxury-font" style={{ minHeight: '2.5em' }}>
+          {p.name}
+        </h3>
+
+        {/* Price + Category */}
         <div className="flex items-center justify-between">
-          <span className="text-base font-black text-[#1C1917]">₹{Number(p.price).toLocaleString('en-IN')}</span>
-          <span className="text-[8px] font-bold uppercase tracking-wider text-[#9CA3AF]">{p.category}</span>
+          <span className="text-sm font-black text-[#1C1917]">₹{Number(p.price).toLocaleString('en-IN')}</span>
+          <span className="text-[7px] font-bold uppercase tracking-wide text-[#9CA3AF]">{p.category}</span>
         </div>
 
-        {/* Platform comparison strip */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-[7px] font-bold uppercase tracking-widest text-[#9CA3AF] shrink-0">Also on</span>
-          <div className="flex items-center gap-1">
-            {PLATFORMS.filter(pl => pl.id !== platform.id).map(pl => (
-              <div
-                key={pl.id}
-                title={pl.id}
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[7px] font-black shadow-sm opacity-60 hover:opacity-100 transition-opacity"
-                style={{ background: pl.color, color: pl.text }}
-              >
-                {pl.label}
-              </div>
-            ))}
-          </div>
+        {/* Also on strip */}
+        <div className="flex items-center gap-1">
+          <span className="text-[7px] font-bold uppercase tracking-widest text-[#9CA3AF] shrink-0 mr-0.5">Also on</span>
+          {PLATFORMS.filter(pl => pl.id !== platform.id).map(pl => (
+            <div
+              key={pl.id}
+              className="w-4 h-4 rounded-[4px] flex items-center justify-center text-[6px] font-black opacity-70"
+              style={{ background: pl.color, color: pl.text }}
+            >
+              {pl.label}
+            </div>
+          ))}
         </div>
 
-        {/* Affiliate CTA */}
+        {/* Buy CTA */}
         <button
           id={`buy-${p.id}`}
           onClick={(e) => { e.stopPropagation(); window.open(p.affiliate_link, '_blank'); }}
-          className="w-full flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all min-h-[40px] hover:opacity-90 active:scale-95"
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all hover:opacity-90 active:scale-95"
           style={{ background: platform.color, color: platform.text }}
         >
-          <ShoppingCart size={12} />
+          <ShoppingCart size={11} />
           Buy on {platform.id === 'amazon' ? 'Amazon' :
                   platform.id === 'flipkart' ? 'Flipkart' :
                   platform.id === 'myntra' ? 'Myntra' :
