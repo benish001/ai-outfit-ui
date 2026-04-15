@@ -7,10 +7,11 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 import Button from '../../components/ui/Button';
+import ComparisonOffers from '../../components/affiliate/ComparisonOffers';
 
 /* ── Platform config ── */
 const PLATFORM_STYLES = {
-  amazon:   { label: 'Amazon',   btn: { background: '#FFD814', color: '#1C1917' }, icon: { background: 'rgba(0,0,0,0.12)', color: '#1C1917' } },
+  amazon:   { label: 'Amazon',   btn: { background: '#FB7185', color: '#fff' }, icon: { background: 'rgba(255,255,255,0.2)', color: '#fff' } },
   flipkart: { label: 'Flipkart', btn: { background: '#2874F0', color: '#fff' },    icon: { background: 'rgba(255,255,255,0.2)', color: '#fff' } },
   myntra:   { label: 'Myntra',   btn: { background: '#FF3F6C', color: '#fff' },    icon: { background: 'rgba(255,255,255,0.2)', color: '#fff' } },
   ajio:     { label: 'AJIO',     btn: { background: '#1C1C1C', color: '#fff' },    icon: { background: 'rgba(255,255,255,0.2)', color: '#fff' } },
@@ -18,10 +19,11 @@ const PLATFORM_STYLES = {
 };
 
 const COMPARISON_PLATFORMS = [
-  { id: 'amazon',   name: 'Amazon',   color: '#FFD814', textColor: '#1C1917', match: 'amazon' },
+  { id: 'amazon',   name: 'Amazon',   color: '#FB7185', textColor: '#fff',    match: 'amazon' },
   { id: 'myntra',   name: 'Myntra',   color: '#FF3F6C', textColor: '#fff',    match: 'myntra' },
   { id: 'flipkart', name: 'Flipkart', color: '#2874F0', textColor: '#fff',    match: 'flipkart' },
   { id: 'ajio',     name: 'AJIO',     color: '#1C1C1C', textColor: '#fff',    match: 'ajio' },
+  { id: 'nykaa',    name: 'Nykaa',    color: '#FC2779', textColor: '#fff',    match: 'nykaa' },
 ];
 
 const detectPlatform = (link = '') => {
@@ -50,10 +52,18 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
     }
   }, [id, product]);
 
-  // Warm up comparison cache
-  useEffect(() => {
-    if (product?.id) api.get(`/outfits/comparison/${product.id}`).catch(() => {});
-  }, [product?.id]);
+
+  const handleToggleSave = async () => {
+    try {
+      if (isSaved) {
+        await api.delete(`/users/saved/${product.id}`);
+        setIsSaved(false);
+      } else {
+        await api.post(`/users/saved/${product.id}`);
+        setIsSaved(true);
+      }
+    } catch (err) { console.error(err); }
+  };
 
   /* Loading skeleton */
   if (loading) return (
@@ -121,7 +131,7 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
           </button>
           <button
             id="product-save"
-            onClick={() => setIsSaved(!isSaved)}
+            onClick={handleToggleSave}
             className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110 shadow-lg"
             style={isSaved
               ? { background: '#F43F5E' }
@@ -184,7 +194,22 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
           {/* Price + Rating row */}
           <div className="flex items-center gap-5">
             <div>
-              <span className="text-3xl font-black text-[#1C1917]">₹{Number(product.price).toLocaleString('en-IN')}</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-[#1C1917]">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                <button 
+                  onClick={async () => {
+                    try {
+                      const res = await api.post(`/outfits/${product.id}/refresh`);
+                      setProduct(res.data);
+                    } catch (e) {
+                      alert("Price refresh failed. API might be limited.");
+                    }
+                  }}
+                  className="text-[8px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-600 flex items-center gap-1 transition-colors"
+                >
+                  <Sparkles size={10} /> Sync Price
+                </button>
+              </div>
               <p className="text-[8px] uppercase tracking-widest font-bold text-[#9CA3AF] mt-0.5">Direct Price</p>
             </div>
             <div className="h-10 w-px bg-rose-100" />
@@ -215,7 +240,14 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
           {/* Primary CTA */}
           <button
             id="product-buy"
-            onClick={() => window.open(product.affiliate_link, '_blank')}
+            onClick={() => {
+              let finalLink = product.affiliate_link;
+              if (finalLink && finalLink.includes('amazon.in') && !finalLink.includes('tag=')) {
+                const connector = finalLink.includes('?') ? '&' : '?';
+                finalLink = `${finalLink}${connector}linkCode=ll2&tag=skintoneai-21&ref_=as_li_ss_tl`;
+              }
+              window.open(finalLink, '_blank');
+            }}
             className="w-full py-5 rounded-3xl text-sm font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all hover:opacity-90 active:scale-[0.98] shadow-lg"
             style={ps.btn}
           >
@@ -225,20 +257,17 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
             Buy on {ps.label}
           </button>
 
-          {/* ── Inline Price Comparison Widget ── */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingDown size={14} className="text-rose-400" />
-                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1C1917]">Price Comparison</h2>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600">Live</span>
-              </div>
+          {/* ── PRICE COMPARISON WIDGET ── */}
+          <div className="space-y-4 pt-4 border-t border-rose-50">
+            <div className="flex items-center gap-2">
+              <TrendingDown size={14} className="text-emerald-500" />
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1C1917]">Price Comparison</h4>
             </div>
             <InlinePriceWidget outfit={product} platformStyles={PLATFORM_STYLES} />
           </div>
+
+          {/* ── Live Affiliate Offers / Coupons ── */}
+          <ComparisonOffers category={product.category} />
 
           <p className="text-center text-[8px] uppercase tracking-widest font-semibold text-rose-200 pb-8">
             Affiliate commissions fund the ToneWear AI engine
@@ -256,12 +285,14 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
 
   useEffect(() => {
     let cancelled = false;
-    api.get(`/outfits/comparison/${outfit.id}`)
+    // Pass the product name so the backend knows what to compare
+    const params = { name: outfit.name };
+    api.get(`/outfits/comparison/${outfit.id}`, { params })
       .then(r => { if (!cancelled) setData(r.data); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [outfit.id]);
+  }, [outfit.id, outfit.name]);
 
   if (loading) return (
     <div className="space-y-2.5">
@@ -300,9 +331,9 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
     <div className="space-y-2.5">
       {COMPARISON_PLATFORMS.map(plat => {
         const isBase = plat.id === basePlatformId;
-        const match = matches.find(m => (m.source_url || '').toLowerCase().includes(plat.match));
+        const match = matches.find(m => m.platform === plat.id);
         const price = isBase ? outfit.price : match?.price;
-        const url = isBase ? outfit.affiliate_link : match?.source_url;
+        const url = isBase ? outfit.affiliate_link : match?.link;
         const isLowest = price != null && price <= lowestPrice;
 
         return (
@@ -328,7 +359,12 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-xs font-black text-[#1C1917] uppercase tracking-wide">{plat.name}</p>
-                {isLowest && price && (
+                {match?.is_deal && (
+                  <span className="text-[7px] font-black uppercase tracking-widest text-white bg-[#FF3F6C] px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Tag size={8} /> Offer Active
+                  </span>
+                )}
+                {isLowest && price && !match?.is_deal && (
                   <span className="text-[7px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                     Best Price
                   </span>
@@ -341,6 +377,8 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
               </div>
               {price
                 ? <p className={`text-base font-black mt-0.5 ${isLowest ? 'text-emerald-700' : 'text-[#1C1917]'}`}>₹{Number(price).toLocaleString('en-IN')}</p>
+                : match?.is_deal
+                ? <p className="text-[10px] font-bold text-rose-500 mt-0.5">{match.coupon ? `Use Code: ${match.coupon}` : 'Live Offer Available'}</p>
                 : <p className="text-xs text-[#9CA3AF] mt-0.5">Not available</p>
               }
             </div>

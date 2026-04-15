@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronDown, ChevronUp, ShoppingCart, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp, ShoppingCart, ShieldCheck, ChevronRight } from 'lucide-react';
 import PlatformLogo from './PlatformLogo';
 import PriceTag from './PriceTag';
+import ComparisonOffers from './ComparisonOffers';
 
 /**
  * Desktop-optimized comparison table.
  * Supports sorting by Price or Delivery.
  */
-const ComparisonTable = ({ platforms = [], onSelectPlatform }) => {
+const ComparisonTable = ({ platforms = [], onSelectPlatform, category }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'currentPrice', direction: 'asc' });
 
   const sortedPlatforms = useMemo(() => {
@@ -109,6 +110,9 @@ const ComparisonTable = ({ platforms = [], onSelectPlatform }) => {
           </tbody>
         </table>
       </div>
+
+      {/* ── Live Affiliate Offers / Coupons ── */}
+      <ComparisonOffers category={category} />
     </div>
   );
 };

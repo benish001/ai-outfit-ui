@@ -72,11 +72,16 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           api.get('/admin/categories'),
           user ? api.get('/users/saved') : Promise.resolve({ data: [] }),
         ]);
-        const priority = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories'];
-        const valid = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories'];
-        const sorted = catRes.data
-          .filter(c => valid.includes(c))
+        const priority = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories', 'Beauty Product'];
+        
+        // Take categories from DB, but guarantee that ALL priority categories exist for live discovery
+        const dbCategories = catRes.data || [];
+        const combined = Array.from(new Set([...priority, ...dbCategories]));
+        
+        const sorted = combined
+          .filter(c => priority.includes(c))
           .sort((a, b) => priority.indexOf(a) - priority.indexOf(b));
+
         setDynamicTabs(['All', ...sorted, 'Saved']);
         if (user) setSavedIds(new Set(savedRes.data.map(p => p.id)));
       } catch (e) { console.error(e); }
@@ -382,16 +387,17 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
 
 /* ── Platform Profiles ── */
 const PLATFORMS = [
-  { id: 'amazon',   label: 'A', color: '#FFD814', text: '#1C1917', match: 'amazon.in' },
+  { id: 'amazon',   label: 'A', color: '#FB7185', text: '#fff',    match: 'amazon.in' },
   { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff',    match: 'flipkart.com' },
   { id: 'myntra',   label: 'M', color: '#FF3F6C', text: '#fff',    match: 'myntra.com' },
   { id: 'ajio',     label: 'A', color: '#1C1C1C', text: '#fff',    match: 'ajio.com' },
   { id: 'nykaa',    label: 'N', color: '#FC2779', text: '#fff',    match: 'nykaa.com' },
 ];
 
-const detectPlatform = (link = '') => {
+const detectPlatform = (link) => {
+  if (!link) return PLATFORMS[0]; // Default to Amazon
   const l = link.toLowerCase();
-  return PLATFORMS.find(p => l.includes(p.match)) || PLATFORMS[0]; // default Amazon
+  return PLATFORMS.find(p => l.includes(p.match)) || PLATFORMS[0];
 };
 
 /* ── Product Card ── */
@@ -408,7 +414,6 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
         boxShadow: '0 4px 20px rgba(244,63,94,0.06)',
       }}
     >
-      {/* ── Image ── */}
       <div className="aspect-[3/4] w-full overflow-hidden relative" style={{ background: 'rgba(255,241,242,0.5)' }}>
         <img
           src={p.image_url}
@@ -474,18 +479,13 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
           ))}
         </div>
 
-        {/* Buy CTA */}
+        {/* VIEW CTA — Triggers navigation to detail page */}
         <button
-          id={`buy-${p.id}`}
-          onClick={(e) => { e.stopPropagation(); window.open(p.affiliate_link, '_blank'); }}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all hover:opacity-90 active:scale-95"
+          id={`view-${p.id}`}
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all hover:opacity-90 active:scale-[0.95] shadow-sm transform-gpu"
           style={{ background: platform.color, color: platform.text }}
         >
-          <ShoppingCart size={11} />
-          Buy on {platform.id === 'amazon' ? 'Amazon' :
-                  platform.id === 'flipkart' ? 'Flipkart' :
-                  platform.id === 'myntra' ? 'Myntra' :
-                  platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
+          VIEW
         </button>
       </div>
     </div>
