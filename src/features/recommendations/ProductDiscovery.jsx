@@ -40,7 +40,11 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
     };
   }, [onboardingGender]);
 
+  const isFetchingRef = useRef(false);
   const fetchProducts = useCallback(async (pageNum, currentTab, isInitial = false) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    
     if (isInitial) setLoading(true);
     else setLoadingMore(true);
     try {
@@ -53,19 +57,28 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         if (currentTab !== 'All') params.category = currentTab;
         if (profileData.colors.length > 0) params.colors = profileData.colors.join(',');
         res = await api.get('/outfits/trending', { params });
-        setHasMore(res.data.length === 40);
+        setHasMore(res.data.length >= 10);
       }
       if (isInitial) setProducts(res.data);
-      else setProducts(prev => [...prev, ...res.data]);
+      else {
+        setProducts(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newItems = res.data.filter(p => !existingIds.has(p.id));
+          return [...prev, ...newItems];
+        });
+      }
     } catch (err) {
       console.error('Fetch failed', err);
     } finally {
       setLoading(false);
       setLoadingMore(false);
+      isFetchingRef.current = false;
     }
   }, [profileData]);
 
+  const globalInitRef = useRef(false);
   useEffect(() => {
+    if (globalInitRef.current) return;
     const init = async () => {
       try {
         const [catRes, savedRes] = await Promise.all([
@@ -73,43 +86,49 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           user ? api.get('/users/saved') : Promise.resolve({ data: [] }),
         ]);
         const priority = ['Casual Wear', 'Formal Wear', 'Party Wear', 'Footwear', 'Accessories', 'Beauty Product'];
-        
-        // Take categories from DB, but guarantee that ALL priority categories exist for live discovery
         const dbCategories = catRes.data || [];
         const combined = Array.from(new Set([...priority, ...dbCategories]));
-        
         const sorted = combined
           .filter(c => priority.includes(c))
           .sort((a, b) => priority.indexOf(a) - priority.indexOf(b));
 
         setDynamicTabs(['All', ...sorted, 'Saved']);
         if (user) setSavedIds(new Set(savedRes.data.map(p => p.id)));
+        globalInitRef.current = true;
       } catch (e) { console.error(e); }
     };
     init();
   }, [user]);
 
+  const lastTabRef = useRef(null);
   useEffect(() => {
+    if (lastTabRef.current === activeTab) {
+      setLoading(false); // Fix: Turn off loading if we already have the data
+      return;
+    }
     setPage(0);
     setHasMore(true);
     fetchProducts(0, activeTab, true);
+    lastTabRef.current = activeTab;
   }, [activeTab, fetchProducts]);
 
+  const isFetchingMore = useRef(false);
   const lastElementRef = useCallback(node => {
     if (observer.current) observer.current.disconnect();
-    
     if (loading || loadingMore || activeTab === 'Saved' || !hasMore) return;
 
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
+      if (entries[0].isIntersecting && hasMore && !isFetchingMore.current) {
+        isFetchingMore.current = true;
         setPage(prev => {
           const next = prev + 1;
-          fetchProducts(next, activeTab);
+          fetchProducts(next, activeTab).finally(() => {
+            isFetchingMore.current = false;
+          });
           return next;
         });
       }
     }, { rootMargin: '600px', threshold: 0.1 });
-    
     if (node) observer.current.observe(node);
   }, [loading, loadingMore, hasMore, fetchProducts, activeTab]);
 
@@ -465,27 +484,29 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
           <span className="text-[7px] font-bold uppercase tracking-wide text-[#9CA3AF]">{p.category}</span>
         </div>
 
-        {/* Also on strip */}
-        <div className="flex items-center gap-1">
-          <span className="text-[7px] font-bold uppercase tracking-widest text-[#9CA3AF] shrink-0 mr-0.5">Also on</span>
-          {PLATFORMS.filter(pl => pl.id !== platform.id).map(pl => (
-            <div
-              key={pl.id}
-              className="w-4 h-4 rounded-[4px] flex items-center justify-center text-[6px] font-black opacity-70"
-              style={{ background: pl.color, color: pl.text }}
-            >
-              {pl.label}
-            </div>
-          ))}
-        </div>
+        {/* Also on strip - Dynamic */}
+        {p.other_platforms && p.other_platforms.length > 0 && (
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="text-[6px] font-bold uppercase tracking-wider text-[#9CA3AF]">Also on</span>
+            {PLATFORMS.filter(pl => p.other_platforms.includes(pl.id)).map(pl => (
+              <div
+                key={pl.id}
+                className="w-3.5 h-3.5 rounded-[3px] flex items-center justify-center text-[5px] font-black"
+                style={{ background: pl.color, color: pl.text }}
+              >
+                {pl.label}
+              </div>
+            ))}
+          </div>
+        )}
 
-        {/* VIEW CTA — Triggers navigation to detail page */}
+        {/* VIEW CTA */}
         <button
           id={`view-${p.id}`}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all hover:opacity-90 active:scale-[0.95] shadow-sm transform-gpu"
+          className="w-full flex items-center justify-center gap-1 mt-auto py-2 rounded-lg text-[8px] font-black uppercase tracking-[0.1em] transition-all hover:opacity-90 active:scale-[0.95] shadow-sm"
           style={{ background: platform.color, color: platform.text }}
         >
-          VIEW
+          VIEW DETAILS
         </button>
       </div>
     </div>

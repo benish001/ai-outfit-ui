@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import {
@@ -43,12 +43,15 @@ const ProductDetail = ({ product: initialProduct, onBack }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
 
+  const loadRef = useRef(null);
   useEffect(() => {
+    if (loadRef.current === id) return;
     if (!product && id) {
       api.get(`/outfits/${id}`)
         .then(r => setProduct(r.data))
         .catch(e => console.error(e))
         .finally(() => setLoading(false));
+      loadRef.current = id;
     }
   }, [id, product]);
 
@@ -283,7 +286,12 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const compRef = useRef(null);
   useEffect(() => {
+    if (compRef.current === outfit.id) {
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     // Pass the product name so the backend knows what to compare
     const params = { name: outfit.name };
@@ -291,6 +299,7 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
       .then(r => { if (!cancelled) setData(r.data); })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
+    compRef.current = outfit.id;
     return () => { cancelled = true; };
   }, [outfit.id, outfit.name]);
 

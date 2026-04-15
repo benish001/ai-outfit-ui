@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Ticket, ExternalLink, Copy, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
@@ -8,11 +8,14 @@ const ComparisonOffers = ({ category }) => {
   const [loading, setLoading] = useState(true);
   const [copiedCode, setCopiedCode] = useState(null);
 
+  const fetchRef = useRef(null);
   useEffect(() => {
+    if (fetchRef.current === category) return;
     api.get('/outfits/trending/offers', { params: { category } })
       .then(res => setDeals(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
+    fetchRef.current = category;
   }, [category]);
 
   const copyToClipboard = (code) => {
