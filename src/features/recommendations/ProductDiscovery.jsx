@@ -70,18 +70,19 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         if (currentTab !== 'All') params.category = currentTab;
         if (profile.colors?.length > 0) params.colors = profile.colors.join(',');
         res = await api.get('/outfits/trending', { params });
-        setHasMore(res.data.length >= 20);
-      }
-      if (isInitial) setProducts(res.data || []);
-      else {
-        setProducts(prev => {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newItems = (res.data || []).filter(p => !existingIds.has(p.id));
-          // STOP the loop: if 0 unique new items, no point fetching more
-          if (newItems.length === 0) setHasMore(false);
-          return newItems.length > 0 ? [...prev, ...newItems] : prev;
-        });
-      }
+        const rawData = res.data || [];
+        // hasMore = true only if we got a full page of 40
+        setHasMore(rawData.length >= 40);
+        if (isInitial) {
+          setProducts(rawData);
+        } else {
+          setProducts(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const newItems = rawData.filter(p => !existingIds.has(p.id));
+            return newItems.length > 0 ? [...prev, ...newItems] : prev;
+          });
+        }
+      } // end else (not Saved)
     } catch (err) {
       console.error('Fetch failed', err);
     } finally {
@@ -133,17 +134,15 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore && !isFetchingMore.current) {
         isFetchingMore.current = true;
-        setPage(prev => {
-          const next = prev + 1;
-          fetchProducts(next, activeTab).finally(() => {
-            isFetchingMore.current = false;
-          });
-          return next;
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchProducts(nextPage, activeTab, false).finally(() => {
+          isFetchingMore.current = false;
         });
       }
-    }, { rootMargin: '100px', threshold: 0.1 }); // Fixed: rootMargin 100px for mobile
+    }, { rootMargin: '300px', threshold: 0 }); // 300px lookahead for mobile
     if (node) observer.current.observe(node);
-  }, [loading, loadingMore, hasMore, activeTab]);
+  }, [loading, loadingMore, hasMore, activeTab, page, fetchProducts]);
 
   const handleToggleSave = async (e, product) => {
     e.stopPropagation();
