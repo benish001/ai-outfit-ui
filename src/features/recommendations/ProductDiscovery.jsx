@@ -250,7 +250,10 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
             <button
               key={tab}
               id={`tab-${tab.toLowerCase().replace(' ', '-')}`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className={`whitespace-nowrap px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border min-h-[38px] ${
                 activeTab === tab
                   ? 'text-white border-transparent shadow-md scale-105'
