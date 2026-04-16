@@ -72,12 +72,14 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         res = await api.get('/outfits/trending', { params });
         setHasMore(res.data.length >= 20);
       }
-      if (isInitial) setProducts(res.data);
+      if (isInitial) setProducts(res.data || []);
       else {
         setProducts(prev => {
           const existingIds = new Set(prev.map(p => p.id));
           const newItems = (res.data || []).filter(p => !existingIds.has(p.id));
-          return [...prev, ...newItems];
+          // STOP the loop: if 0 unique new items, no point fetching more
+          if (newItems.length === 0) setHasMore(false);
+          return newItems.length > 0 ? [...prev, ...newItems] : prev;
         });
       }
     } catch (err) {
