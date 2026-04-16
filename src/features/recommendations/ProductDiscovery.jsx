@@ -41,10 +41,18 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   }, [onboardingGender]);
 
   const isFetchingRef = useRef(false);
+  const lastRequestKeyRef = useRef('');
   const fetchProducts = useCallback(async (pageNum, currentTab, isInitial = false) => {
-    if (isFetchingRef.current) return;
-    isFetchingRef.current = true;
+    // Request Key for deduplication: tab-page-gender
+    const requestKey = `${currentTab}-${pageNum}-${profileData.gender}`;
     
+    // GUARD: Prevent overlapping requests or duplicate initial calls
+    if (isFetchingRef.current) return;
+    if (isInitial && lastRequestKeyRef.current === requestKey) return;
+    
+    isFetchingRef.current = true;
+    if (isInitial) lastRequestKeyRef.current = requestKey;
+
     if (isInitial) setLoading(true);
     else setLoadingMore(true);
     try {
@@ -57,13 +65,13 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         if (currentTab !== 'All') params.category = currentTab;
         if (profileData.colors.length > 0) params.colors = profileData.colors.join(',');
         res = await api.get('/outfits/trending', { params });
-        setHasMore(res.data.length >= 10);
+        setHasMore(res.data.length >= 20);
       }
       if (isInitial) setProducts(res.data);
       else {
         setProducts(prev => {
           const existingIds = new Set(prev.map(p => p.id));
-          const newItems = res.data.filter(p => !existingIds.has(p.id));
+          const newItems = (res.data || []).filter(p => !existingIds.has(p.id));
           return [...prev, ...newItems];
         });
       }
@@ -100,16 +108,14 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
     init();
   }, [user]);
 
+  // Tracks the last active tab to prevent re-fetching when nothing changed
   const lastTabRef = useRef(null);
   useEffect(() => {
-    if (lastTabRef.current === activeTab) {
-      setLoading(false); // Fix: Turn off loading if we already have the data
-      return;
-    }
+    if (lastTabRef.current === activeTab) return;
+    lastTabRef.current = activeTab;
     setPage(0);
     setHasMore(true);
     fetchProducts(0, activeTab, true);
-    lastTabRef.current = activeTab;
   }, [activeTab, fetchProducts]);
 
   const isFetchingMore = useRef(false);
@@ -128,7 +134,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           return next;
         });
       }
-    }, { rootMargin: '600px', threshold: 0.1 });
+    }, { rootMargin: '100px', threshold: 0.1 }); // Fixed: rootMargin 100px for mobile
     if (node) observer.current.observe(node);
   }, [loading, loadingMore, hasMore, fetchProducts, activeTab]);
 
