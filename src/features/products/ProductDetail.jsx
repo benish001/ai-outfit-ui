@@ -293,8 +293,8 @@ const InlinePriceWidget = ({ outfit, platformStyles }) => {
       return;
     }
     let cancelled = false;
-    // Pass the product name so the backend knows what to compare
-    const params = { name: outfit.name };
+    // Pass the product name and category so the backend knows what to compare
+    const params = { name: outfit.name, category: outfit.category };
     api.get(`/outfits/comparison/${outfit.id}`, { params })
       .then(r => { if (!cancelled) setData(r.data); })
       .catch(() => {})
