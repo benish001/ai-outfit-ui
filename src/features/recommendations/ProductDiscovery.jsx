@@ -30,21 +30,26 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
 
   const observer = useRef();
 
+  // Keep profileData in a ref so fetchProducts can read it without being a dependency
+  const profileDataRef = useRef({ gender: 'Female', colors: [] });
   const profileData = React.useMemo(() => {
     const onboarding = JSON.parse(localStorage.getItem('analysisResult') || '{}');
     const gender = onboardingGender || localStorage.getItem('tonewear_gender') || onboarding.gender || 'Female';
     const colors = onboarding.recommendations?.colors_to_wear || [];
-    return {
+    const data = {
       gender: gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase(),
       colors,
     };
+    profileDataRef.current = data; // sync ref on every memo recalculation
+    return data;
   }, [onboardingGender]);
 
   const isFetchingRef = useRef(false);
   const lastRequestKeyRef = useRef('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchProducts = useCallback(async (pageNum, currentTab, isInitial = false) => {
-    // Request Key for deduplication: tab-page-gender
-    const requestKey = `${currentTab}-${pageNum}-${profileData.gender}`;
+    const profile = profileDataRef.current;
+    const requestKey = `${currentTab}-${pageNum}-${profile.gender}`;
     
     // GUARD: Prevent overlapping requests or duplicate initial calls
     if (isFetchingRef.current) return;
@@ -61,9 +66,9 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         res = await api.get('/users/saved');
         setHasMore(false);
       } else {
-        const params = { gender: profileData.gender, skip: pageNum * 40, limit: 40 };
+        const params = { gender: profile.gender, skip: pageNum * 40, limit: 40 };
         if (currentTab !== 'All') params.category = currentTab;
-        if (profileData.colors.length > 0) params.colors = profileData.colors.join(',');
+        if (profile.colors?.length > 0) params.colors = profile.colors.join(',');
         res = await api.get('/outfits/trending', { params });
         setHasMore(res.data.length >= 20);
       }
@@ -82,7 +87,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
       setLoadingMore(false);
       isFetchingRef.current = false;
     }
-  }, [profileData]);
+  }, []); // STABLE: reads profileData via ref — no deps needed
 
   const globalInitRef = useRef(false);
   useEffect(() => {
@@ -136,7 +141,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
       }
     }, { rootMargin: '100px', threshold: 0.1 }); // Fixed: rootMargin 100px for mobile
     if (node) observer.current.observe(node);
-  }, [loading, loadingMore, hasMore, fetchProducts, activeTab]);
+  }, [loading, loadingMore, hasMore, activeTab]);
 
   const handleToggleSave = async (e, product) => {
     e.stopPropagation();
