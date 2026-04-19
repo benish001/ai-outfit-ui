@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, ExternalLink, Loader2, ShoppingBag,
-  Percent, TrendingUp, Sparkles, RefreshCw, Tag, Heart, Search, X
+  Percent, TrendingUp, Sparkles, RefreshCw, Tag, Heart, Search, X,
+  Camera, User as UserIcon
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -163,11 +164,11 @@ const MyntraDeals = () => {
 
       {/* ── STICKY HEADER ──────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-[100] backdrop-blur-xl"
+        className="fixed top-0 left-0 right-0 z-[120] backdrop-blur-xl"
         style={{
-          background: 'rgba(255,240,243,0.91)',
+          background: 'rgba(255,240,243,0.95)',
           borderBottom: '1px solid rgba(255,63,108,0.1)',
-          boxShadow: '0 2px 24px rgba(255,63,108,0.06)',
+          boxShadow: '0 4px 20px rgba(255,63,108,0.06)',
         }}
       >
         {/* Navbar */}
@@ -191,8 +192,9 @@ const MyntraDeals = () => {
             </div>
             <div className="min-w-0">
               <h1 className="text-[15px] font-black leading-none truncate" style={{ color: M_DARK }}>
-                Myntra <span className="font-light italic opacity-40">Affiliate</span>
+                Myntra
               </h1>
+
             </div>
           </div>
 
@@ -302,45 +304,12 @@ const MyntraDeals = () => {
         </div>
       </header>
 
-      {/* ── HERO BANNER ──────────────────────────────────────────── */}
-      <div
-        className="mx-4 mt-4 mb-3 rounded-3xl overflow-hidden relative"
-        style={{
-          background: `linear-gradient(135deg, ${M_PINK}F2, ${M_ORANGE}E8)`,
-          boxShadow: `0 8px 32px ${M_PINK}30`,
-        }}
-      >
-        <div className="px-6 py-5 relative z-10">
-          <p className="text-[8px] uppercase font-black tracking-[0.35em] text-white/70 mb-1">
-            {activeCat.emoji} {activeCat.label} · Exclusive Trending Styles
-          </p>
 
-
-          <h2 className="text-xl font-black text-white leading-tight mb-3.5">
-            Shop Myntra.<br />
-            <span className="font-light italic opacity-80 text-base">Find your perfect look.</span>
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { icon: Percent,    label: 'Exclusive Deals' },
-              { icon: TrendingUp, label: 'New Trends'      },
-              { icon: Tag,        label: 'Curated Looks'   },
-              { icon: Sparkles,   label: 'Top Picks'       },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-[8.5px] font-bold tracking-wide">
-                <Icon size={9} />
-                {label}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-white/10" />
-        <div className="absolute -right-4 bottom-0 w-28 h-28 rounded-full bg-white/10" />
-      </div>
 
       {/* ── PRODUCT GRID ─────────────────────────────────────────── */}
-      <main className="flex-1 px-4 pb-10 relative z-10">
+      <main className="flex-1 px-4 pb-32 pt-[135px] relative z-10 w-full">
+
+
 
         {/* Error */}
         {error && (
@@ -445,6 +414,27 @@ const MyntraDeals = () => {
 
 
       </main>
+
+      {/* ── Sticky Bottom Navigation (Mobile) ── */}
+      <footer
+        className="md:hidden fixed bottom-0 inset-x-0 z-[300] safe-bottom"
+        style={{
+          background: 'rgba(255,241,242,0.94)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(254,205,211,0.5)',
+          boxShadow: '0 -8px 32px rgba(244,63,94,0.08)',
+        }}
+      >
+        <div className="flex items-center justify-around py-3 max-w-lg mx-auto px-4">
+          <TabIcon icon={GridIcon} label="Explore" onClick={() => navigate('/discovery')} />
+          <TabIcon icon={Camera} label="Scan" onClick={() => navigate('/upload')} />
+          <TabIcon icon={ShoppingBag} label="Myntra" active onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} accent />
+          <TabIcon icon={HeartIcon} label="Saved" onClick={() => navigate('/discovery', { state: { tab: 'Saved' } })} />
+          <TabIcon icon={UserIcon} label="Profile" onClick={() => navigate('/discovery')} />
+        </div>
+      </footer>
+
     </div>
   );
 };
@@ -581,3 +571,46 @@ const ProductCard = ({ product: p, isSaved, onToggleSave }) => {
 };
 
 export default MyntraDeals;
+
+/* ── Tab Icons ── */
+const TabIcon = ({ icon: Icon, label, active = false, onClick, accent = false }) => (
+  <button
+    onClick={onClick}
+    className={`flex flex-col items-center gap-1 min-w-[44px] min-h-[44px] justify-center transition-all ${accent
+        ? 'text-[#FF3F6C]'
+        : active
+          ? 'text-rose-500'
+          : 'text-[#9CA3AF] hover:text-rose-400'
+      }`}
+  >
+    {accent ? (
+      <div
+        className="w-8 h-8 rounded-xl flex items-center justify-center mb-[-2px]"
+        style={{ background: 'linear-gradient(135deg, #FF3F6C, #FF7745)', boxShadow: '0 3px 10px rgba(255,63,108,0.35)' }}
+      >
+        <Icon size={16} color="white" />
+      </div>
+    ) : (
+      <Icon size={20} />
+    )}
+    <span
+      className="text-[7px] uppercase font-black tracking-widest"
+      style={accent ? { color: '#FF3F6C' } : {}}
+    >{label}</span>
+  </button>
+);
+
+const GridIcon = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+  </svg>
+);
+
+const HeartIcon = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);

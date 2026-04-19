@@ -295,7 +295,8 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
       </header>
 
       {/* ── Main Product Grid ── */}
-      <main className="flex-1 px-5 md:px-8 pt-40 pb-20 max-w-7xl mx-auto w-full relative z-10">
+      <main className="flex-1 px-5 md:px-8 pt-40 pb-32 max-w-7xl mx-auto w-full relative z-10">
+
 
         <header className="mb-8 md:mb-12">
           <p className="text-[9px] uppercase font-black tracking-[0.4em] text-rose-400 mb-1.5">
@@ -374,25 +375,24 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         )}
       </main>
 
-      {/* ── Sticky Bottom Navigation (Mobile) ── */}
-      <div
+      <footer
         className="md:hidden fixed bottom-0 inset-x-0 z-[300] safe-bottom"
         style={{
-          background: 'rgba(255,241,242,0.90)',
+          background: 'rgba(255,241,242,0.94)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(254,205,211,0.4)',
-          boxShadow: '0 -4px 20px rgba(244,63,94,0.07)',
+          borderTop: '1px solid rgba(254,205,211,0.5)',
+          boxShadow: '0 -8px 32px rgba(244,63,94,0.08)',
         }}
       >
-        <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto px-4">
+        <div className="flex items-center justify-around py-3 max-w-lg mx-auto px-4">
           <TabIcon icon={GridIcon} label="Explore" active={activeTab === 'All'} onClick={() => setActiveTab('All')} />
           <TabIcon icon={Camera} label="Scan" onClick={() => navigate('/upload')} />
           <TabIcon icon={ShoppingBag} label="Myntra" onClick={() => navigate('/myntra')} accent />
           <TabIcon icon={HeartIcon} label="Saved" active={activeTab === 'Saved'} onClick={() => setActiveTab('Saved')} />
           <TabIcon icon={UserIcon} label="Profile" onClick={user ? handleLogout : onAuthClick} />
         </div>
-      </div>
+      </footer>
 
       {/* ── Logout Modal ── */}
       <AnimatePresence>
