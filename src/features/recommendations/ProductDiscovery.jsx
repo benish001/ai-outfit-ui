@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, Star, ShoppingCart, ExternalLink,
-  User as UserIcon, Shield, LogOut, Heart, Camera, Loader2, Sparkles
+  User as UserIcon, Shield, LogOut, Heart, Camera, Loader2, Sparkles, ShoppingBag
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -50,11 +50,11 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   const fetchProducts = useCallback(async (pageNum, currentTab, isInitial = false) => {
     const profile = profileDataRef.current;
     const requestKey = `${currentTab}-${pageNum}-${profile.gender}`;
-    
+
     // GUARD: Prevent overlapping requests or duplicate initial calls
     if (isFetchingRef.current) return;
     if (isInitial && lastRequestKeyRef.current === requestKey) return;
-    
+
     isFetchingRef.current = true;
     if (isInitial) lastRequestKeyRef.current = requestKey;
 
@@ -107,7 +107,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         const sorted = combined
           .filter(c => priority.includes(c))
           .sort((a, b) => priority.indexOf(a) - priority.indexOf(b));
-
+ 
         setDynamicTabs(['All', ...sorted, 'Saved']);
         if (user) setSavedIds(new Set(savedRes.data.map(p => p.id)));
         globalInitRef.current = true;
@@ -115,6 +115,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
     };
     init();
   }, [user]);
+
 
   // Tracks the last active tab to prevent re-fetching when nothing changed
   const lastTabRef = useRef(null);
@@ -162,8 +163,6 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
 
   const handleLogout = () => setShowLogoutModal(true);
   const confirmLogout = () => { logout(); setShowLogoutModal(false); navigate('/'); };
-
-  const isFlipkart = (link) => link?.includes('flipkart.com');
 
   return (
     <div
@@ -269,10 +268,35 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
           ))}
           <div className="min-w-[20px] shrink-0" />
         </div>
+
+        {/* ── Myntra Affiliate Banner ── */}
+        <div className="px-5 pb-3.5">
+          <button
+            id="discovery-myntra-banner"
+            onClick={() => navigate('/myntra')}
+            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-white transition-all hover:opacity-90 active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, #FF3F6C, #FF7745)',
+              boxShadow: '0 4px 16px rgba(255,63,108,0.30)',
+            }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-xs font-black">M</div>
+              <div className="text-left">
+                <p className="text-[7px] uppercase font-black tracking-[0.25em] opacity-80">Trending Now</p>
+                <p className="text-[10px] font-black leading-tight">Exclusive Myntra Curations</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wider bg-white/20 px-2.5 py-1.5 rounded-full">
+              Shop <ExternalLink size={8} />
+            </div>
+          </button>
+        </div>
       </header>
 
       {/* ── Main Product Grid ── */}
       <main className="flex-1 px-5 md:px-8 pt-40 pb-20 max-w-7xl mx-auto w-full relative z-10">
+
         <header className="mb-8 md:mb-12">
           <p className="text-[9px] uppercase font-black tracking-[0.4em] text-rose-400 mb-1.5">
             Neural Curations
@@ -364,6 +388,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto px-4">
           <TabIcon icon={GridIcon} label="Explore" active={activeTab === 'All'} onClick={() => setActiveTab('All')} />
           <TabIcon icon={Camera} label="Scan" onClick={() => navigate('/upload')} />
+          <TabIcon icon={ShoppingBag} label="Myntra" onClick={() => navigate('/myntra')} accent />
           <TabIcon icon={HeartIcon} label="Saved" active={activeTab === 'Saved'} onClick={() => setActiveTab('Saved')} />
           <TabIcon icon={UserIcon} label="Profile" onClick={user ? handleLogout : onAuthClick} />
         </div>
@@ -421,11 +446,11 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
 
 /* ── Platform Profiles ── */
 const PLATFORMS = [
-  { id: 'amazon',   label: 'A', color: '#FB7185', text: '#fff',    match: 'amazon.in' },
-  { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff',    match: 'flipkart.com' },
-  { id: 'myntra',   label: 'M', color: '#FF3F6C', text: '#fff',    match: 'myntra.com' },
-  { id: 'ajio',     label: 'A', color: '#1C1C1C', text: '#fff',    match: 'ajio.com' },
-  { id: 'nykaa',    label: 'N', color: '#FC2779', text: '#fff',    match: 'nykaa.com' },
+  { id: 'amazon', label: 'A', color: '#FB7185', text: '#fff', match: 'amazon.in' },
+  { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff', match: 'flipkart.com' },
+  { id: 'myntra', label: 'M', color: '#FF3F6C', text: '#fff', match: 'myntra.com' },
+  { id: 'ajio', label: 'A', color: '#1C1C1C', text: '#fff', match: 'ajio.com' },
+  { id: 'nykaa', label: 'N', color: '#FC2779', text: '#fff', match: 'nykaa.com' },
 ];
 
 const detectPlatform = (link) => {
@@ -460,11 +485,10 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
         <button
           id={`save-${p.id}`}
           onClick={onToggleSave}
-          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center border transition-all ${
-            isSaved
+          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isSaved
               ? 'bg-rose-500 border-rose-500 text-white'
               : 'bg-white/80 border-rose-100 text-rose-300 hover:text-rose-500 backdrop-blur-sm'
-          }`}
+            }`}
         >
           <Heart size={14} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
@@ -476,9 +500,9 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
         >
           <ShoppingCart size={8} />
           {platform.id === 'amazon' ? 'Amazon' :
-           platform.id === 'flipkart' ? 'Flipkart' :
-           platform.id === 'myntra' ? 'Myntra' :
-           platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
+            platform.id === 'flipkart' ? 'Flipkart' :
+              platform.id === 'myntra' ? 'Myntra' :
+                platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
         </div>
       </div>
 
@@ -530,15 +554,30 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
 
 
 /* ── Tab Icons ── */
-const TabIcon = ({ icon: Icon, label, active = false, onClick }) => (
+const TabIcon = ({ icon: Icon, label, active = false, onClick, accent = false }) => (
   <button
     onClick={onClick}
-    className={`flex flex-col items-center gap-1 min-w-[48px] min-h-[44px] justify-center transition-all ${
-      active ? 'text-rose-500' : 'text-[#9CA3AF] hover:text-rose-400'
-    }`}
+    className={`flex flex-col items-center gap-1 min-w-[44px] min-h-[44px] justify-center transition-all ${accent
+        ? 'text-[#FF3F6C]'
+        : active
+          ? 'text-rose-500'
+          : 'text-[#9CA3AF] hover:text-rose-400'
+      }`}
   >
-    <Icon size={20} />
-    <span className="text-[8px] uppercase font-black tracking-widest">{label}</span>
+    {accent ? (
+      <div
+        className="w-8 h-8 rounded-xl flex items-center justify-center mb-[-2px]"
+        style={{ background: 'linear-gradient(135deg, #FF3F6C, #FF7745)', boxShadow: '0 3px 10px rgba(255,63,108,0.35)' }}
+      >
+        <Icon size={16} color="white" />
+      </div>
+    ) : (
+      <Icon size={20} />
+    )}
+    <span
+      className="text-[7px] uppercase font-black tracking-widest"
+      style={accent ? { color: '#FF3F6C' } : {}}
+    >{label}</span>
   </button>
 );
 

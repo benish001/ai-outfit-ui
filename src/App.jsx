@@ -5,15 +5,16 @@ import { useAuth } from './context/AuthContext';
 
 // ── CODE SPLITTING (Performance Fix #1) ──
 // Lazy loading non-critical routes to unblock the main thread.
-const Splash = lazy(() => import('./features/onboarding/Splash'));
-const PhotoUpload = lazy(() => import('./features/onboarding/PhotoUpload'));
+const Splash              = lazy(() => import('./features/onboarding/Splash'));
+const PhotoUpload         = lazy(() => import('./features/onboarding/PhotoUpload'));
 const ColorRecommendations = lazy(() => import('./features/recommendations/ColorRecommendations'));
-const ProductDiscovery = lazy(() => import('./features/recommendations/ProductDiscovery'));
-const ProductDetail = lazy(() => import('./features/products/ProductDetail'));
-const Login = lazy(() => import('./features/auth/Login'));
-const Register = lazy(() => import('./features/auth/Register'));
-const AdminDashboard = lazy(() => import('./features/admin/AdminDashboard'));
-const GenderSelect = lazy(() => import('./features/onboarding/GenderSelect'));
+const ProductDiscovery    = lazy(() => import('./features/recommendations/ProductDiscovery'));
+const ProductDetail       = lazy(() => import('./features/products/ProductDetail'));
+const Login               = lazy(() => import('./features/auth/Login'));
+const Register            = lazy(() => import('./features/auth/Register'));
+const AdminDashboard      = lazy(() => import('./features/admin/AdminDashboard'));
+const GenderSelect        = lazy(() => import('./features/onboarding/GenderSelect'));
+const MyntraDeals         = lazy(() => import('./features/recommendations/MyntraDeals'));
 
 // Minimal loading fallback to avoid layout shift (Performance Fix #3)
 const PageLoader = () => (
@@ -27,14 +28,14 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isPending, startTransition] = useTransition(); // Concurrent Navigation
-  
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [gender, setGender] = useState(() => localStorage.getItem('tonewear_gender') || 'female');
-  
+
   // Navigation states
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin]   = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [showAdmin, setShowAdmin]   = useState(false);
 
   // Optimized Navigation Helper (Performance Fix #2)
   const safeNavigate = (path) => {
@@ -74,13 +75,13 @@ function App() {
       {/* Auth Overlays */}
       <AnimatePresence>
         {showLogin && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[1000]"
           >
             <Suspense fallback={<PageLoader />}>
-              <Login 
-                onBack={() => setShowLogin(false)} 
+              <Login
+                onBack={() => setShowLogin(false)}
                 onRegister={() => { setShowLogin(false); setShowRegister(true); }}
                 onLoginSuccess={() => {
                   setShowLogin(false);
@@ -91,13 +92,13 @@ function App() {
           </motion.div>
         )}
         {showRegister && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[1000]"
           >
             <Suspense fallback={<PageLoader />}>
-              <Register 
-                onBack={() => setShowRegister(false)} 
+              <Register
+                onBack={() => setShowRegister(false)}
                 onLogin={() => { setShowRegister(false); setShowLogin(true); }}
                 onRegisterSuccess={() => {
                   setShowRegister(false);
@@ -115,35 +116,45 @@ function App() {
             key={location.pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.1, ease: "linear" }}
+            transition={{ duration: 0.1, ease: 'linear' }}
             className="w-full min-h-screen"
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={
-                <Splash onNext={() => {
-                  if (!user) setShowLogin(true);
-                  else safeNavigate('/gender');
-                }} />
-              } />
-              <Route path="/gender" element={<GenderSelect onSelect={handleGenderSelect} />} />
-              <Route path="/upload" element={<PhotoUpload onNext={() => safeNavigate('/analysis')} onBack={() => safeNavigate('/gender')} />} />
-              <Route path="/analysis" element={<ColorRecommendations onNext={() => safeNavigate('/discovery')} onBack={() => safeNavigate('/upload')} />} />
-              <Route path="/discovery" element={
-                <ProductDiscovery 
-                  gender={gender}
-                  onProductSelect={goToProduct} 
-                  onBack={() => safeNavigate('/analysis')} 
-                  onAuthClick={() => setShowLogin(true)}
-                  onAdminClick={() => setShowAdmin(true)}
-                />
-              } />
+              <Route
+                path="/"
+                element={
+                  <Splash onNext={() => {
+                    if (!user) setShowLogin(true);
+                    else safeNavigate('/gender');
+                  }} />
+                }
+              />
+              <Route path="/gender"    element={<GenderSelect onSelect={handleGenderSelect} />} />
+              <Route path="/upload"    element={<PhotoUpload onNext={() => safeNavigate('/analysis')} onBack={() => safeNavigate('/gender')} />} />
+              <Route path="/analysis"  element={<ColorRecommendations onNext={() => safeNavigate('/discovery')} onBack={() => safeNavigate('/upload')} />} />
+              <Route
+                path="/discovery"
+                element={
+                  <ProductDiscovery
+                    gender={gender}
+                    onProductSelect={goToProduct}
+                    onBack={() => safeNavigate('/analysis')}
+                    onAuthClick={() => setShowLogin(true)}
+                    onAdminClick={() => setShowAdmin(true)}
+                  />
+                }
+              />
               <Route path="/product/:id" element={<ProductDetail product={selectedProduct} onBack={() => safeNavigate('/discovery')} />} />
+
+              {/* ── Myntra Affiliate Deals (vCommission Campaign 10882) ── */}
+              <Route path="/myntra" element={<MyntraDeals />} />
+
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
       </Suspense>
-      
+
       {/* ── MOBILE TAP HIGHLIGHT FIX ── */}
       <style dangerouslySetInnerHTML={{ __html: `
         * { -webkit-tap-highlight-color: transparent; }
