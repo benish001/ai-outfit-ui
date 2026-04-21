@@ -38,7 +38,12 @@ const PhotoUpload = ({ onNext, onBack }) => {
     formData.append('image', selectedFile);
     try {
       const response = await api.post('/skin-tone/analyze-skin-tone', formData);
-      setAnalysisResult(response.data.data);
+      const result = response.data.data;
+      setAnalysisResult(result);
+      // Persist skin tone for discovery and specialized shop
+      if (result.skin_tone) {
+        localStorage.setItem('tonewear_skin_tone', result.skin_tone);
+      }
       onNext();
     } catch (err) {
       console.error('Analysis error:', err);

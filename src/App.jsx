@@ -15,6 +15,7 @@ const Register            = lazy(() => import('./features/auth/Register'));
 const AdminDashboard      = lazy(() => import('./features/admin/AdminDashboard'));
 const GenderSelect        = lazy(() => import('./features/onboarding/GenderSelect'));
 const MyntraDeals         = lazy(() => import('./features/recommendations/MyntraDeals'));
+const BeautyShop          = lazy(() => import('./features/beauty/BeautyShop'));
 
 // Minimal loading fallback to avoid layout shift (Performance Fix #3)
 const PageLoader = () => (
@@ -130,7 +131,7 @@ function App() {
                 }
               />
               <Route path="/gender"    element={<GenderSelect onSelect={handleGenderSelect} />} />
-              <Route path="/upload"    element={<PhotoUpload onNext={() => safeNavigate('/analysis')} onBack={() => safeNavigate('/gender')} />} />
+              <Route path="/upload"    element={<PhotoUpload onNext={() => safeNavigate('/discovery')} onBack={() => safeNavigate('/gender')} />} />
               <Route path="/analysis"  element={<ColorRecommendations onNext={() => safeNavigate('/discovery')} onBack={() => safeNavigate('/upload')} />} />
               <Route
                 path="/discovery"
@@ -148,6 +149,9 @@ function App() {
 
               {/* ── Myntra Affiliate Deals (vCommission Campaign 10882) ── */}
               <Route path="/myntra" element={<MyntraDeals />} />
+
+              {/* ── Beauty Shop — Swiss Beauty & Dot & Key (vCommission) ── */}
+              <Route path="/beauty" element={<BeautyShop onBack={() => safeNavigate('/discovery')} />} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

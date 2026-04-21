@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, Star, ShoppingCart, ExternalLink,
-  User as UserIcon, Shield, LogOut, Heart, Camera, Loader2, Sparkles, ShoppingBag
+  User as UserIcon, Shield, LogOut, Heart, Camera, Loader2, Sparkles, ShoppingBag, Flower2 as SparkleIcon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
@@ -18,6 +18,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('All');
+  const [activeSkinTone, setActiveSkinTone] = useState(() => localStorage.getItem('tonewear_skin_tone'));
   const [products, setProducts] = useState([]);
   const [dynamicTabs, setDynamicTabs] = useState([]);
   const [savedIds, setSavedIds] = useState(new Set());
@@ -66,13 +67,22 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         res = await api.get('/users/saved');
         setHasMore(false);
       } else {
-        const params = { gender: profile.gender, skip: pageNum * 40, limit: 40 };
-        if (currentTab !== 'All') params.category = currentTab;
-        if (profile.colors?.length > 0) params.colors = profile.colors.join(',');
-        res = await api.get('/outfits/trending', { params });
+        const isBeauty = currentTab === 'All' || currentTab === 'Beauty Product';
+        const endpoint = isBeauty ? '/beauty/products' : '/outfits/trending';
+        
+        const params = { limit: 40 };
+        if (isBeauty) {
+          params.page = pageNum + 1;
+          if (profile.gender) params.gender = profile.gender;
+        } else {
+          params.skip = pageNum * 40;
+          params.gender = profile.gender;
+          if (currentTab !== 'All') params.category = currentTab;
+        }
+
+        res = await api.get(endpoint, { params });
         const rawData = res.data || [];
-        // hasMore = true only if we got a full page of 40
-        setHasMore(rawData.length >= 40);
+        setHasMore(rawData.length >= 20); // Beauty endpoint might return fewer than 40
         if (isInitial) {
           setProducts(rawData);
         } else {
@@ -242,74 +252,43 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
             )}
           </div>
         </nav>
+ 
+    {/* Skin Tone Indicator Badge (Top Right) */}
+    {activeSkinTone && (
+      <div className="absolute top-4 right-16 flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-sm border border-rose-100 z-10 animate-fade-in">
+        <div 
+          className="w-3.5 h-3.5 rounded-full border border-white shadow-inner"
+          style={{ background: { 'Fair': '#FDDBB4', 'Medium': '#D4956A', 'Dark': '#8D5524', 'Deep': '#4A2010' }[activeSkinTone] || '#FDDBB4' }}
+        />
+        <span className="text-[10px] font-black uppercase tracking-widest text-[#1C1917]">{activeSkinTone} Match</span>
+      </div>
+    )}
 
-        {/* Category Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar pb-3.5 pt-0.5 px-5 gap-2 touch-pan-x">
-          {dynamicTabs.map(tab => (
-            <button
-              key={tab}
-              id={`tab-${tab.toLowerCase().replace(' ', '-')}`}
-              onClick={() => {
-                setActiveTab(tab);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`whitespace-nowrap px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border min-h-[38px] ${
-                activeTab === tab
-                  ? 'text-white border-transparent shadow-md scale-105'
-                  : 'bg-white/70 text-[#6B7280] border-rose-100 hover:border-rose-200 hover:text-rose-500'
-              }`}
-              style={activeTab === tab
-                ? { background: 'linear-gradient(135deg, #F43F5E, #FB7185)', boxShadow: '0 4px 16px rgba(244,63,94,0.30)' }
-                : {}
-              }
-            >
-              {tab}
-            </button>
-          ))}
-          <div className="min-w-[20px] shrink-0" />
-        </div>
-
-        {/* ── Myntra Affiliate Banner ── */}
+    {/* Feature Banner — Focused on Swiss Beauty & Dot Key */}
         <div className="px-5 pb-3.5">
-          <button
-            id="discovery-myntra-banner"
-            onClick={() => navigate('/myntra')}
-            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-white transition-all hover:opacity-90 active:scale-[0.98]"
+          <div
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-white transition-all shadow-lg"
             style={{
-              background: 'linear-gradient(135deg, #FF3F6C, #FF7745)',
-              boxShadow: '0 4px 16px rgba(255,63,108,0.30)',
+              background: 'linear-gradient(135deg, #1C1917, #44403C)',
+              boxShadow: '0 8px 24px rgba(28,25,23,0.2)',
             }}
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-xs font-black">M</div>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">💅</div>
               <div className="text-left">
-                <p className="text-[7px] uppercase font-black tracking-[0.25em] opacity-80">Trending Now</p>
-                <p className="text-[10px] font-black leading-tight">Exclusive Myntra Curations</p>
+                <p className="text-[8px] uppercase font-black tracking-[0.2em] opacity-80">Official Partner Store</p>
+                <p className="text-xs font-black luxury-font">Swiss Beauty · Dot & Key</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wider bg-white/20 px-2.5 py-1.5 rounded-full">
-              Shop <ExternalLink size={8} />
+            <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest bg-rose-500 px-3 py-1.5 rounded-xl shadow-sm">
+              Live Feed <Sparkles size={10} />
             </div>
-          </button>
+          </div>
         </div>
       </header>
 
       {/* ── Main Product Grid ── */}
-      <main className="flex-1 px-5 md:px-8 pt-40 pb-32 max-w-7xl mx-auto w-full relative z-10">
-
-
-        <header className="mb-8 md:mb-12">
-          <p className="text-[9px] uppercase font-black tracking-[0.4em] text-rose-400 mb-1.5">
-            Neural Curations
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black luxury-font leading-tight text-[#1C1917]">
-            {activeTab === 'Saved' ? 'Your Saved' : 'Personalised'}&nbsp;
-            <span className="italic text-rose-400">
-              {activeTab === 'Saved' ? 'Vault.' : 'Looks.'}
-            </span>
-          </h2>
-        </header>
-
+      <main className="flex-1 px-5 md:px-8 pt-44 pb-32 max-w-7xl mx-auto w-full relative z-10">
         {/* Skeleton Loader */}
         {loading && page === 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -388,7 +367,7 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
         <div className="flex items-center justify-around py-3 max-w-lg mx-auto px-4">
           <TabIcon icon={GridIcon} label="Explore" active={activeTab === 'All'} onClick={() => setActiveTab('All')} />
           <TabIcon icon={Camera} label="Scan" onClick={() => navigate('/upload')} />
-          <TabIcon icon={ShoppingBag} label="Myntra" onClick={() => navigate('/myntra')} accent />
+          <TabIcon icon={SparkleIcon} label="Beauty" onClick={() => navigate('/beauty')} accent skinTone />
           <TabIcon icon={HeartIcon} label="Saved" active={activeTab === 'Saved'} onClick={() => setActiveTab('Saved')} />
           <TabIcon icon={UserIcon} label="Profile" onClick={user ? handleLogout : onAuthClick} />
         </div>
@@ -446,11 +425,10 @@ const ProductDiscovery = ({ gender: onboardingGender, onProductSelect, onBack, o
 
 /* ── Platform Profiles ── */
 const PLATFORMS = [
-  { id: 'amazon', label: 'A', color: '#FB7185', text: '#fff', match: 'amazon.in' },
-  { id: 'flipkart', label: 'F', color: '#2874F0', text: '#fff', match: 'flipkart.com' },
-  { id: 'myntra', label: 'M', color: '#FF3F6C', text: '#fff', match: 'myntra.com' },
-  { id: 'ajio', label: 'A', color: '#1C1C1C', text: '#fff', match: 'ajio.com' },
-  { id: 'nykaa', label: 'N', color: '#FC2779', text: '#fff', match: 'nykaa.com' },
+  { id: 'swissbeauty', label: 'SB', color: '#E91E8C', text: '#fff', match: 'swissbeauty.in' },
+  { id: 'dotandkey',   label: 'DK', color: '#22C55E', text: '#fff', match: 'dotandkey.com' },
+  { id: 'nykaa',       label: 'N',  color: '#FC2779', text: '#fff', match: 'nykaa.com' },
+  { id: 'partner',     label: 'P',  color: '#1C1917', text: '#fff', match: 'track.vcommission.com' },
 ];
 
 const detectPlatform = (link) => {
@@ -499,10 +477,10 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
           style={{ background: platform.color, color: platform.text }}
         >
           <ShoppingCart size={8} />
-          {platform.id === 'amazon' ? 'Amazon' :
-            platform.id === 'flipkart' ? 'Flipkart' :
-              platform.id === 'myntra' ? 'Myntra' :
-                platform.id === 'ajio' ? 'AJIO' : 'Nykaa'}
+          <ShoppingCart size={8} />
+          {platform.id === 'swissbeauty' ? 'Swiss Beauty' :
+            platform.id === 'dotandkey' ? 'Dot & Key' :
+              platform.id === 'nykaa' ? 'Nykaa' : 'Official Store'}
         </div>
       </div>
 
@@ -554,20 +532,23 @@ const ProductCard = ({ product: p, isSaved, onSelect, onToggleSave }) => {
 
 
 /* ── Tab Icons ── */
-const TabIcon = ({ icon: Icon, label, active = false, onClick, accent = false }) => (
+const TabIcon = ({ icon: Icon, label, active = false, onClick, accent = false, skinTone = false }) => (
   <button
     onClick={onClick}
-    className={`flex flex-col items-center gap-1 min-w-[44px] min-h-[44px] justify-center transition-all ${accent
-        ? 'text-[#FF3F6C]'
+    className={`flex flex-col items-center gap-1 min-w-[44px] min-h-[44px] justify-center transition-all ${
+      accent
+        ? skinTone ? 'text-rose-500' : 'text-[#FF3F6C]'
         : active
           ? 'text-rose-500'
           : 'text-[#9CA3AF] hover:text-rose-400'
-      }`}
+    }`}
   >
     {accent ? (
       <div
         className="w-8 h-8 rounded-xl flex items-center justify-center mb-[-2px]"
-        style={{ background: 'linear-gradient(135deg, #FF3F6C, #FF7745)', boxShadow: '0 3px 10px rgba(255,63,108,0.35)' }}
+        style={skinTone
+          ? { background: 'linear-gradient(135deg, #F43F5E, #EC4899)', boxShadow: '0 3px 10px rgba(244,63,94,0.35)' }
+          : { background: 'linear-gradient(135deg, #FF3F6C, #FF7745)', boxShadow: '0 3px 10px rgba(255,63,108,0.35)' }}
       >
         <Icon size={16} color="white" />
       </div>
@@ -576,7 +557,7 @@ const TabIcon = ({ icon: Icon, label, active = false, onClick, accent = false })
     )}
     <span
       className="text-[7px] uppercase font-black tracking-widest"
-      style={accent ? { color: '#FF3F6C' } : {}}
+      style={accent ? { color: skinTone ? '#F43F5E' : '#FF3F6C' } : {}}
     >{label}</span>
   </button>
 );
