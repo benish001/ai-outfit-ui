@@ -10,8 +10,6 @@ const PhotoUpload         = lazy(() => import('./features/onboarding/PhotoUpload
 const ColorRecommendations = lazy(() => import('./features/recommendations/ColorRecommendations'));
 const ProductDiscovery    = lazy(() => import('./features/recommendations/ProductDiscovery'));
 const ProductDetail       = lazy(() => import('./features/products/ProductDetail'));
-const Login               = lazy(() => import('./features/auth/Login'));
-const Register            = lazy(() => import('./features/auth/Register'));
 const AdminDashboard      = lazy(() => import('./features/admin/AdminDashboard'));
 const GenderSelect        = lazy(() => import('./features/onboarding/GenderSelect'));
 const MyntraDeals         = lazy(() => import('./features/recommendations/MyntraDeals'));
@@ -25,17 +23,14 @@ const PageLoader = () => (
 );
 
 function App() {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isPending, startTransition] = useTransition(); // Concurrent Navigation
+  const [, startTransition] = useTransition(); // Concurrent Navigation
 
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [gender, setGender] = useState(() => localStorage.getItem('tonewear_gender') || 'female');
 
   // Navigation states
-  const [showLogin, setShowLogin]   = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
   const [showAdmin, setShowAdmin]   = useState(false);
 
   // Optimized Navigation Helper (Performance Fix #2)
@@ -56,7 +51,6 @@ function App() {
   };
 
   const handleGenderSelect = (g) => {
-    setGender(g);
     localStorage.setItem('tonewear_gender', g);
     safeNavigate('/upload');
   };
@@ -73,44 +67,6 @@ function App() {
 
   return (
     <div className="min-h-screen w-full bg-[#FFF1F2] selection:bg-rose-100 selection:text-[#1C1917]">
-      {/* Auth Overlays */}
-      <AnimatePresence>
-        {showLogin && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000]"
-          >
-            <Suspense fallback={<PageLoader />}>
-              <Login
-                onBack={() => setShowLogin(false)}
-                onRegister={() => { setShowLogin(false); setShowRegister(true); }}
-                onLoginSuccess={() => {
-                  setShowLogin(false);
-                  if (location.pathname === '/') safeNavigate('/gender');
-                }}
-              />
-            </Suspense>
-          </motion.div>
-        )}
-        {showRegister && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000]"
-          >
-            <Suspense fallback={<PageLoader />}>
-              <Register
-                onBack={() => setShowRegister(false)}
-                onLogin={() => { setShowRegister(false); setShowLogin(true); }}
-                onRegisterSuccess={() => {
-                  setShowRegister(false);
-                  if (location.pathname === '/') safeNavigate('/gender');
-                }}
-              />
-            </Suspense>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Suspense fallback={<PageLoader />}>
         <AnimatePresence initial={false}>
           <motion.div
@@ -124,10 +80,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <Splash onNext={() => {
-                    if (!user) setShowLogin(true);
-                    else safeNavigate('/gender');
-                  }} />
+                  <Splash onNext={() => safeNavigate('/gender')} />
                 }
               />
               <Route path="/gender"    element={<GenderSelect onSelect={handleGenderSelect} />} />
@@ -137,10 +90,8 @@ function App() {
                 path="/discovery"
                 element={
                   <ProductDiscovery
-                    gender={gender}
                     onProductSelect={goToProduct}
                     onBack={() => safeNavigate('/analysis')}
-                    onAuthClick={() => setShowLogin(true)}
                     onAdminClick={() => setShowAdmin(true)}
                   />
                 }

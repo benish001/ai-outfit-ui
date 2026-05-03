@@ -48,7 +48,7 @@ const matchesSearch = (product, query) => {
 /**
  * ProductDiscovery - Dot & Key only catalog with a single global search box.
  */
-const ProductDiscovery = ({ onProductSelect, onBack, onAuthClick, onAdminClick }) => {
+const ProductDiscovery = ({ onProductSelect, onBack, onAdminClick }) => {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -176,7 +176,12 @@ const ProductDiscovery = ({ onProductSelect, onBack, onAuthClick, onAdminClick }
   const handleToggleSave = async (e, product) => {
     e.stopPropagation();
     if (!user) {
-      onAuthClick();
+      setSavedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(product.id)) next.delete(product.id);
+        else next.add(product.id);
+        return next;
+      });
       return;
     }
 
@@ -261,7 +266,7 @@ const ProductDiscovery = ({ onProductSelect, onBack, onAuthClick, onAdminClick }
             >
               <Camera size={17} />
             </button>
-            {user ? (
+            {user && (
               <button
                 id="discovery-logout"
                 onClick={handleLogout}
@@ -269,15 +274,6 @@ const ProductDiscovery = ({ onProductSelect, onBack, onAuthClick, onAdminClick }
                 style={{ background: '#1C1917' }}
               >
                 <LogOut size={15} />
-              </button>
-            ) : (
-              <button
-                id="discovery-signin"
-                onClick={onAuthClick}
-                className="px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-rose-glow transition-all"
-                style={{ background: 'linear-gradient(135deg, #F43F5E, #FB7185)' }}
-              >
-                Sign In
               </button>
             )}
           </div>
@@ -386,7 +382,7 @@ const ProductDiscovery = ({ onProductSelect, onBack, onAuthClick, onAdminClick }
           <TabIcon icon={Camera} label="Scan" onClick={() => navigate('/upload')} />
           <TabIcon icon={SparkleIcon} label="Beauty" onClick={() => navigate('/beauty')} accent skinTone />
           <TabIcon icon={HeartIcon} label="Saved" active={activeTab === 'Saved'} onClick={() => setActiveTab('Saved')} />
-          <TabIcon icon={UserIcon} label="Profile" onClick={user ? handleLogout : onAuthClick} />
+          <TabIcon icon={UserIcon} label="Profile" onClick={user ? handleLogout : () => {}} />
         </div>
       </footer>
 

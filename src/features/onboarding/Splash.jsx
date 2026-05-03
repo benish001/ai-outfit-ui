@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, Heart } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -12,7 +12,6 @@ const Splash = ({ onNext }) => {
 
   // Pre-fetch next routes to eliminate lazy-loading lag
   const prefetchNext = () => {
-    import('../auth/Login');
     import('../onboarding/GenderSelect');
   };
 
@@ -77,7 +76,7 @@ const Splash = ({ onNext }) => {
 
         {/* ── Feature Chips ── */}
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {['AI Skin Analysis', 'Best Price Finder', '5 Platforms'].map((chip) => (
+          {['Daily Dot & Key Offers', 'Global Product Search', 'Direct Affiliate Checkout'].map((chip) => (
             <div
               key={chip}
               className="px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider text-white border border-white/25 backdrop-blur-md"
@@ -112,20 +111,21 @@ const Splash = ({ onNext }) => {
                 <Heart size={15} fill="white" />
               </div>
               <p className="text-white/80 text-xs leading-snug font-medium">
-                Discover beauty products curated <br className="hidden sm:block" />
-                for <strong className="text-white">your unique skin tone.</strong>
+                Discover <strong className="text-white">daily offer products</strong> from Dot & Key <br className="hidden sm:block" />
+                and find products quickly with one search.
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              {['#F5CBA7', '#E59866', '#CA6F1E', '#9A7D0A', '#784212', '#4A235A'].map((hex) => (
+              {['Daily Deals', 'Dot & Key Only', 'Updated Offers'].map((tag) => (
                 <div
-                  key={hex}
-                  className="w-6 h-6 rounded-full border-2 border-white/40 shadow-sm"
-                  style={{ backgroundColor: hex }}
-                />
+                  key={tag}
+                  className="px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider text-white border border-white/30"
+                  style={{ background: 'rgba(255,255,255,0.18)' }}
+                >
+                  {tag}
+                </div>
               ))}
-              <span className="text-white/50 text-[9px] font-bold ml-1 uppercase tracking-widest">All Tones</span>
             </div>
 
             <Button
@@ -145,7 +145,7 @@ const Splash = ({ onNext }) => {
         </motion.div>
 
         <p className="text-[8px] uppercase tracking-[0.35em] font-bold text-white/40 text-center">
-          Luxury Beauty Intelligence
+          Daily Affiliate Beauty Offers
         </p>
       </div>
     </div>
