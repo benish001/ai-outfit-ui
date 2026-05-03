@@ -23,9 +23,9 @@ const Splash = ({ onNext }) => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden">
-      
+
       {/* ── HIGH PERFORMANCE BACKGROUND (Fixed layer) ── */}
-      <div 
+      <div
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
           background: 'linear-gradient(155deg, #FF6B8A 0%, #FF8C9E 20%, #FFAAB8 45%, #FFB8C6 65%, #D4939E 85%, #B07087 100%)',
@@ -53,7 +53,7 @@ const Splash = ({ onNext }) => {
         >
           <svg viewBox="0 0 80 80" fill="none" className="w-12 h-12 md:w-16 md:h-16">
             <circle cx="40" cy="30" r="16" fill="rgba(255,255,255,0.9)" />
-            <path d="M15 64C15 50.745 26.193 40 40 40C53.807 40 65 50.745 65 64" stroke="rgba(255,255,255,0.9)" strokeWidth="4" strokeLinecap="round"/>
+            <path d="M15 64C15 50.745 26.193 40 40 40C53.807 40 65 50.745 65 64" stroke="rgba(255,255,255,0.9)" strokeWidth="4" strokeLinecap="round" />
           </svg>
         </motion.div>
 
