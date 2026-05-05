@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Sparkles, ShoppingBag, CheckCircle, RefreshCcw, Info } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -6,7 +6,7 @@ import SkinToneBadge from '../../components/ui/SkinToneBadge';
 import { useAnalysis } from '../../context/AnalysisContext';
 
 /**
- * ColorRecommendations — Premium skin tone result + colour palette.
+ * ColorRecommendations â€” Premium skin tone result + colour palette.
  * Pink gradient background; SkinToneBadge as the hero element.
  */
 const ColorRecommendations = ({ onNext, onBack }) => {
@@ -79,7 +79,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
       <div className="fixed -top-24 -right-16 w-72 h-72 rounded-full bg-rose-100/50 blur-[80px] pointer-events-none" />
       <div className="fixed bottom-0 -left-10 w-64 h-64 rounded-full bg-pink-100/40 blur-[80px] pointer-events-none" />
 
-      {/* ── Sticky Header ── */}
+      {/* â”€â”€ Sticky Header â”€â”€ */}
       <header
         className="sticky top-0 z-20 flex items-center justify-between px-5 py-3 backdrop-blur-md"
         style={{ background: 'rgba(255,241,242,0.85)', borderBottom: '1px solid rgba(254,205,211,0.3)' }}
@@ -94,7 +94,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
 
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 border border-rose-100 shadow-sm">
           <Sparkles size={13} className="text-rose-400" />
-          <span className="text-[9px] uppercase tracking-widest font-black text-[#1C1917]">Analysis Result</span>
+          <span className="text-[9px] uppercase tracking-widest font-black text-[#1C1917]">Step 2 of 3</span>
         </div>
 
         <button
@@ -106,7 +106,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         </button>
       </header>
 
-      {/* ── Content ── */}
+      {/* â”€â”€ Content â”€â”€ */}
       <div className="flex-1 px-5 pb-28 space-y-8 overflow-x-hidden pt-8">
 
         {/* Page Title */}
@@ -115,8 +115,8 @@ const ColorRecommendations = ({ onNext, onBack }) => {
             {analysisResult.skin_tone} Skin Tone
           </p>
           <h1 className="text-3xl md:text-4xl font-bold luxury-font leading-tight text-[#1C1917]">
-            Your Ideal<br />
-            <span className="italic text-rose-400">Colour Palette.</span>
+            Your Skin Tone<br />
+            <span className="italic text-rose-400">Analysis Result.</span>
           </h1>
         </div>
 
@@ -127,7 +127,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
           confidence={analysisResult.confidence}
         />
 
-        {/* ── Best Match Colors ── */}
+        {/* â”€â”€ Best Match Colors â”€â”€ */}
         <section>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -181,7 +181,7 @@ const ColorRecommendations = ({ onNext, onBack }) => {
         </section>
 
 
-        {/* ── CTA ── */}
+        {/* â”€â”€ CTA â”€â”€ */}
         <div className="space-y-4 pt-4">
           <Button
             id="color-rec-shop"
@@ -191,11 +191,11 @@ const ColorRecommendations = ({ onNext, onBack }) => {
             onClick={onNext}
           >
             <ShoppingBag size={18} />
-            Explore Full Catalogue
+            Continue to Skin Type
           </Button>
 
           <p className="text-center text-[8px] uppercase tracking-widest font-bold text-rose-200">
-            Neural Engine v5 · Live Sync
+            Neural Engine v5 Â· Live Sync
           </p>
           
           <div className="flex justify-center pb-8">
@@ -213,3 +213,4 @@ const ColorRecommendations = ({ onNext, onBack }) => {
 };
 
 export default ColorRecommendations;
+

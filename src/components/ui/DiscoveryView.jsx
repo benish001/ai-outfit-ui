@@ -37,7 +37,7 @@ const DiscoveryView = () => {
       {/* 1. Header/Nav Section */}
       <header className="py-6 flex items-center justify-between sticky top-0 md:relative z-20 backdrop-blur-md -mx-4 px-4 md:mx-0 md:px-0">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-rose-400 tracking-[0.2em] uppercase mb-0.5">ToneWear AI</span>
+          <span className="text-[10px] font-bold text-rose-400 tracking-[0.2em] uppercase mb-0.5">Beauty Daily</span>
           <h1 className="text-xl font-black text-[#1C1917] tracking-tighter luxury-font">STYLE DISCOVERY</h1>
         </div>
         

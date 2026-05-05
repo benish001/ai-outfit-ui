@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, CheckCircle, X, ChevronLeft, Loader2, Upload, ShieldCheck } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -6,7 +6,7 @@ import { useAnalysis } from '../../context/AnalysisContext';
 import api from '../../services/api';
 
 /**
- * PhotoUpload — Pink-gradient background with neumorphic upload circle.
+ * PhotoUpload â€” Pink-gradient background with neumorphic upload circle.
  * Includes skeleton loading state and smooth state transitions.
  */
 const PhotoUpload = ({ onNext, onBack }) => {
@@ -43,6 +43,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
       // Persist skin tone for discovery and specialized shop
       if (result.skin_tone) {
         localStorage.setItem('tonewear_skin_tone', result.skin_tone);
+        localStorage.setItem('beauty_skin_tone', result.skin_tone);
       }
       onNext();
     } catch (err) {
@@ -53,7 +54,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
     }
   };
 
-  /* ── Analyzing State ── */
+  /* â”€â”€ Analyzing State â”€â”€ */
   if (isAnalyzing) {
     return (
       <div
@@ -69,7 +70,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold luxury-font text-[#1C1917]">Analysing Skin…</h2>
+            <h2 className="text-3xl font-bold luxury-font text-[#1C1917]">Analysing Skinâ€¦</h2>
             <p className="text-[10px] uppercase font-black tracking-[0.3em] text-rose-300">
               Neural Engine Processing
             </p>
@@ -88,7 +89,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
     );
   }
 
-  /* ── Upload State ── */
+  /* â”€â”€ Upload State â”€â”€ */
   return (
     <div
       className="min-h-[100dvh] w-full flex flex-col justify-between p-6 max-w-lg mx-auto overflow-x-hidden"
@@ -98,7 +99,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
       <div className="fixed -top-20 -right-20 w-60 h-60 rounded-full bg-rose-100/60 blur-[70px] pointer-events-none" />
       <div className="fixed bottom-0 -left-10 w-56 h-56 rounded-full bg-pink-100/50 blur-[70px] pointer-events-none" />
 
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div className="relative z-10 pt-4 space-y-6">
         <div className="flex items-center justify-between">
           <button
@@ -112,7 +113,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
           {/* Progress dots */}
           <div className="flex gap-2">
             <div className="w-8 h-1.5 rounded-full bg-rose-400" />
-            <div className="w-8 h-1.5 rounded-full bg-rose-400" />
+            <div className="w-8 h-1.5 rounded-full bg-rose-100" />
             <div className="w-8 h-1.5 rounded-full bg-rose-100" />
           </div>
 
@@ -120,7 +121,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
         </div>
 
         <div className="space-y-1">
-          <p className="text-[9px] uppercase tracking-[0.4em] font-black text-rose-300">Phase 01 of 03</p>
+          <p className="text-[9px] uppercase tracking-[0.4em] font-black text-rose-300">Step 1 of 3</p>
           <h1 className="text-4xl md:text-5xl font-bold luxury-font text-[#1C1917] leading-tight">
             Upload Your<br />
             <span className="italic text-rose-400">Photo.</span>
@@ -128,7 +129,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
         </div>
       </div>
 
-      {/* ── Upload Circle ── */}
+      {/* â”€â”€ Upload Circle â”€â”€ */}
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 py-10">
         <AnimatePresence mode="wait">
           {!preview ? (
@@ -206,7 +207,7 @@ const PhotoUpload = ({ onNext, onBack }) => {
         )}
       </div>
 
-      {/* ── Footer CTA ── */}
+      {/* â”€â”€ Footer CTA â”€â”€ */}
       <div className="relative z-10 pb-4 space-y-3">
         <Button
           id="photo-upload-analyze"
@@ -216,8 +217,8 @@ const PhotoUpload = ({ onNext, onBack }) => {
           onClick={handleAnalyze}
           disabled={!preview || isAnalyzing}
         >
-          {isAnalyzing ? 'Processing…' : 'Analyse Skin Tone'}
-          <span className="ml-1 opacity-60">→</span>
+          {isAnalyzing ? 'Processingâ€¦' : 'Analyse Skin Tone'}
+          <span className="ml-1 opacity-60">â†’</span>
         </Button>
 
         <div className="flex items-center justify-center gap-2 text-[8px] uppercase tracking-widest font-bold text-[#C4A0A8]">
@@ -230,3 +231,4 @@ const PhotoUpload = ({ onNext, onBack }) => {
 };
 
 export default PhotoUpload;
+

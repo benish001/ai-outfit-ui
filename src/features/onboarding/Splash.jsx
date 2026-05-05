@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, Heart } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
 /**
- * Splash — Hero landing screen.
- * Gradient: Warm rose-pink → blush → soft coral.
+ * Splash â€” Hero landing screen.
+ * Gradient: Warm rose-pink â†’ blush â†’ soft coral.
  */
 const Splash = ({ onNext }) => {
   const [isNavigating, setIsNavigating] = useState(false);
 
   // Pre-fetch next routes to eliminate lazy-loading lag
   const prefetchNext = () => {
-    import('../onboarding/GenderSelect');
+    import('../onboarding/PhotoUpload');
   };
 
   const handleStart = () => {
@@ -23,7 +23,7 @@ const Splash = ({ onNext }) => {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden">
 
-      {/* ── HIGH PERFORMANCE BACKGROUND (Fixed layer) ── */}
+      {/* â”€â”€ HIGH PERFORMANCE BACKGROUND (Fixed layer) â”€â”€ */}
       <div
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
@@ -32,13 +32,13 @@ const Splash = ({ onNext }) => {
         }}
       />
 
-      {/* ── Background depth blobs ── */}
+      {/* â”€â”€ Background depth blobs â”€â”€ */}
       <div className="absolute top-[-15%] right-[-10%] w-[400px] h-[400px] rounded-full bg-white/10 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-12%] left-[-8%] w-[500px] h-[500px] rounded-full bg-[#8B1A4A]/15 blur-[130px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center space-y-8 py-10">
 
-        {/* ── Brand Logo ── */}
+        {/* â”€â”€ Brand Logo â”€â”€ */}
         <motion.div
           animate={{ scale: [0.96, 1.02, 0.96] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -56,25 +56,25 @@ const Splash = ({ onNext }) => {
           </svg>
         </motion.div>
 
-        {/* ── Wordmark ── */}
+        {/* â”€â”€ Wordmark â”€â”€ */}
         <div className="text-center space-y-2">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-none luxury-font"
           >
-            Tone<span className="italic font-light opacity-75">Wear</span>
+            Dot & Key
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.7 }}
             className="text-[9px] md:text-[10px] uppercase tracking-[0.45em] font-bold text-white font-poppins"
           >
-            Your Skin · Your Style
+            Daily Offers · Beauty Only
           </motion.p>
         </div>
 
-        {/* ── Feature Chips ── */}
+        {/* â”€â”€ Feature Chips â”€â”€ */}
         <div className="flex flex-wrap items-center justify-center gap-2">
           {['Daily Dot & Key Offers', 'Global Product Search', 'Direct Affiliate Checkout'].map((chip) => (
             <div
@@ -87,7 +87,7 @@ const Splash = ({ onNext }) => {
           ))}
         </div>
 
-        {/* ── CTA Card ── */}
+        {/* â”€â”€ CTA Card â”€â”€ */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,3 +153,4 @@ const Splash = ({ onNext }) => {
 };
 
 export default Splash;
+
